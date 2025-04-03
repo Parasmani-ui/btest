@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Access the game state here
+// Access game state
 declare global {
   var gameState: {
     started: boolean;

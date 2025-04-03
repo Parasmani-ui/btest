@@ -31,7 +31,7 @@ if (!global.gameState) {
 }
 
 function cleanText(text: string): string {
-  // Remove unnecessary line breaks and special characters
+  // remove unnecessary new line and charactes
   return text
     .replace(/\r\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
@@ -75,7 +75,7 @@ function extractSuspectsAndEvidence(caseDetails: string) {
   for (let line of lines) {
     line = line.trim();
     
-    // Check the section headers
+    // check section headers
     if (line.toUpperCase().includes('SUSPECTS:') || line.toUpperCase().includes('SUSPECT LIST:')) {
       inSuspectSection = true;
       inEvidenceSection = false;
@@ -95,7 +95,7 @@ function extractSuspectsAndEvidence(caseDetails: string) {
       continue;
     }
     
-    // suspect extraction
+    // extract suspects
     if (inSuspectSection && line && !line.includes('[Button:') && !line.includes('WHAT WOULD YOU LIKE TO DO')) {
       const suspectMatch = line.match(/(?:\d+\.\s*)?([^-\n]+)(?:\s*-.*)?/);
       if (suspectMatch && suspectMatch[1]) {
@@ -106,7 +106,7 @@ function extractSuspectsAndEvidence(caseDetails: string) {
       }
     }
     
-    // evidence extraction
+    // evidence extract
     if (inEvidenceSection && line && !line.includes('[Button:') && !line.includes('WHAT WOULD YOU LIKE TO DO')) {
       const evidenceMatch = line.match(/(?:[-•*]\s*|(?:\d+\.\s*))?([^:]+)(?:\s*:.*)?/);
       if (evidenceMatch && evidenceMatch[1]) {

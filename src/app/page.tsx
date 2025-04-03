@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -8,6 +8,13 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
   const router = useRouter();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [mounted, setMounted] = useState(false);
+  const [showCaseOptions, setShowCaseOptions] = useState(false);
+
+  // Component mounted after hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -16,6 +23,11 @@ export default function Home() {
   const startGame = (mode: string) => {
     router.push(`/game?mode=${mode}`);
   };
+
+  // Don't render until client-side
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <main className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
@@ -30,30 +42,50 @@ export default function Home() {
             </div>
             
             <div className="p-4 flex-grow">
-              <div className="mb-4">
+              <div className="mb-4 relative">
                 <button 
-                  onClick={() => {}} 
+                  onClick={() => setShowCaseOptions(!showCaseOptions)}
                   className={`w-full p-2 flex justify-between ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'} rounded`}
                 >
                   <span>New Case</span>
                   <span className="text-gray-500 text-sm">0/3</span>
                 </button>
-                <div className={`mt-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} rounded overflow-hidden`}>
-                  <div onClick={() => startGame('quick')} className="p-2 cursor-pointer hover:bg-gray-600">Quick Case</div>
-                  <div onClick={() => startGame('standard')} className="p-2 cursor-pointer hover:bg-gray-600">Standard Case</div>
-                  <div onClick={() => startGame('complex')} className="p-2 cursor-pointer hover:bg-gray-600">Complex Case</div>
+                <div 
+                  id="case-options"
+                  className={`mt-2 transition-all duration-200 ${showCaseOptions ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'} ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} rounded overflow-hidden shadow-lg z-10`}
+                >
+                  <button 
+                    onClick={() => startGame('quick')} 
+                    className="w-full p-2 text-left hover:bg-gray-600 transition-colors"
+                  >
+                    Quick Case
+                  </button>
+                  <button 
+                    onClick={() => startGame('standard')} 
+                    className="w-full p-2 text-left hover:bg-gray-600 transition-colors"
+                  >
+                    Standard Case
+                  </button>
+                  <button 
+                    onClick={() => startGame('complex')} 
+                    className="w-full p-2 text-left hover:bg-gray-600 transition-colors"
+                  >
+                    Complex Case
+                  </button>
                 </div>
               </div>
             </div>
             
             <div className={`p-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-              <div className="flex justify-between items-center">
-                <Link href="/admin" className={`px-2 py-1 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-400'} rounded`}>
+              <div className="flex flex-col gap-4">
+                <Link href="/admin" className={`w-full p-2 text-center ${theme === 'dark' ? 'bg-gray-600 text-white' : 'bg-gray-400 text-gray-800'} rounded`}>
                   Admin
                 </Link>
-                <button onClick={toggleTheme} className="text-xl">
-                  {theme === 'dark' ? '🌙' : '☀️'}
-                </button>
+                <div className="flex justify-end">
+                  <button onClick={toggleTheme} className="text-xl">
+                    {theme === 'dark' ? '🌙' : '☀️'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

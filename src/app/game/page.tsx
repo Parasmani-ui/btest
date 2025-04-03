@@ -17,6 +17,12 @@ interface GameState {
   currentResponse: string;
   hints: string[];
   currentHint: number;
+  currentSuspect: string | null;
+  arrestResult?: {
+    correct: boolean;
+    murderer: string;
+    suspectArrested: string;
+  };
 }
 
 export default function Game() {
@@ -41,21 +47,23 @@ export default function Game() {
       "The murder weapon may provide insights about the killer.",
       "Consider motive, opportunity, and means for each suspect."
     ],
-    currentHint: 0
+    currentHint: 0,
+    currentSuspect: null
   });
   const [loading, setLoading] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
 
-  // गेम शुरू करें जब कंपोनेंट माउंट हो
+  // Start game when component is mounted
   useEffect(() => {
     startGame(mode);
   }, [mode]);
 
-  // थीम टॉगल करें
+  // toggle theme
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  // नई गेम शुरू करें
+  // start new game
   const startGame = async (gameMode: string) => {
     setLoading(true);
     try {
@@ -91,7 +99,7 @@ export default function Game() {
     }
   };
 
-  // suspect interrogation
+  // interrogate suspect
   const interrogateSuspect = async (suspect: string) => {
     setLoading(true);
     try {
@@ -111,7 +119,8 @@ export default function Game() {
         ...gameState,
         currentAction: 'interrogate',
         currentResponse: data.response,
-        interrogatedSuspects: [...gameState.interrogatedSuspects, suspect]
+        interrogatedSuspects: [...gameState.interrogatedSuspects, suspect],
+        currentSuspect: suspect
       });
     } catch (error) {
       console.error('Error interrogating suspect:', error);
@@ -121,7 +130,7 @@ export default function Game() {
     }
   };
 
-  // evidence analyse
+  // analyse evidence
   const analyzeEvidence = async (evidence: string) => {
     setLoading(true);
     try {
@@ -151,7 +160,7 @@ export default function Game() {
     }
   };
 
-  // arrest
+  // make arrest
   const makeArrest = async (suspect: string) => {
     if (!confirm(`Are you sure you want to arrest ${suspect}? This will end the case.`)) {
       return;
@@ -170,16 +179,20 @@ export default function Game() {
       }
 
       const data = await response.json();
+      console.log("Arrest data:", data); // Debug log
       
-      const result = data.correct
-        ? `You were RIGHT! ${suspect} was indeed the murderer.`
-        : `You were WRONG! ${suspect} was innocent. The real murderer was ${data.murderer}.`;
-        
       setGameState({
         ...gameState,
-        currentAction: 'arrest',
-        currentResponse: result,
-        started: false
+        currentAction: 'arrest-result', // Changed from 'arrest' to 'arrest-result'
+        currentResponse: data.correct
+          ? `You were RIGHT! ${suspect} was indeed the murderer.`
+          : `You were WRONG! ${suspect} was innocent. The real murderer was ${data.murderer}.`,
+        started: false,
+        arrestResult: {
+          correct: data.correct,
+          murderer: data.murderer,
+          suspectArrested: suspect
+        }
       });
     } catch (error) {
       console.error('Error making arrest:', error);
@@ -189,9 +202,9 @@ export default function Game() {
     }
   };
 
-  // hints navigate
+  // navigate b/w hints
   const nextHint = async () => {
-    // local list
+    // पहले लोकल हिंट्स की लिस्ट में से
     if (gameState.currentHint < gameState.hints.length - 1) {
       setGameState({
         ...gameState,
@@ -200,7 +213,7 @@ export default function Game() {
       return;
     }
     
-    // if local hints end
+    // new hints from server
     try {
       const response = await fetch('/api/hint');
       
@@ -222,12 +235,12 @@ export default function Game() {
     }
   };
 
-  // show hints
+  // show hint
   const getCurrentHint = () => {
     return gameState.hints[gameState.currentHint];
   };
 
-  // interrogate analysis end
+  // end interrogation or analyssis
   const endAction = () => {
     setGameState({
       ...gameState,
@@ -252,7 +265,7 @@ export default function Game() {
     });
   };
 
-  // arrest options show
+  // arrest option show
   const showArrestOptions = () => {
     setGameState({
       ...gameState,
@@ -260,7 +273,7 @@ export default function Game() {
     });
   };
 
-  // list of action panel
+  // action panel content
   const renderActionPanel = () => {
     if (!gameState.currentAction) return null;
     
@@ -335,22 +348,38 @@ export default function Game() {
           <div className="p-4 rounded-lg bg-gray-800">
             <h3 className="text-xl font-bold mb-4">
               {gameState.currentAction === 'interrogate'
-                ? 'Interrogation'
+                ? `Interrogation: ${gameState.currentSuspect}`
                 : gameState.currentAction === 'analyze'
                 ? 'Evidence Analysis'
                 : 'Case Resolution'}
             </h3>
             <div className="p-3 bg-gray-700 rounded-lg mb-4 whitespace-pre-wrap">
-              {gameState.currentResponse}
+              {gameState.currentResponse.split('\n\n').map((section, index) => {
+                if (section.startsWith('INVESTIGATION SUGGESTIONS:')) {
+                  return (
+                    <div key={index} className="mb-4">
+                      <h4 className="text-lg font-semibold text-blue-400 mb-2">Investigation Suggestions:</h4>
+                      <div className="pl-4">{section.replace('INVESTIGATION SUGGESTIONS:', '').trim()}</div>
+                    </div>
+                  );
+                }
+                if (section.startsWith('SUSPECT STATEMENT:')) {
+                  return (
+                    <div key={index}>
+                      <h4 className="text-lg font-semibold text-green-400 mb-2">Suspect Statement:</h4>
+                      <div className="pl-4">{section.replace('SUSPECT STATEMENT:', '').trim()}</div>
+                    </div>
+                  );
+                }
+                return <div key={index}>{section}</div>;
+              })}
             </div>
-            {gameState.currentAction !== 'arrest' && (
-              <button
-                onClick={endAction}
-                className="p-2 bg-blue-700 hover:bg-blue-600 rounded"
-              >
-                {gameState.currentAction === 'interrogate' ? 'End Interrogation' : 'Back'}
-              </button>
-            )}
+            <button
+              onClick={endAction}
+              className="p-2 bg-blue-700 hover:bg-blue-600 rounded"
+            >
+              {gameState.currentAction === 'interrogate' ? 'End Interrogation' : 'Back'}
+            </button>
           </div>
         );
         
@@ -363,12 +392,20 @@ export default function Game() {
   return (
     <main className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="flex">
-        {/* साइडबार */}
+        {/* sidebar */}
         <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
           <div className="flex flex-col h-full">
             <div className="p-4 flex justify-center">
               <Link href="/">
-                <Image src="/img.png" alt="DetectAive Logo" width={80} height={80} className="cursor-pointer" />
+                <Image 
+                  src="/img.png" 
+                  alt="DetectAive Logo" 
+                  width={80} 
+                  height={80} 
+                  className="cursor-pointer"
+                  priority
+                  unoptimized
+                />
               </Link>
             </div>
             
@@ -386,20 +423,38 @@ export default function Game() {
                 <div className="mt-8">
                   <h3 className="text-amber-500 font-bold mb-2">Case Info</h3>
                   <div className="mb-2">{(gameState.mode || 'Quick').charAt(0).toUpperCase() + (gameState.mode || 'Quick').slice(1)} Case</div>
-                  {/* <div className="mb-2">{gameState.mode?.charAt(0).toUpperCase() + gameState.mode?.slice(1)} Case</div> */}
                   <div className="text-sm text-gray-400">
                     <div className="mb-1">Suspects: {gameState.interrogatedSuspects.length}/{gameState.suspects.length}</div>
                     <div>Evidence: {gameState.analyzedEvidence.length}/{gameState.evidence.length}</div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <button 
+                      onClick={() => setShowGuide(!showGuide)} 
+                      className={`w-full p-2 ${theme === 'dark' ? 'bg-amber-500 hover:bg-amber-700' : 'bg-amber-600 hover:bg-amber-500'} text-white rounded flex justify-between items-center`}
+                    >
+                      <span>Guide</span>
+                      <span>{showGuide ? '▲' : '▼'}</span>
+                    </button>
+                    
+                    {showGuide && (
+                      <div className={`mt-2 p-3 ${theme === 'dark' ? 'bg-slate-900' : 'bg-amber-100'} rounded`}>
+                        <div className="mb-2">{getCurrentHint()}</div>
+                        <button
+                          onClick={nextHint}
+                          className={`w-full p-2 text-sm ${theme === 'dark' ? 'bg-slate-800 hover:bg-amber-700' : 'bg-amber-500 hover:bg-amber-400'} text-white rounded`}
+                        >
+                          Next Hint
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
             </div>
             
             <div className={`p-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-              <div className="flex justify-between items-center">
-                <Link href="/admin" className={`px-2 py-1 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-400'} rounded`}>
-                  Admin
-                </Link>
+              <div className="flex justify-end">
                 <button onClick={toggleTheme} className="text-xl">
                   {theme === 'dark' ? '🌙' : '☀️'}
                 </button>
@@ -408,16 +463,51 @@ export default function Game() {
           </div>
         </div>
         
-        {/* main containt*/}
+        {/* main content */}
         <div className="ml-48 flex-grow p-8">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-2xl">Loading...</div>
             </div>
-          ) : (
+          ) : gameState.currentAction === 'arrest-result' ? (
+            <div className="max-w-4xl mx-auto">
+              <div className="p-4 rounded-lg bg-gray-800">
+                <h3 className="text-xl font-bold mb-4">Case Resolution</h3>
+                <div className="p-6 bg-gray-700 rounded-lg mb-6">
+                  {gameState.arrestResult?.correct ? (
+                    <div className="text-center">
+                      <div className="text-5xl mb-4">🎉</div>
+                      <div className="text-2xl font-bold text-green-400 mb-4">Congratulations!</div>
+                      <div className="mb-6">
+                        You successfully solved the case. <span className="font-bold">{gameState.arrestResult.suspectArrested}</span> was indeed the murderer.
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <div className="text-5xl mb-4">😔</div>
+                      <div className="text-2xl font-bold text-red-400 mb-4">Incorrect Arrest</div>
+                      <div className="mb-6">
+                        You arrested <span className="font-bold">{gameState.arrestResult?.suspectArrested}</span>, but they were innocent.
+                        <div className="mt-3">The real murderer was <span className="font-bold text-red-400">{gameState.arrestResult?.murderer}</span>.</div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-center gap-4 mt-6">
+                    <button
+                      onClick={() => router.push('/')}
+                      className="px-6 py-3 bg-blue-700 hover:bg-blue-600 rounded-lg"
+                    >
+                      Start New Case
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : gameState.started ? (
             <div className="max-w-4xl mx-auto">
               <h2 className="text-2xl font-bold mb-6">
-                {gameState.mode?.charAt(0).toUpperCase() + gameState.mode?.slice(1)} Case
+                {(gameState.mode || 'Quick').charAt(0).toUpperCase() + (gameState.mode || 'Quick').slice(1)} Case
               </h2>
               
               <div className="mb-8 p-6 rounded-lg bg-gray-800 whitespace-pre-wrap">
@@ -445,20 +535,18 @@ export default function Game() {
                 </button>
               </div>
               
-              <div className="mb-8 p-4 rounded-lg bg-amber-900">
-                <h3 className="text-xl font-bold mb-2">Detective's Hint:</h3>
-                <div className="mb-2 p-3 bg-amber-950 rounded">
-                  {getCurrentHint()}
-                </div>
-                <button
-                  onClick={nextHint}
-                  className="p-2 bg-amber-800 hover:bg-amber-700 rounded"
-                >
-                  Next Hint
-                </button>
-              </div>
-              
               {renderActionPanel()}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-[60vh]">
+              <h2 className="text-2xl font-bold mb-4">Welcome to DetectAive</h2>
+              <p className="text-lg mb-8">Click "New Case" to start investigating!</p>
+              <button 
+                onClick={() => router.push('/')}
+                className="p-4 rounded-lg bg-blue-700 hover:bg-blue-600 text-xl"
+              >
+                Start New Case
+              </button>
             </div>
           )}
         </div>
@@ -467,6 +555,14 @@ export default function Game() {
       <footer className={`fixed bottom-0 w-full p-2 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
         <div className="flex justify-between items-center">
           <span>@Parasmani Skill Pvt</span>
+          <div className="flex items-center gap-4">
+            <Link href="/admin" className={`px-3 py-1 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'} rounded`}>
+              Admin
+            </Link>
+            <button onClick={toggleTheme} className="text-xl">
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </button>
+          </div>
         </div>
       </footer>
     </main>

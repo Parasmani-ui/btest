@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDetectiveHint } from '@/utils/helpers';
 
-// Access the game state here
+// access game state
 declare global {
   var gameState: {
     started: boolean;
