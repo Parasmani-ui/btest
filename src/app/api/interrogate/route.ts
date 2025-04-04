@@ -4,7 +4,7 @@ import { interrogateSuspect } from '@/utils/helpers';
 // Reference to the game state (this should be shared between all API routes) 
 // In a real production app we would store this in a database or session store
 declare global {
-  var gameState: {
+  let gameState: {
     started: boolean;
     mode: string | null;
     caseDetails: string | null;

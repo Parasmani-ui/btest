@@ -70,7 +70,6 @@ function extractSuspectsAndEvidence(caseDetails: string) {
   const lines = caseDetails.split('\n');
   let inSuspectSection = false;
   let inEvidenceSection = false;
-  let inInitialReport = false;
   
   for (let line of lines) {
     line = line.trim();
@@ -79,19 +78,11 @@ function extractSuspectsAndEvidence(caseDetails: string) {
     if (line.toUpperCase().includes('SUSPECTS:') || line.toUpperCase().includes('SUSPECT LIST:')) {
       inSuspectSection = true;
       inEvidenceSection = false;
-      inInitialReport = false;
       continue;
     }
     if (line.toUpperCase().includes('EVIDENCE:') || line.toUpperCase().includes('EVIDENCE LIST:')) {
       inSuspectSection = false;
       inEvidenceSection = true;
-      inInitialReport = false;
-      continue;
-    }
-    if (line.toUpperCase().includes('INITIAL REPORT:')) {
-      inSuspectSection = false;
-      inEvidenceSection = false;
-      inInitialReport = true;
       continue;
     }
     

@@ -540,7 +540,7 @@ export default function Game() {
           ) : (
             <div className="flex flex-col items-center justify-center h-[60vh]">
               <h2 className="text-2xl font-bold mb-4">Welcome to DetectAive</h2>
-              <p className="text-lg mb-8">Click "New Case" to start investigating!</p>
+              <p className="text-lg mb-8">Click &ldquo;New Case&rdquo; to start investigating!</p>
               <button 
                 onClick={() => router.push('/')}
                 className="p-4 rounded-lg bg-blue-700 hover:bg-blue-600 text-xl"
