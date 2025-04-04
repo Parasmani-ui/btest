@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // access game state
 declare global {
-  var gameState: {
+  let gameState: {
     started: boolean;
     mode: string | null;
     caseDetails: string | null;
@@ -13,7 +13,7 @@ declare global {
   };
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     return NextResponse.json({
       started: global.gameState.started,

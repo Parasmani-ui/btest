@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -53,18 +53,8 @@ export default function Game() {
   const [loading, setLoading] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
 
-  // Start game when component is mounted
-  useEffect(() => {
-    startGame(mode);
-  }, [mode]);
-
-  // toggle theme
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
-
   // start new game
-  const startGame = async (gameMode: string) => {
+  const startGame = useCallback(async (gameMode: string) => {
     setLoading(true);
     try {
       const response = await fetch('/api/start-game', {
@@ -79,8 +69,8 @@ export default function Game() {
 
       const data = await response.json();
       
-      setGameState({
-        ...gameState,
+      setGameState(prevState => ({
+        ...prevState,
         started: true,
         mode: gameMode,
         caseDetails: data.caseDetails,
@@ -90,13 +80,23 @@ export default function Game() {
         analyzedEvidence: [],
         currentAction: null,
         currentResponse: ''
-      });
+      }));
     } catch (error) {
       console.error('Error starting game:', error);
       alert('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // Start game when component is mounted
+  useEffect(() => {
+    startGame(mode);
+  }, [mode, startGame]);
+
+  // toggle theme
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   // interrogate suspect

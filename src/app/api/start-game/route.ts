@@ -6,7 +6,7 @@ import { generateRandomSuspect } from '@/utils/helpers';
 
 // Game state
 declare global {
-  var gameState: {
+  let gameState: {
     started: boolean;
     mode: string | null;
     caseDetails: string | null;

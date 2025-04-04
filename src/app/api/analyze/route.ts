@@ -4,7 +4,7 @@ import { Config } from '@/config/config';
 
 // Access game state
 declare global {
-  var gameState: {
+  let gameState: {
     started: boolean;
     mode: string | null;
     caseDetails: string | null;

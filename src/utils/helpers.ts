@@ -74,7 +74,7 @@ export async function analyzeEvidence(evidenceItem: string, caseDetails: string,
   **CASE DETAILS:**
   ${caseDetails}
 
-  Provide a analysis of ONLY this specific evidence item. Focus on:
+  Provide a very short analysis of ONLY this specific evidence item. Focus on:
   1. Physical characteristics and condition
   2. Potential significance to the case
   3. How it might connect to the crime
