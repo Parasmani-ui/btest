@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeEvidence } from '@/utils/helpers';
 import { Config } from '@/config/config';
+import { GameState } from '@/types/gameState';
 
 // Access game state
-declare global {
-  let gameState: {
-    started: boolean;
-    mode: string | null;
-    caseDetails: string | null;
-    suspects: string[];
-    evidence: string[];
-    murderer: string | null;
-    actions: string[];
-  };
-}
 
 export async function POST(req: NextRequest) {
   try {

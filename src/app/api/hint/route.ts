@@ -1,20 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getDetectiveHint } from '@/utils/helpers';
+import { GameState } from '@/types/gameState';
 
 // access game state
-declare global {
-  var gameState: {
-    started: boolean;
-    mode: string | null;
-    caseDetails: string | null;
-    suspects: string[];
-    evidence: string[];
-    murderer: string | null;
-    actions: string[];
-  };
-}
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     if (!global.gameState.started) {
       return NextResponse.json({ error: 'Game not started' }, { status: 400 });

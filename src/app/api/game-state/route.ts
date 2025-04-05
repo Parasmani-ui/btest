@@ -1,17 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { GameState } from '@/types/gameState';
 
 // access game state
-declare global {
-  let gameState: {
-    started: boolean;
-    mode: string | null;
-    caseDetails: string | null;
-    suspects: string[];
-    evidence: string[];
-    murderer: string | null;
-    actions: string[];
-  };
-}
 
 export async function GET() {
   try {

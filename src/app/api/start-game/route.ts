@@ -2,20 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ChatOpenAI } from '@langchain/openai';
 import { Config } from '@/config/config';
 import { QUICK_MODE_PROMPT, STANDARD_MODE_PROMPT, COMPLEX_MODE_PROMPT } from '@/utils/prompts';
-import { generateRandomSuspect } from '@/utils/helpers';
-
-// Game state
-declare global {
-  let gameState: {
-    started: boolean;
-    mode: string | null;
-    caseDetails: string | null;
-    suspects: string[];
-    evidence: string[];
-    murderer: string | null;
-    actions: string[];
-  };
-}
+import { GameState } from '@/types/gameState';
 
 // Initialize global game state if not already done
 if (!global.gameState) {
