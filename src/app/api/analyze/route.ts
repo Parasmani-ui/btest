@@ -24,14 +24,14 @@ export async function POST(req: NextRequest) {
       // Use actual OpenAI API
       response = await analyzeEvidence(
         evidence,
-        global.gameState?.caseDetails || '',
-        global.gameState?.murderer || ''
+        (global as any).gameState?.caseDetails || '',
+        (global as any).gameState?.murderer || ''
       );
     }
     
     // Track action
-    if (global.gameState) {
-      global.gameState.actions.push(`Analyzed evidence: ${evidence}`);
+    if ((global as any).gameState) {
+      (global as any).gameState.actions.push(`Analyzed evidence: ${evidence}`);
     }
     
     return NextResponse.json({

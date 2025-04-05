@@ -5,8 +5,8 @@ import { QUICK_MODE_PROMPT, STANDARD_MODE_PROMPT, COMPLEX_MODE_PROMPT } from '@/
 import { GameState } from '@/types/gameState';
 
 // Initialize global game state if not already done
-if (!global.gameState) {
-  global.gameState = {
+if (!(global as any).gameState) {
+  (global as any).gameState = {
     started: false,
     mode: null,
     caseDetails: null,
@@ -113,37 +113,37 @@ export async function POST(req: NextRequest) {
     const mode = data.mode || 'quick';
     
     // Reset game state
-    global.gameState.started = true;
-    global.gameState.mode = mode;
-    global.gameState.actions = [];
+    (global as any).gameState.started = true;
+    (global as any).gameState.mode = mode;
+    (global as any).gameState.actions = [];
     
     // Generate case
-    global.gameState.caseDetails = await generateUniqueCase(mode);
+    (global as any).gameState.caseDetails = await generateUniqueCase(mode);
     
     // Extract suspects and evidence
-    const { suspects, evidence } = extractSuspectsAndEvidence(global.gameState.caseDetails);
+    const { suspects, evidence } = extractSuspectsAndEvidence((global as any).gameState.caseDetails);
     
     // Validate extracted data
     if (suspects.length === 0 || evidence.length === 0) {
-      console.error('Failed to extract suspects or evidence from case:', global.gameState.caseDetails);
+      console.error('Failed to extract suspects or evidence from case:', (global as any).gameState.caseDetails);
       return NextResponse.json({ error: 'Invalid case generated' }, { status: 500 });
     }
     
-    global.gameState.suspects = suspects;
-    global.gameState.evidence = evidence;
+    (global as any).gameState.suspects = suspects;
+    (global as any).gameState.evidence = evidence;
     
     // Secretly select a murderer
     if (suspects.length > 0) {
-      global.gameState.murderer = suspects[Math.floor(Math.random() * suspects.length)];
+      (global as any).gameState.murderer = suspects[Math.floor(Math.random() * suspects.length)];
     } else {
-      global.gameState.murderer = "Unknown";  // Fallback
+      (global as any).gameState.murderer = "Unknown";  // Fallback
     }
     
     return NextResponse.json({
       success: true,
-      caseDetails: global.gameState.caseDetails,
-      suspects: global.gameState.suspects,
-      evidence: global.gameState.evidence
+      caseDetails: (global as any).gameState.caseDetails,
+      suspects: (global as any).gameState.suspects,
+      evidence: (global as any).gameState.evidence
     });
   } catch (error) {
     console.error('Error starting game:', error);

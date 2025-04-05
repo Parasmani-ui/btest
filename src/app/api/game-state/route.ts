@@ -6,11 +6,11 @@ import { GameState } from '@/types/gameState';
 export async function GET() {
   try {
     return NextResponse.json({
-      started: global.gameState.started,
-      mode: global.gameState.mode,
-      suspects: global.gameState.suspects,
-      evidence: global.gameState.evidence,
-      actions: global.gameState.actions
+      started: (global as any).gameState.started,
+      mode: (global as any).gameState.mode,
+      suspects: (global as any).gameState.suspects,
+      evidence: (global as any).gameState.evidence,
+      actions: (global as any).gameState.actions
     });
   } catch (error) {
     console.error('Error getting game state:', error);

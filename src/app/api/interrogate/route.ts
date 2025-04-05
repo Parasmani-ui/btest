@@ -1,22 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { interrogateSuspect } from '@/utils/helpers';
+import { GameState } from '@/types/gameState';
 
 // Reference to the game state (this should be shared between all API routes) 
 // In a real production app we would store this in a database or session store
-declare global {
-  let gameState: {
-    started: boolean;
-    mode: string | null;
-    caseDetails: string | null;
-    suspects: string[];
-    evidence: string[];
-    murderer: string | null;
-    actions: string[];
-  };
-}
 
-if (!global.gameState) {
-  global.gameState = {
+if (!(global as any).gameState) {
+  (global as any).gameState = {
     started: false,
     mode: null,
     caseDetails: null,
@@ -29,25 +19,25 @@ if (!global.gameState) {
 
 export async function POST(req: NextRequest) {
   try {
-    if (!global.gameState.started) {
+    if (!(global as any).gameState.started) {
       return NextResponse.json({ error: 'Game not started' }, { status: 400 });
     }
     
     const data = await req.json();
     const suspect = data.suspect;
     
-    if (!suspect || !global.gameState.suspects.includes(suspect)) {
+    if (!suspect || !(global as any).gameState.suspects.includes(suspect)) {
       return NextResponse.json({ error: 'Invalid suspect' }, { status: 400 });
     }
     
     const response = await interrogateSuspect(
       suspect, 
-      global.gameState.caseDetails || '', 
-      global.gameState.murderer || ''
+      (global as any).gameState.caseDetails || '', 
+      (global as any).gameState.murderer || ''
     );
     
     // Track action
-    global.gameState.actions.push(`Interrogated ${suspect}`);
+    (global as any).gameState.actions.push(`Interrogated ${suspect}`);
     
     return NextResponse.json({
       success: true,

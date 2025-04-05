@@ -6,13 +6,13 @@ import { GameState } from '@/types/gameState';
 
 export async function GET() {
   try {
-    if (!global.gameState.started) {
+    if (!(global as any).gameState.started) {
       return NextResponse.json({ error: 'Game not started' }, { status: 400 });
     }
     
     const hint = await getDetectiveHint(
-      global.gameState.caseDetails || '', 
-      global.gameState.murderer || ''
+      (global as any).gameState.caseDetails || '', 
+      (global as any).gameState.murderer || ''
     );
     
     return NextResponse.json({
