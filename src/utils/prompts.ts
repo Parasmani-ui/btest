@@ -23,10 +23,8 @@ EVIDENCE:
 INITIAL REPORT:
 (Write a detailed account of the crime and circumstances)
 
-WHAT WOULD YOU LIKE TO DO NEXT? SELECT AN OPTION OR TYPE ANYTHING BELOW!
-[Button:Interrogate Suspects]
-[Button:Examine Evidence]
-[Button:Make Arrest]
+WHAT WOULD YOU LIKE TO DO NEXT? SELECT AN OPTION BELOW!
+
 
 Important formatting rules:
 1. Use exactly this structure and these section headings
@@ -68,9 +66,7 @@ INITIAL REPORT:
 (Write a detailed account of the crime and circumstances)
 
 WHAT WOULD YOU LIKE TO DO NEXT? SELECT AN OPTION OR TYPE ANYTHING BELOW!
-[Button:Interrogate Suspects]
-[Button:Examine Evidence]
-[Button:Make Arrest]
+
 
 Important formatting rules:
 1. Use exactly this structure and these section headings
@@ -116,9 +112,7 @@ INITIAL REPORT:
 (Write a detailed account of the crime and circumstances)
 
 WHAT WOULD YOU LIKE TO DO NEXT? SELECT AN OPTION OR TYPE ANYTHING BELOW!
-[Button:Interrogate Suspects]
-[Button:Examine Evidence]
-[Button:Make Arrest]
+
 
 Important formatting rules:
 1. Use exactly this structure and these section headings
