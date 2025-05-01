@@ -1,18 +1,24 @@
 import { NextResponse } from 'next/server';
 import { getDetectiveHint } from '@/utils/helpers';
-import { GameState } from '@/types/gameState';
 
 // access game state
+interface GameStateData {
+  started: boolean;
+  caseDetails: string;
+  murderer: string;
+}
 
 export async function GET() {
   try {
-    if (!(global as any).gameState.started) {
+    const gameState = (global as unknown as { gameState: GameStateData }).gameState;
+    
+    if (!gameState.started) {
       return NextResponse.json({ error: 'Game not started' }, { status: 400 });
     }
     
     const hint = await getDetectiveHint(
-      (global as any).gameState.caseDetails || '', 
-      (global as any).gameState.murderer || ''
+      gameState.caseDetails || '', 
+      gameState.murderer || ''
     );
     
     return NextResponse.json({

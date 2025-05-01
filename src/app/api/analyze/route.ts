@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeEvidence } from '@/utils/helpers';
 import { Config } from '@/config/config';
-import { GameState } from '@/types/gameState';
 
 // Access game state
 
@@ -18,20 +17,19 @@ export async function POST(req: NextRequest) {
     
     // Use mock data if API key is not configured
     if (!Config.OPENAI_API_KEY || Config.OPENAI_API_KEY === 'your_openai_api_key_here') {
-      console.log('Using mock evidence analysis for:', evidence);
       response = `Analysis of ${evidence}:\n\nThis piece of evidence provides important insights into the case.`;
     } else {
       // Use actual OpenAI API
       response = await analyzeEvidence(
         evidence,
-        (global as any).gameState?.caseDetails || '',
-        (global as any).gameState?.murderer || ''
+        (global as {gameState?: {caseDetails: string}}).gameState?.caseDetails || '',
+        (global as {gameState?: {murderer: string}}).gameState?.murderer || ''
       );
     }
     
     // Track action
-    if ((global as any).gameState) {
-      (global as any).gameState.actions.push(`Analyzed evidence: ${evidence}`);
+    if ((global as {gameState?: {actions: string[]}}).gameState) {
+      (global as {gameState?: {actions: string[]}}).gameState.actions.push(`Analyzed evidence: ${evidence}`);
     }
     
     return NextResponse.json({

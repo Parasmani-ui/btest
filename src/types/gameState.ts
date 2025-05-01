@@ -2,16 +2,31 @@
 export interface GameState {
   started: boolean;
   mode: string | null;
-  caseDetails: string | null;
+  caseDetails: string;
   suspects: string[];
   evidence: string[];
-  murderer: string | null;
-  actions: string[];
+  interrogatedSuspects: string[];
+  analyzedEvidence: string[];
+  currentAction: string | null;
+  currentResponse: string;
+  hints: string[];
+  currentHint: number;
+  currentSuspect: string | null;
+  gameOver?: boolean;
+  correctSuspect?: string;
+  correctSuspectIdentified?: boolean;
+  explanation?: string;
+  arrestResult?: {
+    correct: boolean;
+    murderer: string;
+    suspectArrested: string;
+    reasoning?: string;
+  };
 }
 
 // Extend global to include gameState
 declare global {
-  var gameState: GameState;
+  const gameState: GameState;
 }
 
 // This initialization should be in a single place like _app.ts or a specific init file

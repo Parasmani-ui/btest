@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "set ESLINT_WARN_ONLY=true && next build",
+    "dev": "next dev",
+    "build": "ESLINT_WARN_ONLY=true next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -12,7 +12,7 @@
     "@langchain/openai": "^0.5.2",
     "dotenv": "^16.4.7",
     "langchain": "^0.3.19",
-    "next": "15.2.4",
+    "next": "^15.2.4",
     "openai": "^4.91.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

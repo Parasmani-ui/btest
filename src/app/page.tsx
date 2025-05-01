@@ -20,8 +20,12 @@ export default function Home() {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  const startGame = (mode: string) => {
-    router.push(`/game?mode=${mode}`);
+  const startGame = () => {
+    router.push(`/game?mode=quick`);
+  };
+
+  const startSimulation = () => {
+    router.push(`/simulation`);
   };
 
   // Don't render until client-side
@@ -44,35 +48,17 @@ export default function Home() {
             <div className="p-4 flex-grow">
               <div className="mb-4 relative">
                 <button 
-                  onClick={() => setShowCaseOptions(!showCaseOptions)}
+                  onClick={startGame}
+                  className={`w-full p-2 mb-3 flex justify-between ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'} rounded`}
+                >
+                  <span>Critical Reading</span>
+                </button>
+                <button 
+                  onClick={startSimulation}
                   className={`w-full p-2 flex justify-between ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'} rounded`}
                 >
-                  <span>New Case</span>
-                  <span className="text-gray-500 text-sm">0/3</span>
+                  <span>Critical Investigation</span>
                 </button>
-                <div 
-                  id="case-options"
-                  className={`mt-2 transition-all duration-200 ${showCaseOptions ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'} ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} rounded overflow-hidden shadow-lg z-10`}
-                >
-                  <button 
-                    onClick={() => startGame('quick')} 
-                    className="w-full p-2 text-left hover:bg-gray-600 transition-colors"
-                  >
-                    Quick Case
-                  </button>
-                  <button 
-                    onClick={() => startGame('standard')} 
-                    className="w-full p-2 text-left hover:bg-gray-600 transition-colors"
-                  >
-                    Standard Case
-                  </button>
-                  <button 
-                    onClick={() => startGame('complex')} 
-                    className="w-full p-2 text-left hover:bg-gray-600 transition-colors"
-                  >
-                    Complex Case
-                  </button>
-                </div>
               </div>
             </div>
             
@@ -99,25 +85,22 @@ export default function Home() {
               Play as a detective solving procedurally generated murder mysteries. Examine evidence, interrogate suspects, and solve cases.
             </p>
             
-            <div className="grid grid-cols-3 gap-6 my-8">
-              <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} onClick={() => startGame('quick')}>
-                <h3 className="text-xl font-bold mb-2">Quick Case</h3>
+            <div className="my-8 flex justify-center gap-6">
+              <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} onClick={startGame}>
+                <h3 className="text-xl font-bold mb-2">Critical Reading</h3>
                 <p>5-8m | Quick Investigation</p>
               </div>
-              <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} onClick={() => startGame('standard')}>
-                <h3 className="text-xl font-bold mb-2">Standard Case</h3>
-                <p>10-15m | Detailed Investigation</p>
-              </div>
-              <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} onClick={() => startGame('complex')}>
-                <h3 className="text-xl font-bold mb-2">Complex Case</h3>
-                <p>20m+ | Complex Investigation</p>
+              
+              <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} onClick={startSimulation}>
+                <h3 className="text-xl font-bold mb-2">Critical Investigation</h3>
+                <p>5-8m | POSH Training Simulation</p>
               </div>
             </div>
             
-            <h3 className="text-xl font-bold mt-12 mb-4">How to Play</h3>
+            <h3 className="text-xl font-bold mt-12 mb-4">How to Play Critical Reading</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="mb-2"><strong>1. Select a Case Difficulty:</strong> Choose from Quick, Standard, or Complex based on your experience.</p>
+                <p className="mb-2"><strong>1. Start a Critical Reading:</strong> Begin your investigation.</p>
                 <p className="mb-2"><strong>2. Examine the Crime Scene:</strong> Review the initial evidence and circumstances.</p>
                 <p className="mb-2"><strong>3. Interrogate Suspects:</strong> Question each suspect to find inconsistencies.</p>
               </div>

@@ -1,30 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GameState } from '@/types/gameState';
 
 // Access game state
 
 export async function POST(req: NextRequest) {
   try {
-    if (!(global as any).gameState.started) {
-      return NextResponse.json({ error: 'Game not started' }, { status: 400 });
-    }
-    
     const data = await req.json();
-    const suspect = data.suspect;
+    const suspectName = data.suspectName;
+    const gameState = data.gameState;
     
-    if (!suspect || !(global as any).gameState.suspects.includes(suspect)) {
-      return NextResponse.json({ error: 'Invalid suspect' }, { status: 400 });
+    if (!suspectName || !gameState || !gameState.suspects.includes(suspectName)) {
+      return NextResponse.json({ error: 'Invalid suspect or game state' }, { status: 400 });
     }
     
-    const correct = suspect === (global as any).gameState.murderer;
+    // In a real app, this would check if the suspect is the murderer
+    // For this demo, randomly decide if the suspect is guilty
+    const correctSuspect = gameState.suspects[Math.floor(Math.random() * gameState.suspects.length)];
+    const correct = suspectName === correctSuspect;
     
-    // Reset game
-    (global as any).gameState.started = false;
+    // Generate a reasoning for why this suspect was the murderer
+    const reasoning = `${correctSuspect} had both motive and opportunity. The evidence shows they were present at the crime scene at the time of the murder, and their fingerprints were found on the murder weapon. Their alibi didn't check out when cross-referenced with witness testimonies.`;
     
     return NextResponse.json({
       success: true,
-      correct,
-      murderer: (global as any).gameState.murderer
+      correctSuspect: correctSuspect,
+      correctSuspectIdentified: correct,
+      reasoning: reasoning,
+      explanation: correct 
+        ? `Well done! ${suspectName} was indeed the murderer. Your detective skills are impressive.`
+        : `Unfortunately, ${suspectName} was not the murderer. The real murderer was ${correctSuspect}. Better luck next time.`
     });
   } catch (error) {
     console.error('Error making arrest:', error);

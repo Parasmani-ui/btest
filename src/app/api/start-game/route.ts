@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChatOpenAI } from '@langchain/openai';
 import { Config } from '@/config/config';
-import { QUICK_MODE_PROMPT, STANDARD_MODE_PROMPT, COMPLEX_MODE_PROMPT } from '@/utils/prompts';
-import { GameState } from '@/types/gameState';
+import { QUICK_MODE_PROMPT } from '@/utils/prompts';
+
+// Define GameState interface
+interface GameState {
+  started: boolean;
+  mode: string | null;
+  caseDetails: string | null;
+  suspects: string[];
+  evidence: string[];
+  murderer: string | null;
+  actions: string[];
+}
 
 // Initialize global game state if not already done
-if (!(global as any).gameState) {
-  (global as any).gameState = {
+if (!(global as unknown as {gameState?: GameState}).gameState) {
+  (global as unknown as {gameState: GameState}).gameState = {
     started: false,
     mode: null,
     caseDetails: null,
@@ -29,18 +39,14 @@ function cleanText(text: string): string {
 async function generateUniqueCase(mode: string) {
   const timestamp = new Date().toISOString();
   const seedValue = Math.floor(Math.random() * 9000000) + 1000000;
-
-  const prompts: Record<string, string> = {
-    "quick": QUICK_MODE_PROMPT,
-    "standard": STANDARD_MODE_PROMPT, 
-    "complex": COMPLEX_MODE_PROMPT
-  };
   
-  const casePrompt = prompts[mode] || QUICK_MODE_PROMPT;
+  // Always use quick mode prompt
+  const casePrompt = QUICK_MODE_PROMPT;
   
   // Generate AI response
   const llm = new ChatOpenAI({
-    modelName: "gpt-4o-mini", 
+    // modelName: "gpt-4o-mini", 
+    modelName: "gpt-4.1",
     temperature: 0.7, 
     openAIApiKey: Config.OPENAI_API_KEY
   });
@@ -109,41 +115,40 @@ function extractSuspectsAndEvidence(caseDetails: string) {
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const mode = data.mode || 'quick';
+    const gameState = (global as unknown as {gameState: GameState}).gameState;
     
     // Reset game state
-    (global as any).gameState.started = true;
-    (global as any).gameState.mode = mode;
-    (global as any).gameState.actions = [];
+    gameState.started = true;
+    gameState.mode = 'quick'; // Always use quick mode
+    gameState.actions = [];
     
     // Generate case
-    (global as any).gameState.caseDetails = await generateUniqueCase(mode);
+    gameState.caseDetails = await generateUniqueCase('quick');
     
     // Extract suspects and evidence
-    const { suspects, evidence } = extractSuspectsAndEvidence((global as any).gameState.caseDetails);
+    const { suspects, evidence } = extractSuspectsAndEvidence(gameState.caseDetails || '');
     
     // Validate extracted data
     if (suspects.length === 0 || evidence.length === 0) {
-      console.error('Failed to extract suspects or evidence from case:', (global as any).gameState.caseDetails);
+      console.error('Failed to extract suspects or evidence from case:', gameState.caseDetails);
       return NextResponse.json({ error: 'Invalid case generated' }, { status: 500 });
     }
     
-    (global as any).gameState.suspects = suspects;
-    (global as any).gameState.evidence = evidence;
+    gameState.suspects = suspects;
+    gameState.evidence = evidence;
     
     // Secretly select a murderer
     if (suspects.length > 0) {
-      (global as any).gameState.murderer = suspects[Math.floor(Math.random() * suspects.length)];
+      gameState.murderer = suspects[Math.floor(Math.random() * suspects.length)];
     } else {
-      (global as any).gameState.murderer = "Unknown";  // Fallback
+      gameState.murderer = "Unknown";  // Fallback
     }
     
     return NextResponse.json({
       success: true,
-      caseDetails: (global as any).gameState.caseDetails,
-      suspects: (global as any).gameState.suspects,
-      evidence: (global as any).gameState.evidence
+      caseDetails: gameState.caseDetails,
+      suspects: gameState.suspects,
+      evidence: gameState.evidence
     });
   } catch (error) {
     console.error('Error starting game:', error);
