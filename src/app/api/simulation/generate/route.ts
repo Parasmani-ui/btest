@@ -265,7 +265,8 @@ export async function POST(request: NextRequest) {
       try {
         // Make the API call with a timeout
         const completionPromise = openai.chat.completions.create({
-          model: "gpt-4o-mini", // Using gpt-4o-mini for generation
+          // model: "gpt-4o-mini", // Using gpt-4o-mini for generation
+          model: "gpt-4.1", // Using gpt-4.1 
           messages: [
             {
               role: 'system',

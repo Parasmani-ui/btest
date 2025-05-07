@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ResponsibleParty, MisconductType, PrimaryMotivation } from '@/types/simulation';
+import { useTheme } from '@/utils/theme';
 
 interface SimulationConclusionProps {
   conclusion: string;
@@ -29,18 +30,20 @@ export const SimulationConclusion: React.FC<SimulationConclusionProps> = ({
   const isResponsibleCorrect = correctResponsible ? selectedResponsible === correctResponsible : true;
   const isMisconductCorrect = correctMisconduct ? selectedMisconduct === correctMisconduct : true;
   const isMotivationCorrect = correctMotivation ? selectedMotivation === correctMotivation : true;
+  
+  const { theme } = useTheme();
 
   return (
-    <div className="bg-gray-800 rounded-lg shadow-lg p-6 text-gray-200">
-      <h2 className="text-2xl font-bold mb-6 text-white">Case Analysis</h2>
+    <div className={`${theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'} rounded-lg shadow-lg p-6`}>
+      <h2 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Case Analysis</h2>
       
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-white">Responsible Individual</h3>
+          <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Responsible Individual</h3>
           <div className={`p-4 rounded-lg ${
             isResponsibleCorrect
-              ? 'bg-green-800 text-green-100'
-              : 'bg-red-800 text-red-100'
+              ? theme === 'dark' ? 'bg-green-800 text-green-100' : 'bg-green-100 text-green-800 border border-green-200'
+              : theme === 'dark' ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800 border border-red-200'
           }`}>
             <p className="font-medium">Your Selection: {selectedResponsible}</p>
             {correctResponsible && (
@@ -50,11 +53,11 @@ export const SimulationConclusion: React.FC<SimulationConclusionProps> = ({
         </div>
         
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-white">Nature of Misconduct</h3>
+          <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Nature of Misconduct</h3>
           <div className={`p-4 rounded-lg ${
             isMisconductCorrect
-              ? 'bg-green-800 text-green-100'
-              : 'bg-red-800 text-red-100'
+              ? theme === 'dark' ? 'bg-green-800 text-green-100' : 'bg-green-100 text-green-800 border border-green-200'
+              : theme === 'dark' ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800 border border-red-200'
           }`}>
             <p className="font-medium">Your Selection: {selectedMisconduct}</p>
             {correctMisconduct && (
@@ -64,11 +67,11 @@ export const SimulationConclusion: React.FC<SimulationConclusionProps> = ({
         </div>
         
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-white">Primary Motivation</h3>
+          <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Primary Motivation</h3>
           <div className={`p-4 rounded-lg ${
             isMotivationCorrect
-              ? 'bg-green-800 text-green-100'
-              : 'bg-red-800 text-red-100'
+              ? theme === 'dark' ? 'bg-green-800 text-green-100' : 'bg-green-100 text-green-800 border border-green-200'
+              : theme === 'dark' ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800 border border-red-200'
           }`}>
             <p className="font-medium">Your Selection: {selectedMotivation}</p>
             {correctMotivation && (
@@ -78,9 +81,9 @@ export const SimulationConclusion: React.FC<SimulationConclusionProps> = ({
         </div>
         
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-white">Expert Analysis</h3>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <div className="text-green-400 leading-snug" dangerouslySetInnerHTML={{ __html: analysis }} />
+          <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Expert Analysis</h3>
+          <div className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg`}>
+            <div className={`${theme === 'dark' ? 'text-green-400' : 'text-green-700'} leading-snug`} dangerouslySetInnerHTML={{ __html: analysis }} />
           </div>
         </div>
         
@@ -93,7 +96,7 @@ export const SimulationConclusion: React.FC<SimulationConclusionProps> = ({
           </button>
           <Link href="/" className="flex-1">
             <button
-              className="w-full py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+              className={`w-full py-3 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'} ${theme === 'dark' ? 'text-white' : 'text-gray-800'} rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-400'} transition`}
             >
               Go To Home
             </button>

@@ -15,10 +15,10 @@ SUSPECTS:
 3. Full Name - Brief description
 
 EVIDENCE:
-- Evidence Item: Description
-- Evidence Item: Description
-- Evidence Item: Description
-- Evidence Item: Description
+1. Evidence Item: Description
+2. Evidence Item: Description
+3. Evidence Item: Description
+4. Evidence Item: Description
 
 INITIAL REPORT:
 (Write a detailed account of the crime and circumstances)
@@ -94,16 +94,14 @@ The Additional evidence must FORCE the participant to distinguish between ambigu
 <GAME_MECHANICS>
 Participants proceed through:
 POSH CASE FILE: [CASE NAME] 
+
 INDIVIDUALS INVOLVED:
 - Complainant: Name, Role
 - Respondent: Name, Role
+
 INCIDENT OVERVIEW: [ Detailed Incident Background] 
 NAVIGATION MENU: 
-[Button: View Complainant Statement] 
-[Button: View Respondent Statement] 
-[Button: View Additional Evidence] 
-[Button: View Legal Reference Guide] 
-[Button: Conclude Investigation]
+
 </GAME_MECHANICS>
 
 <LEGAL_REFERENCE_GUIDE>
