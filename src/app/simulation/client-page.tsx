@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { SimulationData, MarkdownSimulationData, ResponsibleParty, MisconductType, PrimaryMotivation } from '@/types/simulation';
 import { SimulationConclusion } from '@/simulation';
 import { ThemeProvider } from '@/utils/theme';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { TextAnimate } from '@/components/magicui/text-animate';
+import { SparklesText } from '@/components/magicui/sparkles-text';
+import { useRouter } from 'next/navigation';
 
 interface SimulationClientProps {
   simulationText: string;
@@ -40,6 +44,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     simulationData: null,
     markdownData: null
   });
+  const router = useRouter();
   
   // Toggle theme function
   const toggleTheme = () => {
@@ -188,7 +193,14 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     
     return (
       <form onSubmit={handleSubmitConclusion} className={`${theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'} rounded-lg shadow-lg p-6`}>
-        <h2 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Conclude Investigation</h2>
+        <TextAnimate
+          className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
+          animation="blurInUp"
+          by="word"
+          duration={0.4}
+        >
+          Conclude Investigation
+        </TextAnimate>
         
         <div className="space-y-6">
           <div>
@@ -196,50 +208,58 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               Responsible Individual <span className="text-red-400">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, responsibleParty: 'Respondent'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.responsibleParty === 'Respondent'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Respondent' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.responsibleParty === 'Respondent'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Respondent
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, responsibleParty: 'Complainant'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.responsibleParty === 'Complainant'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Complainant' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.responsibleParty === 'Complainant'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Complainant
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, responsibleParty: 'Both Parties'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.responsibleParty === 'Both Parties'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Both Parties' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.responsibleParty === 'Both Parties'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Both Parties
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, responsibleParty: 'Neither Party'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.responsibleParty === 'Neither Party'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Neither Party' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.responsibleParty === 'Neither Party'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Neither Party
-              </button>
+              </ShimmerButton>
             </div>
             {!conclusion.responsibleParty && (
               <p className="mt-1 text-sm text-red-400">Please select a responsible party</p>
@@ -251,50 +271,58 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               Nature of Misconduct <span className="text-red-400">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, misconductType: 'Sexual Harassment'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.misconductType === 'Sexual Harassment'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'Sexual Harassment' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.misconductType === 'Sexual Harassment'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Sexual Harassment
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, misconductType: 'Discrimination'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.misconductType === 'Discrimination'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'Discrimination' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.misconductType === 'Discrimination'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Discrimination
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, misconductType: 'Retaliation'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.misconductType === 'Retaliation'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'Retaliation' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.misconductType === 'Retaliation'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Retaliation
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, misconductType: 'No Misconduct'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.misconductType === 'No Misconduct'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'No Misconduct' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.misconductType === 'No Misconduct'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 No Misconduct
-              </button>
+              </ShimmerButton>
             </div>
             {!conclusion.misconductType && (
               <p className="mt-1 text-sm text-red-400">Please select a misconduct type</p>
@@ -306,50 +334,58 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               Primary Motivation <span className="text-red-400">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, primaryMotivation: 'Genuine Complaint'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.primaryMotivation === 'Genuine Complaint'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Genuine Complaint' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.primaryMotivation === 'Genuine Complaint'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Genuine Complaint
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, primaryMotivation: 'Personal Vendetta'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.primaryMotivation === 'Personal Vendetta'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Personal Vendetta' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.primaryMotivation === 'Personal Vendetta'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Personal Vendetta
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, primaryMotivation: 'Career Advancement'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.primaryMotivation === 'Career Advancement'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Career Advancement' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.primaryMotivation === 'Career Advancement'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Career Advancement
-              </button>
-              <button
+              </ShimmerButton>
+              <ShimmerButton
                 type="button"
                 onClick={() => setConclusion({...conclusion, primaryMotivation: 'Misunderstanding'})}
-                className={`p-3 rounded-lg transition ${
-                  conclusion.primaryMotivation === 'Misunderstanding'
-                    ? 'bg-blue-600 text-white'
-                    : theme === 'dark' ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Misunderstanding' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                shimmerColor="rgba(255, 255, 255, 0.5)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                background={conclusion.primaryMotivation === 'Misunderstanding'
+                  ? 'rgb(37, 99, 235)'
+                  : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Misunderstanding
-              </button>
+              </ShimmerButton>
             </div>
             {!conclusion.primaryMotivation && (
               <p className="mt-1 text-sm text-red-400">Please select a primary motivation</p>
@@ -357,21 +393,29 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
           </div>
           
           <div className="flex justify-end space-x-4">
-            <button
+            <ShimmerButton
               type="button"
               onClick={() => setShowConclusionForm(false)}
-              className={`px-4 py-2 ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'} rounded-lg ${theme === 'dark' ? 'hover:bg-gray-600' : 'hover:bg-gray-300'} transition`}
+              className={`px-4 py-2 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+              shimmerColor="rgba(255, 255, 255, 0.5)"
+              shimmerSize="0.05em"
+              shimmerDuration="2s"
+              borderRadius="0.375rem"
+              background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
             >
               Go Back
-            </button>
-            <button
+            </ShimmerButton>
+            <ShimmerButton
               type="submit"
               disabled={isSubmitting || !isFormValid}
-              className={`px-4 py-2 rounded-lg transition flex items-center ${
-                isFormValid 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : theme === 'dark' ? 'bg-gray-600 text-gray-300 cursor-not-allowed' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              className={`px-4 py-2 flex items-center ${
+                !isFormValid ? 'opacity-50 cursor-not-allowed' : ''
               }`}
+              shimmerColor="rgba(255, 255, 255, 0.8)"
+              shimmerSize="0.1em"
+              shimmerDuration="2s"
+              borderRadius="0.375rem"
+              background={isFormValid ? 'rgb(37, 99, 235)' : theme === 'dark' ? 'rgb(75, 85, 99)' : 'rgb(209, 213, 219)'}
             >
               {isSubmitting ? (
                 <>
@@ -384,7 +428,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               ) : (
                 'Submit Conclusion'
               )}
-            </button>
+            </ShimmerButton>
           </div>
         </div>
       </form>
@@ -446,36 +490,63 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
           </div>
           
           {/* Home Button */}
-          <Link href="/" className={`group mb-4 w-full py-2 px-4 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-700'} rounded-lg hover:bg-gray-600 hover:text-white flex items-center justify-center transition`}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 transition" viewBox="0 0 20 20" fill="currentColor">
+          <ShimmerButton
+            onClick={() => router.push('/')}
+            className={`group mb-4 w-full py-2 px-4 flex items-center justify-center transition ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+            shimmerColor="rgba(255, 255, 255, 0.5)"
+            shimmerSize="0.05em"
+            shimmerDuration="2s"
+            borderRadius="0.375rem"
+            background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 transition ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
             </svg>
             Home
-          </Link>
+          </ShimmerButton>
           
           {/* Navigation Title */}
           <div className="mb-4">
-            <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} text-center`}>POSH Investigation</h2>
-            <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center text-sm mt-1`}>Training Simulation</p>
+            <TextAnimate
+              className={`text-xl font-bold text-center ${theme === 'dark' ? 'text-white' : 'text-gray-600'}`}
+              animation="blurInUp"
+              by="word"
+              duration={0.3}
+            >
+              POSH Investigation
+            </TextAnimate>
+  
+            <p className={`${theme === 'dark' ? 'text-white' : 'text-gray-600'} text-center text-sm mt-1`}>
+              Training Simulation
+            </p>
           </div>
+
           
           {/* Theme toggle button */}
-          <button
+          <ShimmerButton
             onClick={toggleTheme}
-            className={`mb-4 w-full py-2 px-4 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-700'} rounded-lg hover:bg-gray-600 hover:text-white flex items-center justify-center transition`}
+            className={`mb-4 w-full py-2 px-4 flex items-center justify-center transition ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+            shimmerColor="rgba(255, 255, 255, 0.5)"
+            shimmerSize="0.05em"
+            shimmerDuration="2s"
+            borderRadius="0.375rem"
+            background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
           >
             {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
-          </button>
+          </ShimmerButton>
           
           {/* Legal Guidance Button and Content */}
           <div className="mb-6 flex flex-col space-y-3">
-            <button
+            <ShimmerButton
               onClick={() => setShowLegalGuide(!showLegalGuide)}
-              className={`w-full py-3 rounded-lg transition flex items-center justify-center space-x-2 shadow-md ${
-                showLegalGuide 
-                  ? 'bg-green-600 text-white' 
-                  : theme === 'dark' ? 'bg-green-900/40 text-green-200 hover:bg-green-900/70' : 'bg-green-100 text-green-800 hover:bg-green-200'
-              }`}
+              className={`w-full py-3 flex items-center justify-center space-x-2 shadow-md ${theme === 'dark' ? 'text-white' : 'text-green-800'}`}
+              shimmerColor="rgba(255, 255, 255, 0.5)"
+              shimmerSize="0.05em"
+              shimmerDuration="2s"
+              borderRadius="0.375rem"
+              background={showLegalGuide 
+                ? 'rgb(22, 163, 74)' 
+                : theme === 'dark' ? 'rgba(6, 78, 59, 0.4)' : 'rgba(16, 185, 129, 0.2)'}
             >
               <div className={`h-5 w-5 flex items-center justify-center rounded-full ${theme === 'dark' ? 'bg-green-500/20' : 'bg-green-500/40'}`}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -483,12 +554,19 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
                 </svg>
               </div>
               <span className="font-medium">Legal Guidance</span>
-            </button>
+            </ShimmerButton>
             
             {/* Legal Reference Guide Content - Shown only when legal guide toggle is active */}
             {showLegalGuide && (
               <div className={`${theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-white text-gray-800'} p-3 rounded-lg text-sm max-h-80 overflow-y-auto`}>
-                <h3 className={`${theme === 'dark' ? 'text-white' : 'text-gray-800'} font-bold mb-2`}>Legal Reference Guide</h3>
+                <TextAnimate 
+                  className="font-bold mb-2" 
+                  animation="slideUp" 
+                  by="word" 
+                  duration={0.3}
+                >
+                  Legal Reference Guide
+                </TextAnimate>
                 <div className={`${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} text-xs whitespace-pre-line`}>
                   {parsedData.simulationData?.legalReferenceGuide || parsedData.markdownData?.legal}
                 </div>
@@ -500,16 +578,19 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
           <div className="mt-auto space-y-3">
             <h3 className={`text-xs font-semibold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider mb-2 px-2`}>ACTIONS</h3>
             
-            <button
+            <ShimmerButton
               onClick={onStartNewCase}
-              className={`w-full py-3 rounded-lg transition text-center font-medium shadow-md ${
-                hasSubmitted 
-                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700'
-              }`}
+              className="w-full py-3 text-center font-medium shadow-md text-white"
+              shimmerColor="rgba(255, 255, 255, 0.8)"
+              shimmerSize="0.1em"
+              shimmerDuration="2s"
+              borderRadius="0.375rem"
+              background={hasSubmitted 
+                ? 'rgb(37, 99, 235)' 
+                : 'rgb(5, 150, 105)'}
             >
               Start New Case
-            </button>
+            </ShimmerButton>
           </div>
         </div>
         
@@ -582,91 +663,112 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
 
                 {/* Investigation Tools */}
                 <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-lg`}>
-                  <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-3`}>Investigation Tools</h2>
+                  <TextAnimate
+                    // className="text-xl font-bold mb-3"
+                    className={`text-xl font-bold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
+                    animation="slideUp"
+                    by="word"
+                    duration={0.3}
+                  >
+                    Investigation Tools
+                  </TextAnimate>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
                     {/* Case Overview Button */}
-                    <button
+                    <ShimmerButton
                       onClick={() => handleTabChange('case')}
-                      className={`px-3 py-2 rounded-lg transition flex items-center space-x-2 shadow-md ${
-                        activeTab === 'case' 
-                          ? 'bg-blue-600 text-white' 
-                          : theme === 'dark' ? 'bg-blue-900/40 text-blue-200 hover:bg-blue-900/70' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                      }`}
+                      className="w-full flex items-center space-x-2"
+                      shimmerColor="rgba(255, 255, 255, 0.8)"
+                      shimmerSize="0.1em"
+                      shimmerDuration="2s"
+                      borderRadius="0.5rem"
+                      background={activeTab === 'case' 
+                        ? 'rgb(37, 99, 235)' 
+                        : theme === 'dark' ? 'rgba(30, 58, 138, 0.4)' : 'rgba(219, 234, 254, 1)'}
                     >
                       <div className={`h-5 w-5 flex items-center justify-center rounded-full ${theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-500/40'}`}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
-                      <span className="text-sm">Case Overview</span>
-                    </button>
+                      <span className={`text-sm ${activeTab === 'case' ? 'text-white' : theme === 'dark' ? 'text-blue-200' : 'text-blue-800'}`}>Case Overview</span>
+                    </ShimmerButton>
 
                     {parsedData.simulationData && (
                       <>
                         {/* Complainant Button */}
-                        <button
+                        <ShimmerButton
                           onClick={() => handleTabChange('complainant')}
-                          className={`px-3 py-2 rounded-lg transition flex items-center space-x-2 shadow-md ${
-                            activeTab === 'complainant' 
-                              ? 'bg-purple-600 text-white' 
-                              : theme === 'dark' ? 'bg-purple-900/40 text-purple-200 hover:bg-purple-900/70' : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
-                          }`}
+                          className="w-full flex items-center space-x-2"
+                          shimmerColor="rgba(255, 255, 255, 0.8)"
+                          shimmerSize="0.1em"
+                          shimmerDuration="2s"
+                          borderRadius="0.5rem"
+                          background={activeTab === 'complainant' 
+                            ? 'rgb(147, 51, 234)' 
+                            : theme === 'dark' ? 'rgba(88, 28, 135, 0.4)' : 'rgba(233, 213, 255, 1)'}
                         >
                           <div className={`h-5 w-5 flex items-center justify-center rounded-full ${theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-500/40'}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                           </div>
-                          <span className="text-sm">Complainant Statement</span>
-                        </button>
+                          <span className={`text-sm ${activeTab === 'complainant' ? 'text-white' : theme === 'dark' ? 'text-purple-200' : 'text-purple-800'}`}>Complainant Statement</span>
+                        </ShimmerButton>
 
                         {/* Respondent Button */}
-                        <button
+                        <ShimmerButton
                           onClick={() => handleTabChange('respondent')}
-                          className={`px-3 py-2 rounded-lg transition flex items-center space-x-2 shadow-md ${
-                            activeTab === 'respondent' 
-                              ? 'bg-orange-600 text-white' 
-                              : theme === 'dark' ? 'bg-orange-900/40 text-orange-200 hover:bg-orange-900/70' : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
-                          }`}
+                          className="w-full flex items-center space-x-2"
+                          shimmerColor="rgba(255, 255, 255, 0.8)"
+                          shimmerSize="0.1em"
+                          shimmerDuration="2s"
+                          borderRadius="0.5rem"
+                          background={activeTab === 'respondent' 
+                            ? 'rgb(234, 88, 12)' 
+                            : theme === 'dark' ? 'rgba(124, 45, 18, 0.4)' : 'rgba(254, 215, 170, 1)'}
                         >
                           <div className={`h-5 w-5 flex items-center justify-center rounded-full ${theme === 'dark' ? 'bg-orange-500/20' : 'bg-orange-500/40'}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                           </div>
-                          <span className="text-sm">Respondent Statement</span>
-                        </button>
+                          <span className={`text-sm ${activeTab === 'respondent' ? 'text-white' : theme === 'dark' ? 'text-orange-200' : 'text-orange-800'}`}>Respondent Statement</span>
+                        </ShimmerButton>
                       </>
                     )}
 
                     {/* Evidence Button */}
-                    <button
+                    <ShimmerButton
                       onClick={() => handleTabChange('evidence')}
-                      className={`px-3 py-2 rounded-lg transition flex items-center space-x-2 shadow-md ${
-                        activeTab === 'evidence' 
-                          ? 'bg-yellow-600 text-white' 
-                          : theme === 'dark' ? 'bg-yellow-900/40 text-yellow-200 hover:bg-yellow-900/70' : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                      }`}
+                      className="w-full flex items-center space-x-2"
+                      shimmerColor="rgba(255, 255, 255, 0.8)"
+                      shimmerSize="0.1em"
+                      shimmerDuration="2s"
+                      borderRadius="0.5rem"
+                      background={activeTab === 'evidence' 
+                        ? 'rgb(202, 138, 4)' 
+                        : theme === 'dark' ? 'rgba(113, 63, 18, 0.4)' : 'rgba(254, 240, 138, 1)'}
                     >
                       <div className={`h-5 w-5 flex items-center justify-center rounded-full ${theme === 'dark' ? 'bg-yellow-500/20' : 'bg-yellow-500/40'}`}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <span className="text-sm">Evidence</span>
-                    </button>
+                      <span className={`text-sm ${activeTab === 'evidence' ? 'text-white' : theme === 'dark' ? 'text-yellow-200' : 'text-yellow-800'}`}>Evidence</span>
+                    </ShimmerButton>
                   </div>
 
                   {/* Conclude Button - Separated in its own row */}
                   {!hasSubmitted && (
                     <div className="flex justify-center">
-                      <button
+                      <ShimmerButton
                         onClick={() => setShowConclusionForm(!showConclusionForm)}
-                        className={`px-6 py-2 rounded-lg transition flex items-center space-x-2 shadow-md ${
-                          showConclusionForm
-                            ? 'bg-gray-600 text-white'
-                            : 'bg-red-600 text-white hover:bg-red-700'
-                        }`}
+                        className="px-6 py-2 flex items-center space-x-2 text-white"
+                        shimmerColor="rgba(255, 255, 255, 0.8)"
+                        shimmerSize="0.1em"
+                        shimmerDuration="2s"
+                        borderRadius="0.5rem"
+                        background={showConclusionForm ? 'rgb(75, 85, 99)' : 'rgb(220, 38, 38)'}
                       >
                         <div className="h-5 w-5 flex items-center justify-center rounded-full bg-red-500/20">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -674,7 +776,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
                           </svg>
                         </div>
                         <span className="text-sm font-medium">{showConclusionForm ? 'Go Back' : 'Submit Conclusion'}</span>
-                      </button>
+                      </ShimmerButton>
                     </div>
                   )}
                 </div>

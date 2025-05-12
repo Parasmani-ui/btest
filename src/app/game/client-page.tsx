@@ -9,6 +9,9 @@ import EvidenceActionPanel from './Components/EvidenceActionPanel';
 import AnswerPanel from './Components/AnswerPanel';
 import ArrestResult from './Components/ArrestResult';
 import { ThemeProvider } from '@/utils/theme';
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { TextAnimate } from "@/components/magicui/text-animate";
+import { SparklesText } from "@/components/magicui/sparkles-text";
 
 interface GameState {
   started: boolean;
@@ -411,21 +414,38 @@ export default function GameContent() {
       <div className={`game-content min-h-screen p-4 ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-black'}`}>
         {/* Header and theme toggle */}
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Mystery Detective Game</h1>
-          <div>
-            <button
+          <TextAnimate
+            className="text-2xl font-bold"
+            animation="slideUp"
+            by="word" 
+            duration={0.3}
+          >
+            Mystery Detective Game
+          </TextAnimate>
+          <div className="flex space-x-2">
+            <ShimmerButton
               onClick={toggleTheme}
-              className={`px-3 py-1 rounded-md ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-300'}`}
+              className="px-3 py-1"
+              shimmerColor="rgba(255, 255, 255, 0.5)"
+              shimmerSize="0.05em"
+              shimmerDuration="2s"
+              borderRadius="0.375rem"
+              background={theme === 'dark' ? 'rgb(51, 65, 85)' : 'rgb(203, 213, 225)'}
             >
-              Toggle {theme === 'dark' ? 'Light' : 'Dark'} Mode
-            </button>
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </ShimmerButton>
             {gameState.hints.length < gameState.hints.length && (
-              <button
+              <ShimmerButton
                 onClick={nextHint}
-                className="ml-2 px-3 py-1 rounded-md bg-indigo-600 text-white"
+                className="px-3 py-1"
+                shimmerColor="rgba(255, 255, 255, 0.8)"
+                shimmerSize="0.05em"
+                shimmerDuration="2s"
+                borderRadius="0.375rem"
+                background="rgb(79, 70, 229)"
               >
                 Unlock Hint ({gameState.currentHint + 1}/{gameState.hints.length})
-              </button>
+              </ShimmerButton>
             )}
           </div>
         </div>
@@ -455,54 +475,84 @@ export default function GameContent() {
                   </div>
                   
                   {/* Home Button */}
-                  <div className="px-4 mb-4">
+                  <div className="px-4 mb-0">
                     <Link href="/">
-                      <button className={`w-full p-2 flex items-center justify-center ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'} rounded hover:bg-gray-600`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <ShimmerButton 
+                        className="w-full p-2 flex items-center justify-center"
+                        shimmerColor="rgba(255, 255, 255, 0.5)"
+                        shimmerSize="0.05em"
+                        shimmerDuration="2s"
+                        borderRadius="0.375rem"
+                        background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(255, 255, 255)'}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`} viewBox="0 0 20 20" fill="currentColor">
                           <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                         </svg>
-                        Home
-                      </button>
+                        <span className={theme === 'dark' ? 'text-white' : 'text-gray-800'}>Home</span>
+                      </ShimmerButton>
                     </Link>
                   </div>
                   
                   <div className="p-4 flex-grow">
-                    <div className="mb-4">
-                      <button 
-                        onClick={startGame} 
-                        className={`w-full p-2 flex justify-between ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'} rounded`}
+                    <div className="mb-2">
+                      <ShimmerButton 
+                        onClick={startGame}
+                        className="w-full p-2 flex justify-between"
+                        shimmerColor="rgba(255, 255, 255, 0.5)"
+                        shimmerSize="0.05em"
+                        shimmerDuration="2s"
+                        borderRadius="0.375rem"
+                        background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(255, 255, 255)'}
                       >
-                        <span>New Case</span>
-                      </button>
+                        <span className={theme === 'dark' ? 'text-white' : 'text-gray-800'}>New Case</span>
+                      </ShimmerButton>
                     </div>
                     
                     {gameState.started && (
                       <div className="mt-8">
-                        <h3 className="text-amber-500 font-bold mb-2">Case Info</h3>
-                        <div className="mb-2">{(gameState.mode || 'Quick').charAt(0).toUpperCase() + (gameState.mode || 'Quick').slice(1)} Case</div>
-                        <div className="text-sm text-gray-400">
+                        <SparklesText
+                          className="text-sm text-amber-500 font-normal mb-2"
+                          colors={{ first: "#f59e0b", second: "#d97706" }}
+                          sparklesCount={4}
+                        >
+                          Case Info
+                        </SparklesText>
+                        <div className={`mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                          {(gameState.mode || 'Quick').charAt(0).toUpperCase() + (gameState.mode || 'Quick').slice(1)} Case
+                        </div>
+                        <div className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                           <div className="mb-1">Suspects: {gameState.interrogatedSuspects.length}/{gameState.suspects.length}</div>
                           <div>Evidence: {gameState.analyzedEvidence.length}/{gameState.evidence.length}</div>
                         </div>
                         
                         <div className="mt-4">
-                          <button 
-                            onClick={() => setShowGuide(!showGuide)} 
-                            className={`w-full p-2 ${theme === 'dark' ? 'bg-amber-500 hover:bg-amber-700' : 'bg-amber-600 hover:bg-amber-500'} text-white rounded flex justify-between items-center`}
+                          <ShimmerButton 
+                            onClick={() => setShowGuide(!showGuide)}
+                            className="w-full p-2 flex justify-between items-center"
+                            shimmerColor="rgba(255, 255, 255, 0.5)"
+                            shimmerSize="0.05em"
+                            shimmerDuration="2s"
+                            borderRadius="0.375rem"
+                            background="rgb(217, 119, 6)"
                           >
-                            <span>Guide</span>
-                            <span>{showGuide ? '▲' : '▼'}</span>
-                          </button>
+                            <span className="text-white">Guide</span>
+                            <span className="text-white">{showGuide ? '▲' : '▼'}</span>
+                          </ShimmerButton>
                           
                           {showGuide && (
-                            <div className={`mt-2 p-3 ${theme === 'dark' ? 'bg-slate-900' : 'bg-amber-100'} rounded`}>
+                            <div className={`mt-2 p-3 ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-amber-100 text-gray-800'} rounded`}>
                               <div className="mb-2">{getCurrentHint()}</div>
-                              <button
+                              <ShimmerButton
                                 onClick={nextHint}
-                                className={`w-full p-2 text-sm ${theme === 'dark' ? 'bg-slate-800 hover:bg-amber-700' : 'bg-amber-500 hover:bg-amber-400'} text-white rounded`}
+                                className="w-full p-2 text-sm"
+                                shimmerColor="rgba(255, 255, 255, 0.5)"
+                                shimmerSize="0.05em"
+                                shimmerDuration="2s"
+                                borderRadius="0.375rem"
+                                background={theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(217, 119, 6)'}
                               >
-                                Next Hint
-                              </button>
+                                <span className="text-white">Next Hint</span>
+                              </ShimmerButton>
                             </div>
                           )}
                         </div>
@@ -511,10 +561,20 @@ export default function GameContent() {
                   </div>
                   
                   <div className={`p-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-                    <div className="flex justify-end">
-                      <button onClick={toggleTheme} className="text-xl">
-                        {theme === 'dark' ? '🌙' : '☀️'}
-                      </button>
+                    <div className="flex justify-center">
+                      <ShimmerButton
+                        onClick={toggleTheme}
+                        className="w-full px-3 py-2 flex items-center justify-center"
+                        shimmerColor="rgba(255, 255, 255, 0.5)"
+                        shimmerSize="0.05em"
+                        shimmerDuration="2s"
+                        borderRadius="0.375rem"
+                        background={theme === 'dark' ? 'rgb(51, 65, 85)' : 'rgb(209, 213, 219)'}
+                      >
+                        <span className={theme === 'dark' ? 'text-white' : 'text-gray-800'}>
+                          {theme === 'dark' ? '🌙 Light Mode' : '☀️ Dark Mode'}
+                        </span>
+                      </ShimmerButton>
                     </div>
                   </div>
                 </div>
@@ -531,7 +591,14 @@ export default function GameContent() {
                     {/* case details */}
                     <div className="mb-8">
                       <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-300'}`}>
-                        <h3 className="text-xl font-bold mb-4">Case File</h3>
+                        <TextAnimate
+                          className="text-xl font-bold mb-4"
+                          animation="slideUp"
+                          by="word"
+                          duration={0.3}
+                        >
+                          Case File
+                        </TextAnimate>
                         <div className={`p-6 rounded-lg whitespace-pre-wrap ${theme === 'dark' ? 'bg-gray-700' : 'bg-white text-gray-800'}`}>
                           {gameState.caseDetails}
                         </div>
@@ -542,24 +609,39 @@ export default function GameContent() {
                     {gameState.started && !gameState.currentAction && (
                       <div className="mb-8">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <button
+                          <ShimmerButton
                             onClick={showSuspects}
-                            className="p-4 bg-blue-700 hover:bg-blue-600 rounded-lg"
+                            className="w-full p-4 text-white"
+                            shimmerColor="rgba(255, 255, 255, 0.8)"
+                            shimmerSize="0.1em"
+                            shimmerDuration="2s"
+                            background="rgb(29, 78, 216)"
+                            borderRadius="0.5rem"
                           >
                             Interrogate Suspects
-                          </button>
-                          <button
+                          </ShimmerButton>
+                          <ShimmerButton
                             onClick={showEvidence}
-                            className="p-4 bg-green-700 hover:bg-green-600 rounded-lg"
+                            className="w-full p-4 text-white"
+                            shimmerColor="rgba(255, 255, 255, 0.8)"
+                            shimmerSize="0.1em"
+                            shimmerDuration="2s"
+                            background="rgb(21, 128, 61)"
+                            borderRadius="0.5rem"
                           >
                             Analyze Evidence
-                          </button>
-                          <button
+                          </ShimmerButton>
+                          <ShimmerButton
                             onClick={showArrestOptions}
-                            className="p-4 bg-red-700 hover:bg-red-600 rounded-lg"
+                            className="w-full p-4 text-white"
+                            shimmerColor="rgba(255, 255, 255, 0.8)"
+                            shimmerSize="0.1em"
+                            shimmerDuration="2s"
+                            background="rgb(185, 28, 28)"
+                            borderRadius="0.5rem"
                           >
                             Make an Arrest
-                          </button>
+                          </ShimmerButton>
                         </div>
                       </div>
                     )}
