@@ -3,7 +3,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { Config } from '@/config/config';
 import { QUICK_MODE_PROMPT } from '@/utils/prompts';
 
-export const maxDuration = 120; // Set maximum duration for this API route
+export const maxDuration = 60; // Maximum allowed duration for Vercel hobby plan
 
 // Define GameState interface
 interface GameState {
@@ -52,7 +52,7 @@ async function generateUniqueCase(mode: string) {
     temperature: 0.7, 
     openAIApiKey: Config.OPENAI_API_KEY,
     maxRetries: 2,
-    timeout: 50000 // 50 second timeout
+    timeout: 45000 // 45 second timeout
   });
   
   const response = await llm.predict(`${casePrompt}\nUse timestamp ${timestamp} and hidden randomness factor ${seedValue}.`);

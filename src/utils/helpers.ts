@@ -26,19 +26,25 @@ export function generateRandomSuspect() {
 // interrogation of suspect
 export async function interrogateSuspect(suspectName: string, caseDetails: string, murderer: string) {
   const llm = new ChatOpenAI({
-    modelName: "gpt-4o-mini", 
+    // modelName: "gpt-4o-mini", 
+    modelName: "gpt-4.1",
     temperature: 0.7, 
     openAIApiKey: Config.OPENAI_API_KEY,
     maxRetries: 2,
-    timeout: 30000 // 30 second timeout
+    timeout: 25000 // 25 second timeout
   });
+  
+  // Truncate case details if too long to improve response time
+  const truncatedCaseDetails = caseDetails.length > 2000 
+    ? caseDetails.substring(0, 2000) + "..." 
+    : caseDetails;
   
   const prompt = `
   You are the suspect, **${suspectName}**, in an ongoing investigation.
   The detective is questioning you based on this case:
 
   **CASE DETAILS:**
-  ${caseDetails}
+  ${truncatedCaseDetails}
 
   Provide your response in two parts:
 
@@ -69,14 +75,19 @@ export async function analyzeEvidence(evidenceItem: string, caseDetails: string,
     temperature: 0.7, 
     openAIApiKey: Config.OPENAI_API_KEY,
     maxRetries: 2,
-    timeout: 30000 // 30 second timeout
+    timeout: 25000 // 25 second timeout
   });
+  
+  // Truncate case details if too long to improve response time
+  const truncatedCaseDetails = caseDetails.length > 2000 
+    ? caseDetails.substring(0, 2000) + "..." 
+    : caseDetails;
   
   const prompt = `
   You are a forensic analyst reviewing this specific piece of evidence: **${evidenceItem}**.
 
   **CASE DETAILS:**
-  ${caseDetails}
+  ${truncatedCaseDetails}
 
   Provide a very short analysis of ONLY this specific evidence item. Focus on:
   1. Physical characteristics and condition
@@ -99,14 +110,19 @@ export async function getDetectiveHint(caseDetails: string, murderer: string) {
     temperature: 0.7, 
     openAIApiKey: Config.OPENAI_API_KEY,
     maxRetries: 2,
-    timeout: 30000 // 30 second timeout
+    timeout: 25000 // 25 second timeout
   });
+  
+  // Truncate case details if too long to improve response time
+  const truncatedCaseDetails = caseDetails.length > 2000 
+    ? caseDetails.substring(0, 2000) + "..." 
+    : caseDetails;
   
   const prompt = `
   You are a detective's assistant providing a helpful hint for a murder mystery.
   
   Current case details:
-  ${caseDetails}
+  ${truncatedCaseDetails}
   
   The real murderer is: ${murderer}
   

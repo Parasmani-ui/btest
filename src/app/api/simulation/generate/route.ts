@@ -5,7 +5,7 @@ import { POSH_TRAINING_SIMULATION_PROMPT } from '@/utils/prompts';
 import fs from 'fs';
 import path from 'path';
 
-export const maxDuration = 120; // Increased from 60 to 120 seconds for longer generation time
+export const maxDuration = 60; // Maximum allowed duration for Vercel hobby plan
 
 // Basic template for creating a new simulation if all else fails
 const EMPTY_TEMPLATE: SimulationData = {
@@ -255,7 +255,7 @@ export async function POST(request: NextRequest) {
       // Initialize OpenAI client with updated timeout settings
       const openai = new OpenAI({ 
         apiKey,
-        timeout: 50000,  // Increased timeout for API calls
+        timeout: 45000,  // 45 second timeout for API calls
         maxRetries: 2    // Allow more retries
       });
       
@@ -283,8 +283,8 @@ export async function POST(request: NextRequest) {
         });
         
         // Use timeout for the entire operation
-        console.log('Waiting for OpenAI API response (timeout: 50s)');
-        const completion = await fetchWithTimeout(completionPromise, 50000);
+        console.log('Waiting for OpenAI API response (timeout: 45s)');
+        const completion = await fetchWithTimeout(completionPromise, 45000);
 
         const simulationText = completion.choices[0]?.message?.content;
         
