@@ -3,6 +3,8 @@ import { ChatOpenAI } from '@langchain/openai';
 import { Config } from '@/config/config';
 import { QUICK_MODE_PROMPT } from '@/utils/prompts';
 
+export const maxDuration = 120; // Set maximum duration for this API route
+
 // Define GameState interface
 interface GameState {
   started: boolean;
@@ -45,10 +47,12 @@ async function generateUniqueCase(mode: string) {
   
   // Generate AI response
   const llm = new ChatOpenAI({
-    // modelName: "gpt-4o-mini", 
+    // modelName: "gpt-4o-mini", // Using faster model
     modelName: "gpt-4.1",
     temperature: 0.7, 
-    openAIApiKey: Config.OPENAI_API_KEY
+    openAIApiKey: Config.OPENAI_API_KEY,
+    maxRetries: 2,
+    timeout: 50000 // 50 second timeout
   });
   
   const response = await llm.predict(`${casePrompt}\nUse timestamp ${timestamp} and hidden randomness factor ${seedValue}.`);

@@ -28,7 +28,9 @@ export async function interrogateSuspect(suspectName: string, caseDetails: strin
   const llm = new ChatOpenAI({
     modelName: "gpt-4o-mini", 
     temperature: 0.7, 
-    openAIApiKey: Config.OPENAI_API_KEY
+    openAIApiKey: Config.OPENAI_API_KEY,
+    maxRetries: 2,
+    timeout: 30000 // 30 second timeout
   });
   
   const prompt = `
@@ -65,7 +67,9 @@ export async function analyzeEvidence(evidenceItem: string, caseDetails: string,
   const llm = new ChatOpenAI({
     modelName: "gpt-4o-mini", 
     temperature: 0.7, 
-    openAIApiKey: Config.OPENAI_API_KEY
+    openAIApiKey: Config.OPENAI_API_KEY,
+    maxRetries: 2,
+    timeout: 30000 // 30 second timeout
   });
   
   const prompt = `
@@ -93,7 +97,9 @@ export async function getDetectiveHint(caseDetails: string, murderer: string) {
   const llm = new ChatOpenAI({
     modelName: "gpt-4o-mini", 
     temperature: 0.7, 
-    openAIApiKey: Config.OPENAI_API_KEY
+    openAIApiKey: Config.OPENAI_API_KEY,
+    maxRetries: 2,
+    timeout: 30000 // 30 second timeout
   });
   
   const prompt = `

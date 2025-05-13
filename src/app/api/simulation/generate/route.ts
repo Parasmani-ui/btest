@@ -5,7 +5,7 @@ import { POSH_TRAINING_SIMULATION_PROMPT } from '@/utils/prompts';
 import fs from 'fs';
 import path from 'path';
 
-export const maxDuration = 60; // Increased from 60 to 120 seconds for longer generation time
+export const maxDuration = 120; // Increased from 60 to 120 seconds for longer generation time
 
 // Basic template for creating a new simulation if all else fails
 const EMPTY_TEMPLATE: SimulationData = {
@@ -255,8 +255,8 @@ export async function POST(request: NextRequest) {
       // Initialize OpenAI client with updated timeout settings
       const openai = new OpenAI({ 
         apiKey,
-        timeout: 30000,  // 60 second timeout for API calls
-        maxRetries: 1    // Allow one retry
+        timeout: 50000,  // Increased timeout for API calls
+        maxRetries: 2    // Allow more retries
       });
       
       // Use the imported POSH_TRAINING_SIMULATION_PROMPT instead of the inline prompt
@@ -265,8 +265,8 @@ export async function POST(request: NextRequest) {
       try {
         // Make the API call with a timeout
         const completionPromise = openai.chat.completions.create({
-          // model: "gpt-4o-mini", // Using gpt-4o-mini for generation
-          model: "gpt-4.1", // Using gpt-4.1 
+          // model: "gpt-4o-mini", // Using gpt-4o-mini for faster generation
+          model: "gpt-4.1",
           messages: [
             {
               role: 'system',
@@ -283,8 +283,8 @@ export async function POST(request: NextRequest) {
         });
         
         // Use timeout for the entire operation
-        console.log('Waiting for OpenAI API response (timeout: 30s)');
-        const completion = await fetchWithTimeout(completionPromise, 30000);
+        console.log('Waiting for OpenAI API response (timeout: 50s)');
+        const completion = await fetchWithTimeout(completionPromise, 50000);
 
         const simulationText = completion.choices[0]?.message?.content;
         
