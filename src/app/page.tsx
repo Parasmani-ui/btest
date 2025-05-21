@@ -32,6 +32,10 @@ export default function Home() {
     router.push(`/simulation`);
   };
 
+  const startHospitalSimulation = () => {
+    router.push(`/hospital-simulation`);
+  };
+
   // Don't render until client-side
   if (!mounted) {
     return null;
@@ -73,6 +77,18 @@ export default function Home() {
                   background="rgb(21, 128, 61)"
                 >
                   Critical Investigation
+                </ShimmerButton>
+
+                <ShimmerButton
+                  onClick={startHospitalSimulation}
+                  className="w-full p-3 text-white"
+                  shimmerColor="rgba(255, 255, 255, 0.8)"
+                  shimmerSize="0.1em"
+                  shimmerDuration="2s"
+                  borderRadius="0.5rem"
+                  background="rgb(220, 38, 38)"
+                >
+                  Crisis Management
                 </ShimmerButton>
               </div>
             </div>
@@ -139,6 +155,21 @@ export default function Home() {
                   Critical Investigation
                 </SparklesText>
                 <p>5-8m | POSH Training Simulation</p>
+              </div>
+
+              {/* Hospital Crisis Simulation card with SparklesText */}
+              <div 
+                className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                onClick={startHospitalSimulation}
+              >
+                <SparklesText 
+                  className="text-lg sm:text-xl font-bold mb-2"
+                  colors={{ first: "#ef4444", second: "#f87171" }}
+                  sparklesCount={6}
+                >
+                  Crisis Management
+                </SparklesText>
+                <p>5-8m | Hospital Simulation</p>
               </div>
             </div>
             
