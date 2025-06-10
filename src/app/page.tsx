@@ -36,6 +36,10 @@ export default function Home() {
     router.push(`/hospital-simulation`);
   };
 
+  const startFakeNewsSimulation = () => {
+    router.push(`/fake-news-simulation`);
+  };
+
   // Don't render until client-side
   if (!mounted) {
     return null;
@@ -89,6 +93,18 @@ export default function Home() {
                   background="rgb(220, 38, 38)"
                 >
                   Crisis Management
+                </ShimmerButton>
+
+                <ShimmerButton
+                  onClick={startFakeNewsSimulation}
+                  className="w-full p-3 text-white"
+                  shimmerColor="rgba(255, 255, 255, 0.8)"
+                  shimmerSize="0.1em"
+                  shimmerDuration="2s"
+                  borderRadius="0.5rem"
+                  background="rgb(245, 101, 39)"
+                >
+                  Critical Misinformation
                 </ShimmerButton>
               </div>
             </div>
@@ -170,6 +186,21 @@ export default function Home() {
                   Crisis Management
                 </SparklesText>
                 <p>5-8m | Hospital Simulation</p>
+              </div>
+
+              {/* Fake News Simulation card with SparklesText */}
+              <div 
+                className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                onClick={startFakeNewsSimulation}
+              >
+                <SparklesText 
+                  className="text-lg sm:text-xl font-bold mb-2"
+                  colors={{ first: "#f59e0b", second: "#fbbf24" }}
+                  sparklesCount={6}
+                >
+                  Critical Misinformation
+                </SparklesText>
+                <p>5-8m | Fake News</p>
               </div>
             </div>
             
