@@ -40,6 +40,10 @@ export default function Home() {
     router.push(`/fake-news-simulation`);
   };
 
+  const startChainFailSimulation = () => {
+    router.push(`/chainfail-simulation`);
+  };
+
   // Don't render until client-side
   if (!mounted) {
     return null;
@@ -106,6 +110,18 @@ export default function Home() {
                 >
                   Critical Misinformation
                 </ShimmerButton>
+
+                <ShimmerButton
+                  onClick={startChainFailSimulation}
+                  className="w-full p-3 text-white"
+                  shimmerColor="rgba(255, 255, 255, 0.8)"
+                  shimmerSize="0.1em"
+                  shimmerDuration="2s"
+                  borderRadius="0.5rem"
+                  background="rgb(168, 85, 247)"
+                >
+                  Critical ChainFail
+                </ShimmerButton>
               </div>
             </div>
             
@@ -156,7 +172,7 @@ export default function Home() {
                 TEST YOUR SKILLS
               </TextAnimate>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
                 {/* Critical Reading card */}
                 <div 
                   className={`p-6 rounded-lg border border-[rgb(37,99,235)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
@@ -215,6 +231,21 @@ export default function Home() {
                     Critical Misinformation
                   </SparklesText>
                   <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Fake News</p>
+                </div>
+
+                {/* Critical ChainFail card */}
+                <div 
+                  className={`p-6 rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                  onClick={startChainFailSimulation}
+                >
+                  <SparklesText 
+                    className="text-lg font-bold mb-2"
+                    colors={{ first: "#a855f7", second: "#d8b4fe" }}
+                    sparklesCount={6}
+                  >
+                    Critical ChainFail
+                  </SparklesText>
+                                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Breakdown Protocol</p>
                 </div>
               </div>
             </div>
