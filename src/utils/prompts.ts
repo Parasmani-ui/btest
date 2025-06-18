@@ -240,39 +240,49 @@ After Round 10 (or early exit), the AI must:
 </PERFORMANCE_EVALUATION>
 
 <OUTPUT_STRUCTURE>
-During each round, output must be structured as:
-{
-  "roundNumber": 4,
-  "crisisTitle": "ICU Staffing Collapse",
-  "scenarioText": "The ICU lead resigns over unsafe working conditions. Nurses refuse to clock in unless immediate reforms happen. A political figure is scheduled for emergency surgery in the same wing.",
-  "options": {
-    "A": "Reassign ER doctors to ICU immediately and postpone all scheduled surgeries.",
-    "B": "Persuade striking staff with emergency bonuses while keeping surgery on schedule.",
-    "C": "Request Army Medical Corps backup and suspend ICU for 24 hours."
-  },
-  "consequence": null, // Leave null until user picks
-  "userDecision": null,
-  "role": "Hospital Director"
-}
+Format each round response as simple, readable text using this structure:
 
-At the end of the simulation:
-{
-  "role": "Hospital Director",
-  "decisionHistory": [
-    {
-      "round": 1,
-      "userDecision": "B",
-      "summary": "Rerouted mild cases to secondary care facilities. Helped reduce ER load temporarily."
-    },
-    ...
-  ],
-  "performanceSummary": {
-    "criticalThinking": "Strong early game prioritization, but late-stage tunnel vision on PR.",
-    "ethics": "Consistently upheld patient dignity. Refused political pressure.",
-    "leadership": "Proactive and adaptive. Occasionally ignored key advisors.",
-    "finalScore": 8.2
-  }
-}
+🩺 Round X/10 – [Crisis Title]
+
+[Detailed scenario description that sets up the crisis situation, including context, urgency, and stakes]
+
+🤔 What do you do?
+
+[A] [Option A description]
+[B] [Option B description]  
+[C] [Option C description]
+
+Type A, B, or C — or write your own decision:
+
+When providing consequences from previous decisions, start with:
+📊 Following your [previous choice], [consequence description that leads to new scenario]
+
+At the end of the simulation, provide a comprehensive performance evaluation in readable text format:
+
+## 🏥 FINAL PERFORMANCE EVALUATION
+
+**Your Role:** [Role Name]
+
+### 📋 Decision Summary
+**Round 1:** [Decision] - [Outcome summary]
+**Round 2:** [Decision] - [Outcome summary]
+[Continue for all rounds]
+
+### 📊 Performance Assessment
+
+**Critical Thinking:** [Detailed assessment]
+
+**Ethical Judgment:** [Detailed assessment]
+
+**Resource Management:** [Detailed assessment]
+
+**Communication:** [Detailed assessment]
+
+**Adaptability:** [Detailed assessment]
+
+### 🎯 Final Score: [X]/10
+
+[Overall summary and key insights about performance]
 </OUTPUT_STRUCTURE>
 
 <EXIT_MECHANIC>
@@ -347,7 +357,7 @@ CRISIS OUTCOME:
 [Briefly explain what irreversible consequence happened due to the chain]
 
 WHAT WOULD YOU LIKE TO REVIEW NEXT?
-[Available options: View Timeline, Examine Evidence, Profile Individuals, Make Final Analysis]
+
 `;
 
 export const CHAINFAIL_SIMULATION_PROMPT = `

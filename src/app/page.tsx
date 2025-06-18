@@ -183,9 +183,9 @@ export default function Home() {
                     colors={{ first: "#3b82f6", second: "#60a5fa" }}
                     sparklesCount={6}
                   >
-                    Critical Reading
+                    Quick Investigation
                   </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Quick Investigation</p>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Reading</p>
                 </div>
                 
                 {/* Critical Investigation card */}
@@ -198,9 +198,9 @@ export default function Home() {
                     colors={{ first: "#10b981", second: "#34d399" }}
                     sparklesCount={6}
                   >
-                    Critical Investigation
+                    Corporate POSH Training
                   </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | POSH Training</p>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Investigation</p>
                 </div>
 
                 {/* Crisis Management card */}
@@ -213,9 +213,9 @@ export default function Home() {
                     colors={{ first: "#ef4444", second: "#f87171" }}
                     sparklesCount={6}
                   >
-                    Crisis Management
+                    Hospital Simulation
                   </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Hospital Simulation</p>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Crisis Management</p>
                 </div>
 
                 {/* Critical Misinformation card */}
@@ -228,9 +228,9 @@ export default function Home() {
                     colors={{ first: "#f59e0b", second: "#fbbf24" }}
                     sparklesCount={6}
                   >
-                    Critical Misinformation
+                    Social Fake News
                   </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Fake News</p>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Misinformation</p>
                 </div>
 
                 {/* Critical ChainFail card */}
@@ -243,9 +243,9 @@ export default function Home() {
                     colors={{ first: "#a855f7", second: "#d8b4fe" }}
                     sparklesCount={6}
                   >
-                    Critical ChainFail
+                    Industrial accident
                   </SparklesText>
-                                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Breakdown Protocol</p>
+                                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical ChainFail</p>
                 </div>
               </div>
             </div>

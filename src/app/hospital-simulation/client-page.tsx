@@ -65,53 +65,26 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
     // Reset options for the latest message only
     setOptions([]);
     
-    // First, try to parse as JSON if the content appears to be JSON formatted
-    if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
-      try {
-        const jsonData = JSON.parse(content);
-        
-        // Extract data from JSON structure
-        if (jsonData.roundNumber && jsonData.crisisTitle && jsonData.scenarioText && jsonData.options) {
-          // Set current round from JSON
-          setCurrentRound(jsonData.roundNumber);
-          
-          // Extract scenario text with proper formatting
-          let formattedScenario = `🩺 Round ${jsonData.roundNumber}/10 – ${jsonData.crisisTitle}\n\n${jsonData.scenarioText}`;
-          
-          // Add role information if available
-          if (jsonData.role && !role) {
-            setRole(jsonData.role);
-            formattedScenario = `Your role: ${jsonData.role}\n\n${formattedScenario}`;
-          }
-          
-          setScenarioText(formattedScenario);
-          
-          // Extract options
-          const extractedOptions: ScenarioOption[] = [];
-          if (jsonData.options.A) extractedOptions.push({ label: 'A', text: jsonData.options.A });
-          if (jsonData.options.B) extractedOptions.push({ label: 'B', text: jsonData.options.B });
-          if (jsonData.options.C) extractedOptions.push({ label: 'C', text: jsonData.options.C });
-          if (jsonData.options.D) extractedOptions.push({ label: 'D', text: jsonData.options.D });
-          
-          setOptions(extractedOptions);
-          return; // Successfully parsed JSON, don't continue with other parsing methods
-        }
-        
-        // For end-of-simulation JSON, handle differently
-        if (jsonData.role && jsonData.decisionHistory && jsonData.performanceSummary) {
-          setIsCompleted(true);
-          // Format as readable text instead of raw JSON
-          const formattedSummary = formatPerformanceSummary(jsonData);
-          setScenarioText(formattedSummary);
-          return;
-        }
-      } catch (e) {
-        // Failed to parse as JSON, continue with regular parsing
-        console.log("Failed to parse as JSON:", e);
-      }
+    // Parse round number from content
+    const roundMatch = content.match(/🩺 Round (\d+)\/10/);
+    if (roundMatch && roundMatch[1]) {
+      setCurrentRound(parseInt(roundMatch[1]));
     }
     
-    // Check if content has options (A, B, C format) - this is the fallback method
+    // Extract role information if available and not already set
+    const roleMatch = content.match(/Your role: ([A-Za-z\s]+)/);
+    if (roleMatch && roleMatch[1] && !role) {
+      setRole(roleMatch[1].trim());
+    }
+    
+    // Check if this is the final performance evaluation
+    if (content.includes('FINAL PERFORMANCE EVALUATION') || content.includes('Final Score:')) {
+      setIsCompleted(true);
+      setScenarioText(content);
+      return;
+    }
+    
+    // Check if content has options (A, B, C format)
     // More robust pattern to match options - handles various formats:
     // [A] Option text
     // A. Option text
@@ -177,40 +150,6 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
         setOptions(newOptions);
       }
     }
-  };
-  
-  // Format performance summary from JSON to readable text
-  const formatPerformanceSummary = (data: any) => {
-    let summary = `## Final Performance Evaluation\n\n`;
-    summary += `**Role:** ${data.role}\n\n`;
-    
-    // Add decision history
-    summary += `### Decision History\n\n`;
-    if (data.decisionHistory && data.decisionHistory.length > 0) {
-      data.decisionHistory.forEach((decision: any) => {
-        summary += `**Round ${decision.round}:** ${decision.userDecision}\n`;
-        summary += `${decision.summary}\n\n`;
-      });
-    }
-    
-    // Add performance metrics
-    summary += `### Performance Assessment\n\n`;
-    if (data.performanceSummary) {
-      const metrics = data.performanceSummary;
-      for (const key in metrics) {
-        if (key !== 'finalScore') {
-          const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
-          summary += `**${capitalizedKey}:** ${metrics[key]}\n\n`;
-        }
-      }
-      
-      // Add final score
-      if (metrics.finalScore) {
-        summary += `## Final Score: ${metrics.finalScore}/10\n\n`;
-      }
-    }
-    
-    return summary;
   };
   
   // Format message content with Markdown
@@ -345,10 +284,9 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
     
     // Check if this is a scenario message that should show options
     const isScenarioWithOptions = isLatestAssistantMessage && options.length > 0;
-    const isJsonContent = content.trim().startsWith('{') && content.trim().endsWith('}');
 
-    // If this is the raw JSON content and it's the latest message, show the formatted version
-    if (isJsonContent && isLatestAssistantMessage) {
+    if (isScenarioWithOptions && isLatestAssistantMessage) {
+      // This is a scenario with options and it's the latest message
       return (
         <div>
           <div className="mb-4">
@@ -356,46 +294,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
           </div>
           
           {/* Options as buttons */}
-          {options.length > 0 && (
-            // <div className="mt-6 px-4 py-3 bg-opacity-10 rounded-lg border border-opacity-20 border-red-500 bg-rose-950">
-            <div className="mt-6 px-4 py-3 bg-red-100 dark:bg-rose-950 text-black dark:text-white border border-red-500 border-opacity-20 rounded-lg">
-
-              <p className="font-medium mb-3 text-lg">🤔 What do you do?</p>
-              <div className="flex flex-col space-y-3">
-                {options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleOptionClick(option.label)}
-                    className={`p-4 text-left rounded-md transition hover:opacity-90 shadow-sm border-l-4 ${
-                      theme === 'dark' 
-                        ? 'bg-red-900 text-white hover:bg-red-800 border-red-600' 
-                        : 'bg-red-50 text-red-900 hover:bg-red-100 border-red-500'
-                    }`}
-                  >
-                    <div className="flex items-start">
-                      <span className="font-bold text-lg mr-2">[{option.label}]</span>
-                      <span>{option.text}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <div className="mt-3 text-sm text-opacity-70">
-                Type your own decision or select an option above.
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    } else if (isScenarioWithOptions && isLatestAssistantMessage) {
-      // This is a non-JSON scenario with options (fallback case) and it's the latest message
-      return (
-        <div>
-          <div className="mb-4">
-            {formatMessage(scenarioText)}
-          </div>
-          
-          {/* Options as buttons */}
-          <div className="mt-6 px-4 py-3 bg-opacity-10 rounded-lg border border-opacity-20 border-red-500 bg-red-500">
+          <div className="mt-6 px-4 py-3 bg-red-100 dark:bg-rose-950 text-black dark:text-white border border-red-500 border-opacity-20 rounded-lg">
             <p className="font-medium mb-3 text-lg">🤔 What do you do?</p>
             <div className="flex flex-col space-y-3">
               {options.map((option, index) => (
@@ -429,9 +328,9 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
-      <div className={`flex flex-col h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+      <div className={`flex flex-col h-screen ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
         {/* Header */}
-        <header className={`p-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} flex justify-between items-center shadow-md`}>
+        <header className={`p-4 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} flex justify-between items-center shadow-md`}>
           <div className="flex items-center">
             <button 
               onClick={() => router.push('/')}
@@ -455,12 +354,12 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                 Role: {role}
               </div>
             )}
-            <div className={`px-3 py-1 rounded-full ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
+            <div className={`px-3 py-1 rounded-full ${theme === 'dark' ? 'bg-red-700' : 'bg-gray-200'}`}>
               Round: {currentRound}/10
             </div>
             <button 
               onClick={toggleTheme}
-              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
+              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-red-700' : 'hover:bg-gray-200'}`}
             >
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
@@ -468,7 +367,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
         </header>
         
         {/* Chat Messages */}
-        <div className={`flex-1 overflow-y-auto p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`flex-1 overflow-y-auto p-4 ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-50'}`}>
           <div className="max-w-4xl mx-auto space-y-4">
             {messages.map((message, index) => {
               // Skip system messages
@@ -479,18 +378,18 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                   key={index}
                   className={`p-4 rounded-lg max-w-3xl ${
                     message.role === 'assistant' 
-                      ? theme === 'dark' ? 'bg-gray-800 ml-auto mr-auto' : 'bg-white ml-auto mr-auto shadow' 
-                      : theme === 'dark' ? 'bg-blue-900 mr-auto' : 'bg-blue-100 mr-auto'
+                      ? theme === 'dark' ? 'bg-red-800 ml-auto mr-auto' : 'bg-white ml-auto mr-auto shadow' 
+                      : theme === 'dark' ? 'bg-red-700 mr-auto' : 'bg-blue-100 mr-auto'
                   }`}
                 >
                   <div className={`text-sm font-semibold mb-1 ${
                     message.role === 'assistant' 
                       ? theme === 'dark' ? 'text-red-400' : 'text-red-600'
-                      : theme === 'dark' ? 'text-blue-300' : 'text-blue-700'
+                      : theme === 'dark' ? 'text-red-300' : 'text-blue-700'
                   }`}>
                     {message.role === 'assistant' ? 'MEDICRUX' : 'You'}
                   </div>
-                  <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
+                  <div className={`${theme === 'dark' ? 'text-red-100' : 'text-gray-800'}`}>
                     {message.role === 'assistant' 
                       ? renderAssistantMessage(message.content, index)
                       : formatMessage(message.content)
@@ -503,7 +402,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
             
             {isThinking && (
               <div className={`p-4 rounded-lg max-w-3xl ${
-                theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow'
+                theme === 'dark' ? 'bg-red-800' : 'bg-white shadow'
               } ml-auto mr-auto flex items-center space-x-2`}>
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse delay-100"></div>
@@ -515,7 +414,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
         </div>
         
         {/* Input Area */}
-        <div className={`p-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className={`p-4 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} border-t ${theme === 'dark' ? 'border-red-700' : 'border-gray-200'}`}>
           <div className="max-w-4xl mx-auto">
             {isCompleted ? (
               <div className="flex space-x-4">
@@ -537,7 +436,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                   shimmerSize="0.05em"
                   shimmerDuration="2s"
                   borderRadius="0.5rem"
-                  background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
+                  background={theme === 'dark' ? 'rgb(127, 29, 29)' : 'rgb(229, 231, 235)'}
                 >
                   Return Home
                 </ShimmerButton>
@@ -550,7 +449,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                   onChange={(e) => setUserInput(e.target.value)}
                   placeholder="Type your custom response... (or select an option above)"
                   className={`flex-1 p-3 rounded-lg ${
-                    theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-gray-100 text-gray-900 border-gray-300'
+                    theme === 'dark' ? 'bg-gray-900 text-white border-red-600' : 'bg-gray-100 text-gray-900 border-gray-300'
                   } border focus:outline-none focus:ring-2 focus:ring-red-500`}
                   disabled={isThinking}
                 />
@@ -573,7 +472,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                   shimmerSize="0.1em"
                   shimmerDuration="2s"
                   borderRadius="0.5rem"
-                  background={isThinking ? "rgb(156, 163, 175)" : "rgb(107, 114, 128)"}
+                  background={isThinking ? "rgb(156, 163, 175)" : "rgb(127, 29, 29)"}
                   disabled={isThinking}
                 >
                   End

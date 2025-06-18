@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       const hospitalPrompt = HOSPITAL_CRISIS_SIMULATION_PROMPT;
 
       try {
-        // Make the API call with JSON response formatting
+        // Make the API call with text response formatting
         const completion = await openai.chat.completions.create({
           // model: "gpt-4o-mini",
           model: "gpt-4.1",
@@ -39,12 +39,11 @@ export async function POST(request: NextRequest) {
             },
             {
               role: 'user',
-              content: "Start a new hospital crisis management simulation. Select a random role for the participant from the available options. Begin with Round 1 and present an initial hospital crisis scenario. Format the response as JSON exactly as described in the OUTPUT_STRUCTURE section of your instructions.",
+              content: "Start a new hospital crisis management simulation. Select a random role for the participant from the available options. Begin with Round 1 and present an initial hospital crisis scenario using the simple text format described in your instructions.",
             }
           ],
           temperature: 0.8, // Higher temperature for more variety
           max_tokens: 4000, // Appropriate for initial scenario
-          response_format: { type: "json_object" }, // Request JSON format
         });
 
         const simulationText = completion.choices[0]?.message?.content;

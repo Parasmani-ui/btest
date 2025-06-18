@@ -70,10 +70,10 @@ export async function POST(request: NextRequest) {
     // Create the user message based on input
     let userMessage = "";
     if (isExit || isRound10Complete) {
-      userMessage = "exit and provide a performance evaluation in JSON format";
+      userMessage = "exit and provide a performance evaluation";
     } else {
-      // Append JSON format request to user input with explicit next round instruction
-      userMessage = `${userInput} (CRITICAL INSTRUCTION: Acknowledge the user's choice, increase the round number by 1, and present a NEW scenario for the NEXT round. Current content MUST be replaced with a different crisis scenario. Format as JSON per OUTPUT_STRUCTURE)`;
+      // Append next round instruction to user input
+      userMessage = `${userInput}`;
     }
 
     // Make the API call
@@ -88,11 +88,11 @@ export async function POST(request: NextRequest) {
           },
           {
             role: 'system',
-            content: "CRITICAL INSTRUCTION: After receiving the user's decision, you MUST advance to the next round with a new scenario. DO NOT repeat the current round."
+            content: "CRITICAL INSTRUCTION: After receiving the user's decision, acknowledge their choice briefly, then advance to the next round with a completely new scenario. DO NOT repeat the current round."
           },
           {
             role: 'system',
-            content: "PROGRESS REQUIREMENT: Each time a user submits a decision, increment the round number and present an entirely new scenario. For example, if they just responded to Round 2, you MUST present Round 3 with different content."
+            content: "PROGRESS REQUIREMENT: Each time a user submits a decision, increment the round number and present an entirely new scenario using the simple text format specified in your instructions."
           },
           ...simulationHistory.map((msg: any) => ({
             role: msg.role,
@@ -105,7 +105,6 @@ export async function POST(request: NextRequest) {
         ],
         temperature: 0.7,
         max_tokens: 4000,
-        response_format: { type: "json_object" }, // Request JSON format
       });
 
       const responseText = completion.choices[0]?.message?.content;
