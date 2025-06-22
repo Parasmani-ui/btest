@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Settings, User, Wrench, FileText, Target } from 'lucide-react';
-import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
@@ -12,7 +11,6 @@ interface ChainFailDecisions {
   rootCause: string;
   secondaryFactor: string;
   preventiveAction: string;
-  responsibleParty: string;
 }
 
 interface ChainFailSimulationClientProps {
@@ -38,8 +36,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
   const [decisions, setDecisions] = useState<ChainFailDecisions>({
     rootCause: '',
     secondaryFactor: '',
-    preventiveAction: '',
-    responsibleParty: ''
+    preventiveAction: ''
   });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<string>('');

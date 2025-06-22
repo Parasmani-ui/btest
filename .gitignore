@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -46,3 +44,54 @@ next-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Firebase
+firebase-debug.log
+firebase-debug.*.log
+*.log
+firebase.json
+.firebase/
+.firebaserc
+
+# Firebase Admin SDK (Service Account Keys)
+*firebase-adminsdk*.json
+*service-account*.json
+
+# Cache files
+caseCache.json
+*.cache
+.cache/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary folders
+tmp/
+temp/

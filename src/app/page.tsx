@@ -8,6 +8,7 @@ import { SparklesText } from '@/components/magicui/sparkles-text';
 import { TextReveal } from '@/components/magicui/text-reveal';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
+import { Header } from '@/components/ui/Header';
 
 export default function Home() {
   const router = useRouter();
@@ -50,399 +51,283 @@ export default function Home() {
   }
 
   return (
-    <main className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-      <div className="flex">
-        {/* Sidebar */}
-        <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
-          <div className="flex flex-col h-full">
-            <div className="p-4 flex justify-center">
-              <Link href="/">
-                <Image src="/img.png" alt="DetectAive Logo" width={80} height={80} className="cursor-pointer" priority/>
-              </Link>
-            </div>
-            
-            <div className="p-4 flex-grow">
-              <div className="mb-4 relative space-y-4">
-                <ShimmerButton
-                  onClick={startGame}
-                  className="w-full p-3 text-white"
-                  shimmerColor="rgba(255, 255, 255, 0.8)"
-                  shimmerSize="0.1em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background="rgb(37, 99, 235)"
-                >
-                  Critical Reading
-                </ShimmerButton>
-                
-                <ShimmerButton
-                  onClick={startSimulation}
-                  className="w-full p-3 text-white"
-                  shimmerColor="rgba(255, 255, 255, 0.8)"
-                  shimmerSize="0.1em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background="rgb(21, 128, 61)"
-                >
-                  Critical Investigation
-                </ShimmerButton>
-
-                <ShimmerButton
-                  onClick={startHospitalSimulation}
-                  className="w-full p-3 text-white"
-                  shimmerColor="rgba(255, 255, 255, 0.8)"
-                  shimmerSize="0.1em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background="rgb(220, 38, 38)"
-                >
-                  Crisis Management
-                </ShimmerButton>
-
-                <ShimmerButton
-                  onClick={startFakeNewsSimulation}
-                  className="w-full p-3 text-white"
-                  shimmerColor="rgba(255, 255, 255, 0.8)"
-                  shimmerSize="0.1em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background="rgb(245, 101, 39)"
-                >
-                  Critical Misinformation
-                </ShimmerButton>
-
-                <ShimmerButton
-                  onClick={startChainFailSimulation}
-                  className="w-full p-3 text-white"
-                  shimmerColor="rgba(255, 255, 255, 0.8)"
-                  shimmerSize="0.1em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background="rgb(168, 85, 247)"
-                >
-                  Critical ChainFail
-                </ShimmerButton>
-              </div>
-            </div>
-            
-            <div className={`p-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-              <div className="flex flex-col gap-4">
-                <Link href="/admin" className={`w-full p-2 text-center ${theme === 'dark' ? 'bg-gray-600 text-white' : 'bg-gray-400 text-gray-800'} rounded`}>
-                  Admin
+    <>
+      <Header />
+      <main className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-900 text-gray-900'}`}>
+        <div className="flex">
+          {/* Sidebar */}
+          <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
+            <div className="flex flex-col h-full">
+              {/* <div className="p-4 flex justify-center">
+                <Link href="/">
+                  <Image src="/img.png" alt="DetectAive Logo" width={80} height={80} className="cursor-pointer" priority/>
                 </Link>
-                <div className="flex justify-end">
-                  <button onClick={toggleTheme} className="text-xl">
-                    {theme === 'dark' ? '🌙' : '☀️'}
-                  </button>
+              </div> */}
+              
+              <div className="p-4 flex-grow">
+                <div className="mb-4 relative space-y-4">
+                  <ShimmerButton
+                    onClick={startGame}
+                    className="w-full p-3 text-white"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(37, 99, 235)"
+                  >
+                    Critical Reading
+                  </ShimmerButton>
+                  
+                  <ShimmerButton
+                    onClick={startSimulation}
+                    className="w-full p-3 text-white text-sm"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(21, 128, 61)"
+                  >
+                    Critical Investigation
+                  </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startHospitalSimulation}
+                    className="w-full p-3 text-white"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(220, 38, 38)"
+                  >
+                    Crisis Management
+                  </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startFakeNewsSimulation}
+                    className="w-full p-3 text-white text-sm"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(245, 101, 39)"
+                  >
+                    Critical Misinformation
+                  </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startChainFailSimulation}
+                    className="w-full p-3 text-white"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(168, 85, 247)"
+                  >
+                    Critical ChainFail
+                  </ShimmerButton>
+                </div>
+              </div>
+              
+              <div className={`p-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
+                <div className="flex flex-col gap-4">
+                  <Link href="/admin" className={`w-full p-2 text-center ${theme === 'dark' ? 'bg-gray-600 text-white' : 'bg-gray-400 text-gray-800'} rounded`}>
+                    Admin
+                  </Link>
+                  <div className="flex justify-end">
+                    <button onClick={toggleTheme} className="text-xl">
+                      {theme === 'dark' ? '🌙' : '☀️'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Main Content */}
-        <div className="ml-48 flex-grow p-8 overflow-y-auto">
-          <div className="max-w-6xl mx-auto">
-            {/* Header Section */}
-            <div className="text-center mb-12">
-              <Image src="/img.png" alt="Parasmani Skills Logo" width={200} height={200} className="mx-auto mb-6" priority/>
-              
-              <div className="mb-6">
-                <SparklesText 
-                  className="text-2xl sm:text-3xl font-bold mb-2"
-                  colors={{ first: "#3b82f6", second: "#10b981" }}
-                >
-                  Your Trusted Company
-                </SparklesText>
-                <h2 className="text-xl font-semibold mb-4">Skills Assessment Agency</h2>
-                <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-4xl mx-auto`}>
-                  "Parasmani Skills" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
-                </p>
-              </div>
-            </div>
-
-            {/* Game Modes Section */}
-            <div className="mb-16">
-              <TextAnimate
-                className="text-2xl font-bold text-center mb-8"
-                animation="slideUp"
-                by="word"
-                duration={0.3}
-              >
-                TEST YOUR SKILLS
-              </TextAnimate>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-                {/* Critical Reading card */}
-                <div 
-                  className={`p-6 rounded-lg border border-[rgb(37,99,235)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
-                  onClick={startGame}
-                >
-                  <SparklesText 
-                    className="text-lg font-bold mb-2"
-                    colors={{ first: "#3b82f6", second: "#60a5fa" }}
-                    sparklesCount={6}
-                  >
-                    Quick Investigation
-                  </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Reading</p>
-                </div>
+          
+          {/* Main Content */}
+          <div className="ml-48 flex-grow p-8 overflow-y-auto">
+            <div className="max-w-6xl mx-auto">
+              {/* Header Section */}
+              <div className="text-center mb-12">
+                <Image src="/img.png" alt="Parasmani Skills Logo" width={200} height={200} className="mx-auto mb-6" priority/>
                 
-                {/* Critical Investigation card */}
-                <div 
-                  className={`p-6 rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
-                  onClick={startSimulation}
-                >
+                <div className="mb-6">
                   <SparklesText 
-                    className="text-lg font-bold mb-2"
-                    colors={{ first: "#10b981", second: "#34d399" }}
-                    sparklesCount={6}
+                    className="text-2xl sm:text-3xl font-bold mb-2"
+                    colors={{ first: "#3b82f6", second: "#10b981" }}
                   >
-                    Corporate POSH Training
+                    Your Trusted Company
                   </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Investigation</p>
-                </div>
-
-                {/* Crisis Management card */}
-                <div 
-                  className={`p-6 rounded-lg border border-[rgb(220,38,38)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
-                  onClick={startHospitalSimulation}
-                >
-                  <SparklesText 
-                    className="text-lg font-bold mb-2"
-                    colors={{ first: "#ef4444", second: "#f87171" }}
-                    sparklesCount={6}
-                  >
-                    Hospital Simulation
-                  </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Crisis Management</p>
-                </div>
-
-                {/* Critical Misinformation card */}
-                <div 
-                  className={`p-6 rounded-lg border border-[rgb(245,101,39)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
-                  onClick={startFakeNewsSimulation}
-                >
-                  <SparklesText 
-                    className="text-lg font-bold mb-2"
-                    colors={{ first: "#f59e0b", second: "#fbbf24" }}
-                    sparklesCount={6}
-                  >
-                    Social Fake News
-                  </SparklesText>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Misinformation</p>
-                </div>
-
-                {/* Critical ChainFail card */}
-                <div 
-                  className={`p-6 rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
-                  onClick={startChainFailSimulation}
-                >
-                  <SparklesText 
-                    className="text-lg font-bold mb-2"
-                    colors={{ first: "#a855f7", second: "#d8b4fe" }}
-                    sparklesCount={6}
-                  >
-                    Industrial accident
-                  </SparklesText>
-                                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical ChainFail</p>
+                  <h2 className="text-xl font-semibold mb-4">Skills Assessment Agency</h2>
+                  <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-4xl mx-auto`}>
+                    "Parasmani Skills" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
+                  </p>
                 </div>
               </div>
-            </div>
 
-            {/* What We Do Section */}
-            <div className="mb-16">
-              <div className="flex justify-center mb-8">
+              {/* Game Modes Section */}
+              <div className="mb-16">
                 <TextAnimate
-                  className="text-2xl font-bold border-b-4 border-blue-300 inline-block pb-1"
+                  className="text-2xl font-bold text-center mb-8"
                   animation="slideUp"
                   by="word"
                   duration={0.3}
                 >
-                  What We Do
+                  TEST YOUR SKILLS
                 </TextAnimate>
-              </div>
-
-              <p className={`text-center text-lg mb-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                We provide wide range of business services
-              </p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-semibold mb-2">SKILLS ASSESSMENT</h3>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-semibold mb-2">CREDENTIAL SERVICES</h3>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-semibold mb-2">SOLUTION FOR INSTITUTIONS</h3>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-semibold mb-2">CORPORATE SOLUTIONS</h3>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-semibold mb-2">PLACEMENT SUPPORT</h3>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-semibold mb-2">TEST YOUR SKILLS</h3>
-                </div>
-              </div>
-              
-              <div className="text-center mt-8">
-                <ShimmerButton
-                  onClick={() => {}}
-                  className="px-6 py-3 text-white"
-                  shimmerColor="rgba(255, 255, 255, 0.8)"
-                  shimmerSize="0.1em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background="rgb(37, 99, 235)"
-                >
-                  View All Our Services
-                </ShimmerButton>
-              </div>
-            </div>
-
-            {/* Our Associations Section */}
-            <div className="mb-16">
-              <TextAnimate
-                className="text-2xl font-bold text-center mb-8"
-                animation="slideUp"
-                by="word"
-                duration={0.3}
-              >
-                Our Associations
-              </TextAnimate>
-              <p className={`text-center text-lg mb-8 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                We are associated with like minded Organizations
-              </p>
-              
-              {/* <div className="grid grid-cols-2 md:grid-cols-5 gap-6 items-center">
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <p className="font-semibold">PSSC</p>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <p className="font-semibold">RASCI</p>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <p className="font-semibold">AU</p>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <p className="font-semibold">CII</p>
-                </div>
-                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <p className="font-semibold">DWSSC</p>
-                </div>
-              </div> */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-6 items-center">
-                {/* PSSC */}
-                <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                 <img src="/pssc.png" alt="PSSC Logo" className="w-22 h-22 mx-auto mb-1 object-contain" />
-                 <p className="font-semibold">PSSC</p>
-                </div>
-
-              {/* RASCI */}
-                <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <img src="/rasci.jpg" alt="RASCI Logo" className="w-22 h-22 mx-auto mb-1 object-contain" />
-                  <p className="font-semibold">RASCI</p>
-                </div>
-
-              {/* AU */}
-                <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <img src="/images/au.png" alt="AU " className="w-22 h-22 mx-auto mb-1 object-contain" />
-                  <p className="font-semibold">AU</p>
-                </div>
-
-              {/* CII */}
-                <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <img src="/cii.png" alt="CII Logo" className="w-22 h-22 mx-auto mb-1 object-contain" />
-                  <p className="font-semibold">CII</p>
-                </div>
-
-              {/* DWSSC */}
-                <div className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <img src="/dwssc.png" alt="DWSSC Logo" className="w- h-16 mx-auto mb-1 object-contain" />
-                  <p className="font-semibold">DWSSC</p>
-                </div>
-              </div>
-
-
-            </div>
-
-            {/* About Us Section */}
-            <div className="mb-16">
-              <TextAnimate
-                className="text-2xl font-bold text-center mb-8"
-                animation="slideUp"
-                by="word"
-                duration={0.3}
-              >
-                Your Trusted Partners For Assessment
-              </TextAnimate>
-              <p className={`text-center text-lg mb-12 max-w-4xl mx-auto ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                The company is incorporated with mission of contributing to the inclusive growth of individuals and organisation and contribute to the development of country by being a key player in assessment system.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-bold text-lg mb-3">ABOUT US</h3>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Parasmani Skills is started with the objective to be a key player as an assessing agency.
-                  </p>
-                </div>
                 
-                <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-bold text-lg mb-3">CAREER</h3>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Parasmani Skills is providing employment opportunities for various roles & locations.
-                  </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                  {/* Critical Reading card */}
+                  <div 
+                    className={`p-6 rounded-lg border border-[rgb(37,99,235)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    onClick={startGame}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={{ first: "#3b82f6", second: "#60a5fa" }}
+                      sparklesCount={6}
+                    >
+                      Quick Investigation
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Reading</p>
+                  </div>
+                  
+                  {/* Critical Investigation card */}
+                  <div 
+                    className={`p-6 rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    onClick={startSimulation}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={{ first: "#10b981", second: "#34d399" }}
+                      sparklesCount={6}
+                    >
+                      Complex Investigation
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | Critical Investigation</p>
+                  </div>
+                  
+                  {/* Crisis Management card */}
+                  <div 
+                    className={`p-6 rounded-lg border border-[rgb(220,38,38)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    onClick={startHospitalSimulation}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={{ first: "#dc2626", second: "#ef4444" }}
+                      sparklesCount={6}
+                    >
+                      Crisis Response
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>10-20m | Crisis Management</p>
+                  </div>
+                  
+                  {/* Critical Misinformation card */}
+                  <div 
+                    className={`p-6 rounded-lg border border-[rgb(245,101,39)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    onClick={startFakeNewsSimulation}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={{ first: "#f56527", second: "#fb923c" }}
+                      sparklesCount={6}
+                    >
+                      Information Scrutiny
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>8-15m | Critical Misinformation</p>
+                  </div>
+                  
+                  {/* Critical ChainFail card */}
+                  <div 
+                    className={`p-6 rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    onClick={startChainFailSimulation}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={{ first: "#a855f7", second: "#c084fc" }}
+                      sparklesCount={6}
+                    >
+                      Chain Analysis
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>12-25m | Critical ChainFail</p>
+                  </div>
                 </div>
-                
-                <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-bold text-lg mb-3">SOLUTIONS</h3>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Parasmani Skills provides different services for students and agencies.
-                  </p>
+              </div>
+
+                             {/* Skills showcase section */}
+
+              <div className="mb-16">
+                <div className="flex justify-center mb-8">
+                  <TextAnimate
+                    className="text-2xl font-bold border-b-4 border-blue-300 inline-block pb-1 text-white"
+                    animation="slideUp"
+                    by="word"
+                    duration={0.3}
+                  >
+                    Experience our comprehensive skills assessment program 
+                  </TextAnimate>
+                </div>  
+                <p className={`text-lg mt-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-3xl mx-auto`}>
+                  Develop critical thinking, problem-solving, and investigative skills through immersive scenarios designed to challenge and enhance your cognitive abilities.
+                </p>
+              </div>
+
+              {/* Partners section */}
+              <div className="mb-16">
+                <h3 className="text-xl font-bold text-center mb-8">Our Esteemed Partners</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 items-center justify-center">
+                  <div className="flex justify-center">
+                    <Image src="/cii.png" alt="CII" width={80} height={80} className="object-contain" />
+                  </div>
+                  <div className="flex justify-center">
+                    <Image src="/dwssc.png" alt="DWSSC" width={80} height={60} className="object-contain" />
+                  </div>
+                  <div className="flex justify-center">
+                    <Image src="/ncvet_skill_india.png" alt="NCVET Skill India" width={80} height={80} className="object-contain" />
+                  </div>
+                  <div className="flex justify-center">
+                    <Image src="/nsdc.png" alt="NSDC" width={80} height={80} className="object-contain" />
+                  </div>
+                  <div className="flex justify-center">
+                    <Image src="/pssc.png" alt="PSSC" width={80} height={80} className="object-contain" />
+                  </div>
                 </div>
-                
-                <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} text-center hover:shadow-lg transition`}>
-                  <h3 className="font-bold text-lg mb-3">ASSOCIATE WITH US</h3>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Parasmani Skills is working to supplement and compliment the effort of like-minded agencies.
-                  </p>
+              </div>
+
+              {/* About section */}
+              <div className={`p-8 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} mb-16`}>
+                <h3 className="text-2xl font-bold mb-6 text-center">Why Choose Parasmani ?</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="text-center">
+                    <h4 className="text-lg font-semibold mb-3">🎯 Targeted Assessment</h4>
+                    <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Our assessments are designed to evaluate specific cognitive skills essential for modern problem-solving scenarios.
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <h4 className="text-lg font-semibold mb-3">🧠 Adaptive Learning</h4>
+                    <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Each simulation adapts to your skill level, providing personalized challenges that promote continuous improvement.
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <h4 className="text-lg font-semibold mb-3">📊 Comprehensive Analytics</h4>
+                    <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Detailed performance analytics help you understand your strengths and areas for development.
+                    </p>
+                  </div>
                 </div>
+              </div>
+
+              {/* Footer */}
+              <div className="text-center pt-8 border-t border-gray-300">
+                <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  © 2016 Parasmani Skills. | Empowering minds through innovative assessment solutions.
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <footer className={`fixed bottom-0 w-full p-2 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
-        <div className="flex justify-between items-center">
-          <span>@Parasmani Skill Pvt</span>
-        </div>
-      </footer>
-      
-      {/* Add custom scrollbar styles */}
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: ${theme === 'dark' ? '#1f2937' : '#e5e7eb'};
-          border-radius: 5px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: ${theme === 'dark' ? '#4b5563' : '#9ca3af'};
-          border-radius: 5px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: ${theme === 'dark' ? '#6b7280' : '#6b7280'};
-        }
-      `}</style>
-    </main>
+      </main>
+    </>
   );
 }

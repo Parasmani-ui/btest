@@ -16,10 +16,17 @@ export async function middleware(request: NextRequest) {
     // Log API performance to console
     console.log(`API ${request.nextUrl.pathname} took ${Date.now() - startTime}ms`);
   }
+
+  // Handle auth redirects
+  if (request.nextUrl.pathname.startsWith('/dashboard') || 
+      request.nextUrl.pathname.startsWith('/admin')) {
+    // These routes will be protected by the ProtectedRoute component
+    // The middleware just passes through for client-side auth checking
+  }
   
   return response;
 }
 
 export const config = {
-  matcher: ['/api/:path*'],
+  matcher: ['/api/:path*', '/dashboard/:path*', '/admin/:path*'],
 }; 

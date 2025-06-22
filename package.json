@@ -9,10 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
     "@langchain/openai": "^0.5.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
+    "firebase": "^11.9.1",
+    "firebase-admin": "^13.4.0",
     "langchain": "^0.3.19",
     "lucide-react": "^0.508.0",
     "motion": "^12.10.5",
@@ -20,9 +23,12 @@
     "openai": "^4.91.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.58.1",
+    "react-hot-toast": "^2.5.2",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "tailwind-merge": "^3.2.0"
+    "tailwind-merge": "^3.2.0",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
