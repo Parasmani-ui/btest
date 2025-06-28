@@ -7,6 +7,7 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
 import ReactMarkdown from 'react-markdown';
+import GameHeader from '@/components/ui/GameHeader';
 
 // Define props for the component
 interface HospitalSimulationClientProps {
@@ -328,43 +329,28 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
+      <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={true} />
       <div className={`flex flex-col h-screen ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-        {/* Header */}
-        <header className={`p-4 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} flex justify-between items-center shadow-md`}>
-          <div className="flex items-center">
-            <button 
-              onClick={() => router.push('/')}
-              className="mr-4 p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-            </button>
-            <SparklesText 
-              className="text-xl font-bold"
-              colors={{ first: "#ef4444", second: "#f97316" }}
-            >
-              Hospital Crisis Simulation
-            </SparklesText>
-          </div>
-          
+        {/* Game Info Bar */}
+        <div className={`p-3 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} flex justify-between items-center shadow-sm border-b ${theme === 'dark' ? 'border-red-700' : 'border-gray-200'}`}>
           <div className="flex items-center space-x-4">
             {role && (
-              <div className={`px-3 py-1 rounded-full ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-red-100 text-red-800'}`}>
+              <div className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-red-100 text-red-800'}`}>
                 Role: {role}
               </div>
             )}
-            <div className={`px-3 py-1 rounded-full ${theme === 'dark' ? 'bg-red-700' : 'bg-gray-200'}`}>
+            <div className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-red-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
               Round: {currentRound}/10
             </div>
-            <button 
-              onClick={toggleTheme}
-              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-red-700' : 'hover:bg-gray-200'}`}
-            >
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
           </div>
-        </header>
+          
+          <button 
+            onClick={toggleTheme}
+            className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-red-700' : 'hover:bg-gray-200'}`}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+        </div>
         
         {/* Chat Messages */}
         <div className={`flex-1 overflow-y-auto p-4 ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-50'}`}>

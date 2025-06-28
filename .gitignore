@@ -95,3 +95,6 @@ pids
 # Temporary folders
 tmp/
 temp/
+DASHBOARD_IMPLEMENTATION_SUMMARY.md
+TEST_DATA_SETUP.md
+VERCEL_DEPLOYMENT_SETUP.md

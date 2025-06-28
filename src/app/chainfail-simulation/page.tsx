@@ -6,6 +6,8 @@ import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import { useGameSession } from '@/lib/gameSession';
+import GameHeader from '@/components/ui/GameHeader';
 
 export default function ChainFailSimulationPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +15,7 @@ export default function ChainFailSimulationPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const { startSession } = useGameSession();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -21,6 +24,13 @@ export default function ChainFailSimulationPage() {
   const generateSimulation = async () => {
     setIsLoading(true);
     setError(null);
+    
+    try {
+      // Start game session tracking
+      await startSession('chainfail');
+    } catch (sessionError) {
+      console.error('Error starting session:', sessionError);
+    }
     
     // Create an AbortController to handle request timeouts
     const controller = new AbortController();
@@ -90,6 +100,7 @@ export default function ChainFailSimulationPage() {
   if (isLoading) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
+        <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={false} />
         <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'}`}>
           <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
             <TextAnimate
@@ -118,6 +129,7 @@ export default function ChainFailSimulationPage() {
   if (error) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
+        <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={false} />
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'} flex items-center justify-center`}>
           <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <TextAnimate
@@ -211,15 +223,19 @@ export default function ChainFailSimulationPage() {
 
   if (hasStarted && simulationText) {
     return (
-      <ChainFailSimulationClient
-        simulationText={simulationText}
-        onStartNewCase={handleStartNewCase}
-      />
+      <ThemeProvider value={{ theme, toggleTheme }}>
+        <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={true} />
+        <ChainFailSimulationClient
+          simulationText={simulationText}
+          onStartNewCase={handleStartNewCase}
+        />
+      </ThemeProvider>
     );
   }
 
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
+      <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={false} />
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'} flex items-center justify-center`}>
         <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-2xl w-full`}>
           <div className="text-center">

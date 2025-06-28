@@ -9,6 +9,8 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
 import { useRouter } from 'next/navigation';
+import GameHeader from '@/components/ui/GameHeader';
+import { useGameSession } from '@/lib/gameSession';
 
 interface SimulationClientProps {
   simulationText: string;
@@ -473,6 +475,11 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
   
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
+      <GameHeader 
+        gameTitle="Complex Investigation" 
+        showTimestamp={true}
+        startTiming={!!(parsedData.simulationData || parsedData.markdownData) && !hasSubmitted}
+      />
       <div className={`flex h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
         <div className={`w-64 ${theme === 'dark' ? 'bg-green-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-green-700' : 'border-gray-300'}`}>

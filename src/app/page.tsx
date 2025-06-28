@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -9,6 +9,17 @@ import { TextReveal } from '@/components/magicui/text-reveal';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { Header } from '@/components/ui/Header';
+
+// Define colors outside component to prevent recreating on every render
+const SPARKLE_COLORS = {
+  main: { first: "#3b82f6", second: "#10b981" },
+  blue: { first: "#3b82f6", second: "#60a5fa" },
+  green: { first: "#10b981", second: "#34d399" },
+  red: { first: "#dc2626", second: "#ef4444" },
+  orange: { first: "#f56527", second: "#fb923c" },
+  purple: { first: "#a855f7", second: "#c084fc" },
+  gold: { first: "#f59e0b", second: "#fbbf24" }
+};
 
 export default function Home() {
   const router = useRouter();
@@ -45,6 +56,10 @@ export default function Home() {
     router.push(`/chainfail-simulation`);
   };
 
+  const startForensicAuditSimulation = () => {
+    router.push(`/forensic-audit-simulation`);
+  };
+
   // Don't render until client-side
   if (!mounted) {
     return null;
@@ -75,7 +90,7 @@ export default function Home() {
                     borderRadius="0.5rem"
                     background="rgb(37, 99, 235)"
                   >
-                    Critical Reading
+                    Critical Thinking
                   </ShimmerButton>
                   
                   <ShimmerButton
@@ -125,10 +140,22 @@ export default function Home() {
                   >
                     Critical ChainFail
                   </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startForensicAuditSimulation}
+                    className="w-full p-3 text-white text-sm"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(245, 158, 11)"
+                  >
+                    Financial Investigation
+                  </ShimmerButton>
                 </div>
               </div>
               
-              <div className={`p-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
+              {/* <div className={`p-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
                 <div className="flex flex-col gap-4">
                   <Link href="/admin" className={`w-full p-2 text-center ${theme === 'dark' ? 'bg-gray-600 text-white' : 'bg-gray-400 text-gray-800'} rounded`}>
                     Admin
@@ -139,7 +166,7 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
           
@@ -153,7 +180,7 @@ export default function Home() {
                 <div className="mb-6">
                   <SparklesText 
                     className="text-2xl sm:text-3xl font-bold mb-2"
-                    colors={{ first: "#3b82f6", second: "#10b981" }}
+                    colors={SPARKLE_COLORS.main}
                   >
                     Your Trusted Company
                   </SparklesText>
@@ -175,7 +202,8 @@ export default function Home() {
                   TEST YOUR SKILLS
                 </TextAnimate>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                {/* First Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
                   {/* Critical Reading card */}
                   <div 
                     className={`p-6 rounded-lg border border-[rgb(37,99,235)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
@@ -183,12 +211,12 @@ export default function Home() {
                   >
                     <SparklesText 
                       className="text-lg font-bold mb-2"
-                      colors={{ first: "#3b82f6", second: "#60a5fa" }}
+                      colors={SPARKLE_COLORS.blue}
                       sparklesCount={6}
                     >
                       Quick Investigation
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Reading</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Thinking</p>
                   </div>
                   
                   {/* Critical Investigation card */}
@@ -198,7 +226,7 @@ export default function Home() {
                   >
                     <SparklesText 
                       className="text-lg font-bold mb-2"
-                      colors={{ first: "#10b981", second: "#34d399" }}
+                      colors={SPARKLE_COLORS.green}
                       sparklesCount={6}
                     >
                       Complex Investigation
@@ -213,7 +241,7 @@ export default function Home() {
                   >
                     <SparklesText 
                       className="text-lg font-bold mb-2"
-                      colors={{ first: "#dc2626", second: "#ef4444" }}
+                      colors={SPARKLE_COLORS.red}
                       sparklesCount={6}
                     >
                       Crisis Response
@@ -228,7 +256,7 @@ export default function Home() {
                   >
                     <SparklesText 
                       className="text-lg font-bold mb-2"
-                      colors={{ first: "#f56527", second: "#fb923c" }}
+                      colors={SPARKLE_COLORS.orange}
                       sparklesCount={6}
                     >
                       Information Scrutiny
@@ -243,12 +271,51 @@ export default function Home() {
                   >
                     <SparklesText 
                       className="text-lg font-bold mb-2"
-                      colors={{ first: "#a855f7", second: "#c084fc" }}
+                      colors={SPARKLE_COLORS.purple}
                       sparklesCount={6}
                     >
                       Chain Analysis
                     </SparklesText>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>12-25m | Critical ChainFail</p>
+                  </div>
+                </div>
+
+                {/* Second Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                  {/* Forensic Audit card */}
+                  <div 
+                    className={`p-6 rounded-lg border border-[rgb(245,158,11)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    onClick={startForensicAuditSimulation}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={SPARKLE_COLORS.gold}
+                      sparklesCount={6}
+                    >
+                      Forensic Audit
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Financial misconduct</p>
+                  </div>
+                  
+                  {/* Placeholder cards for future games */}
+                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
+                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
+                    <p className="text-sm text-gray-400">New Game Mode</p>
+                  </div>
+                  
+                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
+                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
+                    <p className="text-sm text-gray-400">New Game Mode</p>
+                  </div>
+                  
+                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
+                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
+                    <p className="text-sm text-gray-400">New Game Mode</p>
+                  </div>
+                  
+                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
+                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
+                    <p className="text-sm text-gray-400">New Game Mode</p>
                   </div>
                 </div>
               </div>

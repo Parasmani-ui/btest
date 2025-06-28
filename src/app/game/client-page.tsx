@@ -12,6 +12,8 @@ import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { SparklesText } from "@/components/magicui/sparkles-text";
+import { useGameSession } from '@/lib/gameSession';
+import GameHeader from '@/components/ui/GameHeader';
 
 interface GameState {
   started: boolean;
@@ -43,6 +45,7 @@ export default function GameContent() {
   const router = useRouter();
   const mode = 'quick';
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const { startSession, endSession, addEvidence, addAction, incrementHints, getCurrentSession } = useGameSession();
   const [gameState, setGameState] = useState<GameState>({
     started: false,
     mode: null,
@@ -71,6 +74,9 @@ export default function GameContent() {
   const startGame = useCallback(async () => {
     setLoading(true);
     try {
+      // Start game session tracking
+      await startSession('quick');
+      
       const response = await fetch('/api/start-game', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,12 +109,46 @@ export default function GameContent() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [startSession]);
 
   // Start game when component is mounted
   useEffect(() => {
     startGame();
-  }, [startGame]);
+  }, []);
+
+  // Cleanup session on component unmount or page leave
+  useEffect(() => {
+    const handleBeforeUnload = async () => {
+      const session = getCurrentSession();
+      if (session.isActive) {
+        // End session without score if user leaves unexpectedly
+        await endSession(false, 0);
+      }
+    };
+
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'hidden') {
+        const session = getCurrentSession();
+        if (session.isActive && !gameState.gameOver) {
+          // Don't end session on visibility change, just let it track time
+          console.log('Game minimized, session continues...');
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // End session when component unmounts
+      const session = getCurrentSession();
+      if (session.isActive && !gameState.gameOver) {
+        endSession(false, 0);
+      }
+    };
+  }, []);
 
   // toggle theme
   const toggleTheme = () => {
@@ -119,6 +159,9 @@ export default function GameContent() {
   const interrogateSuspect = async (suspect: string) => {
     setLoading(true);
     try {
+      // Track this action in the session
+      await addAction(`Interrogated ${suspect}`);
+      
       const response = await fetch('/api/interrogate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -150,6 +193,10 @@ export default function GameContent() {
   const analyzeEvidence = async (evidence: string) => {
     setLoading(true);
     try {
+      // Track evidence analysis
+      await addEvidence(`Analyzed: ${evidence}`);
+      await addAction(`Analyzed evidence: ${evidence}`);
+      
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -184,6 +231,9 @@ export default function GameContent() {
 
     setLoading(true);
     try {
+      // Track the arrest action
+      await addAction(`Arrested ${suspect}`);
+      
       const res = await fetch('/api/arrest', {
         method: 'POST',
         headers: {
@@ -198,6 +248,19 @@ export default function GameContent() {
       const data = await res.json();
       
       if (data.success) {
+        // Calculate score based on correctness and efficiency
+        const isCorrect = data.correctSuspectIdentified;
+        const baseScore = isCorrect ? 100 : 0;
+        const evidenceBonus = gameState.analyzedEvidence.length * 5; // 5 points per evidence analyzed
+        const interrogationBonus = gameState.interrogatedSuspects.length * 3; // 3 points per suspect interrogated
+        const hintsUsed = gameState.currentHint + 1;
+        const hintPenalty = hintsUsed * 2; // 2 points penalty per hint used
+        
+        const finalScore = Math.max(0, baseScore + evidenceBonus + interrogationBonus - hintPenalty);
+        
+        // End the game session
+        await endSession(isCorrect, finalScore);
+        
         setGameState({
           ...gameState,
           gameOver: true,
@@ -220,6 +283,10 @@ export default function GameContent() {
 
   // navigate b/w hints
   const nextHint = async () => {
+    // Track hint usage
+    await incrementHints();
+    await addAction('Used a hint');
+    
     // first check local hints list
     if (gameState.currentHint < gameState.hints.length - 1) {
       setGameState({
@@ -411,6 +478,11 @@ export default function GameContent() {
   // main game interface
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
+      <GameHeader 
+        gameTitle="Quick Investigation" 
+        showTimestamp={true} 
+        startTiming={gameState.started && !loading}
+      />
       <div className={`game-content min-h-screen p-4 ${theme === 'dark' ? 'bg-blue-900 text-white' : 'bg-slate-100 text-black'}`}>
         {/* Header and theme toggle */}
         <div className="flex justify-between items-center mb-4">

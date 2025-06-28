@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { CSSProperties, ReactElement, useEffect, useState } from "react";
+import { CSSProperties, ReactElement, useEffect, useState, useCallback, useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -93,51 +93,58 @@ export const SparklesText: React.FC<SparklesTextProps> = ({
 }) => {
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
 
-  useEffect(() => {
-    const generateStar = (): Sparkle => {
-      const starX = `${Math.random() * 100}%`;
-      const starY = `${Math.random() * 100}%`;
-      const color = Math.random() > 0.5 ? colors.first : colors.second;
-      const delay = Math.random() * 2;
-      const scale = Math.random() * 1 + 0.3;
-      const lifespan = Math.random() * 10 + 5;
-      const id = `${starX}-${starY}-${Date.now()}`;
-      return { id, x: starX, y: starY, color, delay, scale, lifespan };
-    };
+  // Stabilize the generateStar function with useCallback
+  const generateStar = useCallback((): Sparkle => {
+    const starX = `${Math.random() * 100}%`;
+    const starY = `${Math.random() * 100}%`;
+    const color = Math.random() > 0.5 ? colors.first : colors.second;
+    const delay = Math.random() * 2;
+    const scale = Math.random() * 1 + 0.3;
+    const lifespan = Math.random() * 10 + 5;
+    const id = `${starX}-${starY}-${Date.now()}`;
+    return { id, x: starX, y: starY, color, delay, scale, lifespan };
+  }, [colors.first, colors.second]);
 
+  // Stabilize the update function
+  const updateStars = useCallback(() => {
+    setSparkles((currentSparkles) =>
+      currentSparkles.map((star) => {
+        if (star.lifespan <= 0) {
+          return generateStar();
+        } else {
+          return { ...star, lifespan: star.lifespan - 0.1 };
+        }
+      })
+    );
+  }, [generateStar]);
+
+  // Initialize stars only once
+  useEffect(() => {
     const initializeStars = () => {
-      const newSparkles = Array.from({ length: sparklesCount }, generateStar);
+      const newSparkles = Array.from({ length: sparklesCount }, () => generateStar());
       setSparkles(newSparkles);
     };
 
-    const updateStars = () => {
-      setSparkles((currentSparkles) =>
-        currentSparkles.map((star) => {
-          if (star.lifespan <= 0) {
-            return generateStar();
-          } else {
-            return { ...star, lifespan: star.lifespan - 0.1 };
-          }
-        }),
-      );
-    };
-
     initializeStars();
-    const interval = setInterval(updateStars, 100);
+  }, [sparklesCount, generateStar]);
 
+  // Separate effect for the interval
+  useEffect(() => {
+    const interval = setInterval(updateStars, 100);
     return () => clearInterval(interval);
-  }, [colors.first, colors.second, sparklesCount]);
+  }, [updateStars]);
+
+  // Memoize the style object
+  const style = useMemo(() => ({
+    "--sparkles-first-color": `${colors.first}`,
+    "--sparkles-second-color": `${colors.second}`,
+  } as CSSProperties), [colors.first, colors.second]);
 
   return (
     <div
       className={cn("text-6xl font-bold", className)}
       {...props}
-      style={
-        {
-          "--sparkles-first-color": `${colors.first}`,
-          "--sparkles-second-color": `${colors.second}`,
-        } as CSSProperties
-      }
+      style={style}
     >
       <span className="relative inline-block">
         {sparkles.map((sparkle) => (

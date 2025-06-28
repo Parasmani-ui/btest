@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase-admin/firestore';
+
+// Check if Firebase Admin is properly initialized
+function isFirebaseAdminInitialized() {
+  return adminAuth && adminDb;
+}
 
 // Verify admin token
 async function verifyAdminToken(authToken: string) {
   try {
+    if (!isFirebaseAdminInitialized()) {
+      throw new Error('Firebase Admin SDK not initialized');
+    }
+    
     const decodedToken = await adminAuth.verifyIdToken(authToken);
     const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
     const userData = userDoc.data();
@@ -18,6 +28,12 @@ async function verifyAdminToken(authToken: string) {
 // GET - Fetch all users (admin only)
 export async function GET(request: NextRequest) {
   try {
+    if (!isFirebaseAdminInitialized()) {
+      return NextResponse.json({ 
+        error: 'Firebase Admin SDK not initialized. Please check server configuration.' 
+      }, { status: 500 });
+    }
+
     const authToken = request.headers.get('authorization')?.replace('Bearer ', '');
     
     if (!authToken) {
@@ -31,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch all users from Firestore
     const usersSnapshot = await adminDb.collection('users').get();
-    const users = usersSnapshot.docs.map(doc => ({
+    const users = usersSnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
       uid: doc.id,
       ...doc.data()
     }));
@@ -46,6 +62,12 @@ export async function GET(request: NextRequest) {
 // PUT - Update user (admin only)
 export async function PUT(request: NextRequest) {
   try {
+    if (!isFirebaseAdminInitialized()) {
+      return NextResponse.json({ 
+        error: 'Firebase Admin SDK not initialized. Please check server configuration.' 
+      }, { status: 500 });
+    }
+
     const authToken = request.headers.get('authorization')?.replace('Bearer ', '');
     
     if (!authToken) {
@@ -79,6 +101,12 @@ export async function PUT(request: NextRequest) {
 // DELETE - Delete user (admin only)
 export async function DELETE(request: NextRequest) {
   try {
+    if (!isFirebaseAdminInitialized()) {
+      return NextResponse.json({ 
+        error: 'Firebase Admin SDK not initialized. Please check server configuration.' 
+      }, { status: 500 });
+    }
+
     const authToken = request.headers.get('authorization')?.replace('Bearer ', '');
     
     if (!authToken) {

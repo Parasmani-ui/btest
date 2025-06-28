@@ -14,17 +14,8 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { UserData } from '@/types/user';
 import toast from 'react-hot-toast';
-
-interface UserData {
-  uid: string;
-  email: string;
-  displayName: string;
-  role: 'user' | 'admin';
-  createdAt: string;
-  lastLoginAt: string;
-  profileComplete: boolean;
-}
 
 interface AuthContextType {
   user: User | null;
@@ -97,6 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date().toISOString(),
         lastLoginAt: new Date().toISOString(),
         profileComplete: false,
+        totalPlaytime: 0,
+        gamesPlayed: 0,
+        casesCompleted: 0,
+        averageScore: 0,
       };
       
       await setDoc(doc(db, 'users', user.uid), userData);
@@ -141,6 +136,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           createdAt: new Date().toISOString(),
           lastLoginAt: new Date().toISOString(),
           profileComplete: true, // Google provides basic profile info
+          totalPlaytime: 0,
+          gamesPlayed: 0,
+          casesCompleted: 0,
+          averageScore: 0,
         };
         
         await setDoc(doc(db, 'users', user.uid), userData);

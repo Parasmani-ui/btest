@@ -6,6 +6,8 @@ import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import { useGameSession } from '@/lib/gameSession';
+import GameHeader from '@/components/ui/GameHeader';
 
 export default function HospitalSimulationPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +15,7 @@ export default function HospitalSimulationPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const { startSession } = useGameSession();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -21,6 +24,13 @@ export default function HospitalSimulationPage() {
   const generateSimulation = async () => {
     setIsLoading(true);
     setError(null);
+    
+    try {
+      // Start game session tracking
+      await startSession('hospital');
+    } catch (sessionError) {
+      console.error('Error starting session:', sessionError);
+    }
     
     // Create an AbortController to handle request timeouts
     const controller = new AbortController();
@@ -90,6 +100,7 @@ export default function HospitalSimulationPage() {
   if (isLoading) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
+        <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={false} />
         <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'}`}>
           <div className={`${theme === 'dark' ? 'bg-red-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
             <TextAnimate
@@ -118,6 +129,7 @@ export default function HospitalSimulationPage() {
   if (error) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
+        <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={false} />
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'} flex items-center justify-center`}>
           <div className={`${theme === 'dark' ? 'bg-red-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <TextAnimate
@@ -221,6 +233,7 @@ export default function HospitalSimulationPage() {
   // Landing page for simulation
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
+      <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={false} />
       <div className={`flex h-screen ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
         <div className={`w-64 ${theme === 'dark' ? 'bg-red-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-red-700' : 'border-gray-300'}`}>
