@@ -222,7 +222,7 @@ export default function ForensicAuditSimulationClientPage() {
                 Test Your Financial Investigation Skills
               </h2>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                You are a CFO facing a forensic audit. Analyze financial anomalies, 
+                You are the CFO facing a forensic audit. Analyse financial anomalies, 
                 challenge inconsistencies, and decide whether to escalate to the board 
                 or recommend internal review.
               </p>
@@ -231,7 +231,7 @@ export default function ForensicAuditSimulationClientPage() {
                 disabled={loading}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold disabled:opacity-50"
               >
-                {loading ? 'Starting Audit...' : 'Begin Forensic Audit'}
+                {loading ? 'Starting Audit...' : 'Start Forensic Audit'}
               </button>
             </div>
           ) : (
