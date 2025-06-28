@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/ui/Header';
+import GameHeader from '@/components/ui/GameHeader';
 import { SparklesText } from '@/components/magicui/sparkles-text';
 
 // Define colors for the forensic audit theme (gold/amber theme)
@@ -194,7 +194,11 @@ export default function ForensicAuditSimulationClientPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 dark:from-gray-900 dark:via-amber-900 dark:to-yellow-900">
-      <Header />
+      <GameHeader 
+        gameTitle="Forensic Audit Simulation"
+        showTimestamp={true}
+        startTiming={gameState.gameStarted}
+      />
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
