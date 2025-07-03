@@ -90,7 +90,7 @@ export default function Home() {
                     borderRadius="0.5rem"
                     background="rgb(37, 99, 235)"
                   >
-                    Critical Thinking
+                    Police Investigation
                   </ShimmerButton>
                   
                   <ShimmerButton
@@ -102,7 +102,7 @@ export default function Home() {
                     borderRadius="0.5rem"
                     background="rgb(21, 128, 61)"
                   >
-                    Critical Investigation
+                    Culture Compass
                   </ShimmerButton>
 
                   <ShimmerButton
@@ -214,9 +214,9 @@ export default function Home() {
                       colors={SPARKLE_COLORS.blue}
                       sparklesCount={6}
                     >
-                      Quick Investigation
+                      Police Investigation
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Thinking</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Procedural Blind Spot</p>
                   </div>
                   
                   {/* Critical Investigation card */}
@@ -229,9 +229,9 @@ export default function Home() {
                       colors={SPARKLE_COLORS.green}
                       sparklesCount={6}
                     >
-                      Complex Investigation
+                      POSH Investigation
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | Critical Investigation</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | Culture Compass</p>
                   </div>
                   
                   {/* Crisis Management card */}
@@ -244,9 +244,9 @@ export default function Home() {
                       colors={SPARKLE_COLORS.red}
                       sparklesCount={6}
                     >
-                      Crisis Response
+                      Hospital Crisis Management
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>10-20m | Crisis Management</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>10-20m | Lifeline & Leverage</p>
                   </div>
                   
                   {/* Critical Misinformation card */}
@@ -259,9 +259,9 @@ export default function Home() {
                       colors={SPARKLE_COLORS.orange}
                       sparklesCount={6}
                     >
-                      Information Scrutiny
+                      Social Media Misinformation
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>8-15m | Critical Misinformation</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>8-15m | Information Scrutiny</p>
                   </div>
                   
                   {/* Critical ChainFail card */}
@@ -292,9 +292,9 @@ export default function Home() {
                       colors={SPARKLE_COLORS.gold}
                       sparklesCount={6}
                     >
-                      Forensic Audit
+                      Financial Forensic
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Financial misconduct</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Integrity Ledger</p>
                   </div>
                   
                   {/* Placeholder cards for future games */}

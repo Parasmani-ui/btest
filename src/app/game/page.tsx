@@ -139,9 +139,9 @@ export default function CriticalReadingPage() {
                     colors={{ first: "#3b82f6", second: "#60a5fa" }}
                     sparklesCount={10}
                   >
-                    Critical Reading
+                    Police Investigation
                   </SparklesText>
-                  <p className="text-lg mb-4">5-8m | Quick Investigation</p>
+                  <p className="text-lg mb-4">5-8m | Procedural Blind Spot</p>
                   <TextAnimate
                     className={`${theme === 'dark' ? 'text-blue-300' : 'text-gray-600'} mb-6 leading-relaxed`}
                     animation="slideUp"
