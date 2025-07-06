@@ -43,7 +43,7 @@ Generate a helpful hint for the CFO's investigation.`
           }
         ],
         temperature: 0.7,
-        max_tokens: 300,
+        max_tokens: 500,
       });
 
       auditorResponse = completion.choices[0]?.message?.content || "💡 Focus on the audit trail and timeline discrepancies in the evidence presented.";

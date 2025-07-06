@@ -17,12 +17,16 @@ interface GameHeaderProps {
   gameTitle?: string;
   showTimestamp?: boolean;
   startTiming?: boolean;
+  gameEnded?: boolean;
+  resetKey?: string | number;
 }
 
 export default function GameHeader({ 
   gameTitle = "Investigation Game", 
   showTimestamp = true,
-  startTiming = false 
+  startTiming = false,
+  gameEnded = false,
+  resetKey = 0
 }: GameHeaderProps) {
   const { userData, logout } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -31,6 +35,21 @@ export default function GameHeader({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const sessionStartRef = useRef<Date | null>(null);
   const hasStarted = useRef(false);
+  const finalElapsedTime = useRef<string>('00:00');
+  const previousResetKey = useRef(resetKey);
+
+  // Reset timer when resetKey changes (indicates new game)
+  useEffect(() => {
+    if (resetKey !== previousResetKey.current) {
+      // Reset all timer state
+      hasStarted.current = false;
+      sessionStartRef.current = null;
+      finalElapsedTime.current = '00:00';
+      setSessionStartTime(null);
+      setElapsedTime('00:00');
+      previousResetKey.current = resetKey;
+    }
+  }, [resetKey]);
 
   // Start timing when startTiming prop becomes true
   useEffect(() => {
@@ -40,7 +59,7 @@ export default function GameHeader({
       sessionStartRef.current = startTime;
       hasStarted.current = true;
     }
-  }, [startTiming]);
+  }, [startTiming, gameEnded]);
 
   // Timer for current time and elapsed time
   useEffect(() => {
@@ -55,12 +74,17 @@ export default function GameHeader({
       setCurrentTime(now);
       
       // Calculate elapsed time only if session has started
-      if (sessionStartRef.current && startTiming) {
+      if (sessionStartRef.current && startTiming && !gameEnded) {
         const elapsed = Math.floor((now.getTime() - sessionStartRef.current.getTime()) / 1000);
         const minutes = Math.floor(elapsed / 60);
         const seconds = elapsed % 60;
-        setElapsedTime(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-      } else {
+        const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        setElapsedTime(timeString);
+        finalElapsedTime.current = timeString;
+      } else if (gameEnded && finalElapsedTime.current !== '00:00') {
+        // Keep the final elapsed time frozen when game ends
+        setElapsedTime(finalElapsedTime.current);
+      } else if (!startTiming && !gameEnded) {
         setElapsedTime('00:00');
       }
     }, 1000);
@@ -72,7 +96,7 @@ export default function GameHeader({
         intervalRef.current = null;
       }
     };
-  }, [startTiming]); // Add startTiming to dependencies
+  }, [startTiming, gameEnded, resetKey]); // Add resetKey to dependencies
 
   const handleSignOut = useCallback(async () => {
     if (confirm('Are you sure you want to sign out?')) {
@@ -126,18 +150,28 @@ export default function GameHeader({
             )}
           </div>
 
-          {/* Center - Elapsed Time (only show when timing has started) */}
-          {startTiming && sessionStartTime && (
-            <div className="hidden md:flex items-center space-x-2 bg-green-900 bg-opacity-50 px-4 py-2 rounded-lg">
-              <PlayIcon className="w-4 h-4 text-green-400" />
-              <div className="text-sm text-green-300">
-                <span className="font-medium">Elapsed:</span> {elapsedTime}
+          {/* Center - Elapsed Time (show when timing has started or game has ended) */}
+          {(startTiming || gameEnded) && sessionStartTime && (
+            <div className={`hidden md:flex items-center space-x-2 px-4 py-2 rounded-lg ${
+              gameEnded 
+                ? 'bg-blue-900 bg-opacity-50' 
+                : 'bg-green-900 bg-opacity-50'
+            }`}>
+              <PlayIcon className={`w-4 h-4 ${
+                gameEnded ? 'text-blue-400' : 'text-green-400'
+              }`} />
+              <div className={`text-sm ${
+                gameEnded ? 'text-blue-300' : 'text-green-300'
+              }`}>
+                <span className="font-medium">
+                  {gameEnded ? 'Final Time:' : 'Elapsed:'}
+                </span> {elapsedTime}
               </div>
             </div>
           )}
 
           {/* Show "Waiting to start..." when timing hasn't started yet */}
-          {!startTiming && (
+          {!startTiming && !gameEnded && (
             <div className="hidden md:flex items-center space-x-2 bg-yellow-900 bg-opacity-50 px-4 py-2 rounded-lg">
               <ClockIcon className="w-4 h-4 text-yellow-400" />
               <div className="text-sm text-yellow-300">
@@ -192,16 +226,22 @@ export default function GameHeader({
           </div>
         </div>
 
-        {/* Mobile elapsed time (only show when timing has started) */}
-        {startTiming && sessionStartTime && (
+        {/* Mobile elapsed time (show when timing has started or game has ended) */}
+        {(startTiming || gameEnded) && sessionStartTime && (
           <div className="md:hidden pb-3 flex items-center justify-center space-x-2 text-sm text-gray-400">
-            <PlayIcon className="w-4 h-4 text-green-400" />
-            <span className="text-green-400">Elapsed: {elapsedTime}</span>
+            <PlayIcon className={`w-4 h-4 ${
+              gameEnded ? 'text-blue-400' : 'text-green-400'
+            }`} />
+            <span className={`${
+              gameEnded ? 'text-blue-400' : 'text-green-400'
+            }`}>
+              {gameEnded ? 'Final Time:' : 'Elapsed:'} {elapsedTime}
+            </span>
           </div>
         )}
 
         {/* Mobile waiting message */}
-        {!startTiming && (
+        {!startTiming && !gameEnded && (
           <div className="md:hidden pb-3 flex items-center justify-center space-x-2 text-sm text-gray-400">
             <ClockIcon className="w-4 h-4 text-yellow-400" />
             <span className="text-yellow-400">Waiting to start...</span>

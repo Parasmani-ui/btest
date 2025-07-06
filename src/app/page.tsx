@@ -18,7 +18,8 @@ const SPARKLE_COLORS = {
   red: { first: "#dc2626", second: "#ef4444" },
   orange: { first: "#f56527", second: "#fb923c" },
   purple: { first: "#a855f7", second: "#c084fc" },
-  gold: { first: "#f59e0b", second: "#fbbf24" }
+  gold: { first: "#f59e0b", second: "#fbbf24" },
+  cyan: { first: "#0891b2", second: "#06b6d4" }
 };
 
 export default function Home() {
@@ -60,6 +61,10 @@ export default function Home() {
     router.push(`/forensic-audit-simulation`);
   };
 
+  const startFoodSafetySimulation = () => {
+    router.push(`/food-safety-simulation`);
+  };
+
   // Don't render until client-side
   if (!mounted) {
     return null;
@@ -83,19 +88,19 @@ export default function Home() {
                 <div className="mb-4 relative space-y-4">
                   <ShimmerButton
                     onClick={startGame}
-                    className="w-full p-3 text-white"
+                    className="w-full p-3 text-white text-sm"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
                     borderRadius="0.5rem"
                     background="rgb(37, 99, 235)"
                   >
-                    Police Investigation
+                   Procedural Blind Spot
                   </ShimmerButton>
                   
                   <ShimmerButton
                     onClick={startSimulation}
-                    className="w-full p-3 text-white text-sm"
+                    className="w-full p-3 text-white"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -107,26 +112,26 @@ export default function Home() {
 
                   <ShimmerButton
                     onClick={startHospitalSimulation}
-                    className="w-full p-3 text-white"
+                    className="w-full p-3 text-white text-sm"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
                     borderRadius="0.5rem"
                     background="rgb(220, 38, 38)"
                   >
-                    Crisis Management
+                    Lifeline & Leverage
                   </ShimmerButton>
 
                   <ShimmerButton
                     onClick={startFakeNewsSimulation}
-                    className="w-full p-3 text-white text-sm"
+                    className="w-full p-3 text-white"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
                     borderRadius="0.5rem"
                     background="rgb(245, 101, 39)"
                   >
-                    Critical Misinformation
+                    Cyber Scrutiny
                   </ShimmerButton>
 
                   <ShimmerButton
@@ -138,19 +143,31 @@ export default function Home() {
                     borderRadius="0.5rem"
                     background="rgb(168, 85, 247)"
                   >
-                    Critical ChainFail
+                    ChainFail 
                   </ShimmerButton>
 
                   <ShimmerButton
                     onClick={startForensicAuditSimulation}
-                    className="w-full p-3 text-white text-sm"
+                    className="w-full p-3 text-white"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
                     borderRadius="0.5rem"
                     background="rgb(245, 158, 11)"
                   >
-                    Financial Investigation
+                    Finance Forensic
+                  </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startFoodSafetySimulation}
+                    className="w-full p-3 text-white"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(8, 145, 178)"
+                  >
+                    Food Safety
                   </ShimmerButton>
                 </div>
               </div>
@@ -261,7 +278,7 @@ export default function Home() {
                     >
                       Social Media Misinformation
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>8-15m | Information Scrutiny</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>8-15m | Cyber Scrutiny</p>
                   </div>
                   
                   {/* Critical ChainFail card */}
@@ -292,17 +309,27 @@ export default function Home() {
                       colors={SPARKLE_COLORS.gold}
                       sparklesCount={6}
                     >
-                      Financial Forensic
+                    Financial Forensic
                     </SparklesText>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Integrity Ledger</p>
                   </div>
                   
-                  {/* Placeholder cards for future games */}
-                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
-                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
-                    <p className="text-sm text-gray-400">New Game Mode</p>
+                  {/* Food Safety card */}
+                  <div 
+                    className={`p-6 rounded-lg border border-[rgb(8,145,178)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    onClick={startFoodSafetySimulation}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={SPARKLE_COLORS.cyan}
+                      sparklesCount={6}
+                    >
+                      Food Safety
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Thinking</p>
                   </div>
                   
+                  {/* Placeholder cards for future games */}
                   <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
                     <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
                     <p className="text-sm text-gray-400">New Game Mode</p>
