@@ -16,6 +16,7 @@ export interface GameState {
   correctSuspect?: string;
   correctSuspectIdentified?: boolean;
   explanation?: string;
+  finalElapsedTime?: string;
   arrestResult?: {
     correct: boolean;
     murderer: string;

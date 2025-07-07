@@ -19,6 +19,7 @@ interface GameHeaderProps {
   startTiming?: boolean;
   gameEnded?: boolean;
   resetKey?: string | number;
+  sessionStartTime?: Date | null;
 }
 
 export default function GameHeader({ 
@@ -26,40 +27,31 @@ export default function GameHeader({
   showTimestamp = true,
   startTiming = false,
   gameEnded = false,
-  resetKey = 0
+  resetKey = 0,
+  sessionStartTime = null
 }: GameHeaderProps) {
   const { userData, logout } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState('00:00');
+  const [mounted, setMounted] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const sessionStartRef = useRef<Date | null>(null);
-  const hasStarted = useRef(false);
   const finalElapsedTime = useRef<string>('00:00');
   const previousResetKey = useRef(resetKey);
+
+  // Set mounted to true after component mounts (prevents hydration errors)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Reset timer when resetKey changes (indicates new game)
   useEffect(() => {
     if (resetKey !== previousResetKey.current) {
-      // Reset all timer state
-      hasStarted.current = false;
-      sessionStartRef.current = null;
+      // Reset elapsed time state
       finalElapsedTime.current = '00:00';
-      setSessionStartTime(null);
       setElapsedTime('00:00');
       previousResetKey.current = resetKey;
     }
   }, [resetKey]);
-
-  // Start timing when startTiming prop becomes true
-  useEffect(() => {
-    if (startTiming && !hasStarted.current) {
-      const startTime = new Date();
-      setSessionStartTime(startTime);
-      sessionStartRef.current = startTime;
-      hasStarted.current = true;
-    }
-  }, [startTiming, gameEnded]);
 
   // Timer for current time and elapsed time
   useEffect(() => {
@@ -73,9 +65,9 @@ export default function GameHeader({
       const now = new Date();
       setCurrentTime(now);
       
-      // Calculate elapsed time only if session has started
-      if (sessionStartRef.current && startTiming && !gameEnded) {
-        const elapsed = Math.floor((now.getTime() - sessionStartRef.current.getTime()) / 1000);
+      // Calculate elapsed time only if session has started and we have a start time
+      if (sessionStartTime && startTiming && !gameEnded) {
+        const elapsed = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
         const minutes = Math.floor(elapsed / 60);
         const seconds = elapsed % 60;
         const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -96,7 +88,7 @@ export default function GameHeader({
         intervalRef.current = null;
       }
     };
-  }, [startTiming, gameEnded, resetKey]); // Add resetKey to dependencies
+  }, [startTiming, gameEnded, resetKey, sessionStartTime]);
 
   const handleSignOut = useCallback(async () => {
     if (confirm('Are you sure you want to sign out?')) {
@@ -136,7 +128,7 @@ export default function GameHeader({
               <h1 className="text-lg font-semibold text-white">{gameTitle}</h1>
             </div>
             
-            {showTimestamp && (
+            {showTimestamp && mounted && (
               <div className="hidden sm:flex items-center space-x-4">
                 <div className="flex items-center space-x-1 text-sm text-gray-300">
                   <CalendarIcon className="w-4 h-4" />

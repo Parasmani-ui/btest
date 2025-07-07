@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import GameHeader from '@/components/ui/GameHeader';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import { handleGameEnd } from '@/lib/gameSession';
+import { useGameSession } from '@/lib/gameSession';
 
 // Define colors for the food safety theme (cyan/teal theme)
 const SPARKLE_COLORS = {
@@ -45,6 +47,7 @@ export default function FoodSafetySimulationClientPage() {
     gameEnded: false,
   });
   const [userInput, setUserInput] = useState('');
+  const { startSession } = useGameSession();
 
   useEffect(() => {
     setMounted(true);
@@ -53,6 +56,9 @@ export default function FoodSafetySimulationClientPage() {
   const startFoodSafetySimulation = async () => {
     setLoading(true);
     try {
+      // Start game session tracking
+      await startSession('food-safety');
+      
       const response = await fetch('/api/food-safety-simulation/generate', {
         method: 'POST',
         headers: {
@@ -133,6 +139,20 @@ export default function FoodSafetySimulationClientPage() {
           finalVerdict: data.finalVerdict,
           finalStatement: data.finalStatement
         }));
+
+        // Update user stats when game ends
+        if (data.gameEnded || gameState.currentRound + 1 >= gameState.maxRounds) {
+          try {
+            const totalScore = data.scores ? 
+              ((data.scores.insightfulness + data.scores.evidenceEvaluation) / 10) * 100 : 50;
+            const caseSolved = data.finalVerdict === 'ban_lifted';
+            
+            await handleGameEnd(caseSolved, totalScore);
+            console.log('User stats updated after food safety simulation');
+          } catch (error) {
+            console.error('Error updating user stats:', error);
+          }
+        }
 
         setUserInput('');
       }

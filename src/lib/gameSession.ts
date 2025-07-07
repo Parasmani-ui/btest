@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { createGameSession, updateGameSession } from '@/lib/firestore';
+import { createGameSession, updateGameSession, updateUserStatsAfterGame } from '@/lib/firestore';
 import { GameSession } from '@/types/user';
 
 // Game session manager class
@@ -22,13 +22,16 @@ export class GameSessionManager {
 
   // Start a new game session
   async startSession(
-    gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail',
+    gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety',
     userId: string,
     organizationId?: string | null
   ): Promise<string> {
     try {
+      console.log(`🎮 Starting new game session: ${gameType} for user ${userId}`);
+      
       // End any existing session first
       if (this.currentSession) {
+        console.log(`⚠️  Ending existing session: ${this.currentSession}`);
         await this.endSession(false, 0);
       }
 
@@ -53,10 +56,16 @@ export class GameSessionManager {
       };
 
       this.currentSession = await createGameSession(sessionData);
-      console.log(`Game session started: ${this.currentSession} for ${gameType}`);
+      console.log(`✅ Game session started successfully: ${this.currentSession} for ${gameType}`);
       return this.currentSession;
     } catch (error) {
-      console.error('Error starting game session:', error);
+      console.error('❌ Error starting game session:', error);
+      // Reset state on error
+      this.currentSession = null;
+      this.startTime = null;
+      this.gameType = null;
+      this.userId = null;
+      this.organizationId = null;
       throw error;
     }
   }
@@ -87,16 +96,22 @@ export class GameSessionManager {
   // End the current session
   async endSession(caseSolved: boolean = false, finalScore: number = 0): Promise<void> {
     if (!this.currentSession || !this.startTime) {
-      console.warn('No active session to end');
+      console.warn('⚠️  No active session to end');
       return;
     }
 
+    const sessionId = this.currentSession;
+    const gameType = this.gameType;
+    const userId = this.userId;
+
     try {
+      console.log(`🏁 Ending game session: ${sessionId}, solved: ${caseSolved}, score: ${finalScore}`);
+      
       const endTime = new Date();
       const duration = Math.round((endTime.getTime() - this.startTime.getTime()) / 1000 / 60); // Duration in minutes
       const timeSpent = this.getTimeSpent();
 
-      await updateGameSession(this.currentSession, {
+      await updateGameSession(sessionId, {
         endedAt: endTime.toISOString(),
         duration,
         caseSolved,
@@ -104,16 +119,27 @@ export class GameSessionManager {
         timeSpent
       });
 
-      console.log(`Game session ended: ${this.currentSession}, Duration: ${duration}m, Score: ${finalScore}`);
+      console.log(`✅ Session data updated: ${sessionId}, Duration: ${duration}m, Score: ${finalScore}`);
 
-      // Reset session data
+      // Update user stats after successful game session
+      if (userId && gameType) {
+        console.log(`📊 Updating user stats for: ${userId}, game: ${gameType}`);
+        await updateUserStatsAfterGame(userId, gameType, caseSolved, finalScore, duration);
+        console.log(`✅ User stats updated successfully`);
+      }
+
+      console.log(`🎯 Game session completed successfully: ${sessionId}`);
+    } catch (error) {
+      console.error('❌ Error ending game session:', error);
+      // Don't throw error here, as we still want to reset session data
+    } finally {
+      // Always reset session data, even if there was an error
+      console.log(`🧹 Cleaning up session data for: ${sessionId}`);
       this.currentSession = null;
       this.startTime = null;
       this.gameType = null;
       this.userId = null;
       this.organizationId = null;
-    } catch (error) {
-      console.error('Error ending game session:', error);
     }
   }
 
@@ -205,7 +231,7 @@ export function useGameSession() {
   const { userData } = useAuth();
   const sessionManager = GameSessionManager.getInstance();
 
-  const startSession = async (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail') => {
+  const startSession = async (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety') => {
     if (!userData?.uid) {
       throw new Error('User not authenticated');
     }
@@ -239,6 +265,16 @@ export function useGameSession() {
 
   const getCurrentSession = () => sessionManager.getCurrentSession();
 
+  const handleGameEnd = async (caseSolved: boolean = false, finalScore: number = 0) => {
+    try {
+      await sessionManager.endSession(caseSolved, finalScore);
+      console.log('Game ended and user stats updated successfully');
+    } catch (error) {
+      console.error('Error ending game session:', error);
+      throw error;
+    }
+  };
+
   return {
     startSession,
     endSession,
@@ -246,6 +282,19 @@ export function useGameSession() {
     addEvidence,
     addAction,
     incrementHints,
-    getCurrentSession
+    getCurrentSession,
+    handleGameEnd
   };
+}
+
+// Standalone utility function for ending games (can be used outside React components)
+export async function handleGameEnd(caseSolved: boolean = false, finalScore: number = 0): Promise<void> {
+  try {
+    const sessionManager = GameSessionManager.getInstance();
+    await sessionManager.endSession(caseSolved, finalScore);
+    console.log('Game ended and user stats updated successfully');
+  } catch (error) {
+    console.error('Error ending game session:', error);
+    throw error;
+  }
 } 

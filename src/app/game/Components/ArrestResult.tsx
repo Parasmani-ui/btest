@@ -32,6 +32,15 @@ const ArrestResult: React.FC<ArrestResultProps> = ({ gameState, resetGame }) => 
           : 'Wrong Suspect Arrested!'}
       </TextAnimate>
       
+      {/* Display elapsed time */}
+      {gameState.finalElapsedTime && (
+        <div className={`text-center mb-4 p-3 rounded-lg ${theme === 'dark' ? 'bg-slate-700' : 'bg-white'}`}>
+          <span className={`text-lg font-semibold ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}>
+            Time Elapsed: {gameState.finalElapsedTime}
+          </span>
+        </div>
+      )}
+      
       <div className={`p-4 rounded-lg mb-4 ${theme === 'dark' ? 'bg-slate-700' : 'bg-white'}`}>
         <div className="mb-2 flex items-center">
           <span className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
@@ -85,6 +94,9 @@ const ArrestResult: React.FC<ArrestResultProps> = ({ gameState, resetGame }) => 
       
       <div className="flex justify-center space-x-4">
         <Button onClick={resetGame}>Start New Case</Button>
+        <Link href="/dashboard">
+          <Button className="text-white" background={theme === 'dark' ? 'rgb(29, 78, 216)' : 'rgb(59, 130, 246)'}>Go To Dashboard</Button>
+        </Link>
         <Link href="/">
           <Button className="text-white" background={theme === 'dark' ? 'rgb(75, 85, 99)' : 'rgb(156, 163, 175)'}>Go To Home</Button>
         </Link>

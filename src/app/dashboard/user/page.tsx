@@ -63,6 +63,7 @@ export default function UserDashboardPage() {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && userData?.uid) {
         // Refresh data when user returns to the dashboard (e.g., after playing a game)
+        console.log('Dashboard became visible, refreshing stats...');
         loadUserStats();
       }
     };
@@ -72,6 +73,51 @@ export default function UserDashboardPage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [userData?.uid]);
+
+  // Add focus listener to refresh when user navigates back to dashboard
+  useEffect(() => {
+    const handleFocus = () => {
+      if (userData?.uid) {
+        console.log('Dashboard gained focus, refreshing stats...');
+        loadUserStats();
+      }
+    };
+
+    const handlePageShow = () => {
+      if (userData?.uid) {
+        console.log('Dashboard page shown (back navigation), refreshing stats...');
+        loadUserStats();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('pageshow', handlePageShow);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [userData?.uid]);
+
+  // Add periodic refresh every 30 seconds when dashboard is visible
+  useEffect(() => {
+    if (!userData?.uid) return;
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        console.log('Periodic refresh of stats...');
+        loadUserStats();
+      }
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [userData?.uid]);
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    console.log('Manual refresh requested...');
+    loadUserStats();
+  };
 
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
@@ -170,7 +216,7 @@ export default function UserDashboardPage() {
     },
     {
       name: 'Average Score',
-      value: `${userStats?.averageScore.toFixed(1) || '0'}%`,
+      value: `${userStats?.averageScore?.toFixed(1) || '0'}%`,
       icon: TrendingUpIcon,
       color: 'bg-purple-500',
     },
@@ -198,7 +244,7 @@ export default function UserDashboardPage() {
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={loadUserStats}
+                  onClick={handleRefresh}
                   className="inline-flex items-center px-4 py-2 bg-blue-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
                   disabled={loading}
                 >
@@ -266,7 +312,7 @@ export default function UserDashboardPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Avg Score:</span>
-                          <span className="text-white">{data.averageScore.toFixed(1)}%</span>
+                          <span className="text-white">{data.averageScore?.toFixed(1) || '0'}%</span>
                         </div>
                       </div>
                     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { SimulationData, MarkdownSimulationData, ResponsibleParty, MisconductType, PrimaryMotivation } from '@/types/simulation';
 import { SimulationConclusion } from '@/simulation';
@@ -25,64 +25,81 @@ interface ConclusionState {
 }
 
 export default function SimulationClient({ simulationText, onStartNewCase }: SimulationClientProps) {
-  const [activeTab, setActiveTab] = useState('case');
-  const [showLegalGuide, setShowLegalGuide] = useState(false);
-  const [conclusion, setConclusion] = useState<ConclusionState>({
+  const router = useRouter();
+  const { startSession, handleGameEnd } = useGameSession();
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [activeTab, setActiveTab] = useState<string>('case');
+  const [showConclusionForm, setShowConclusionForm] = useState<boolean>(false);
+  const [hasSubmitted, setHasSubmitted] = useState<boolean>(false);
+  const [submissionResponse, setSubmissionResponse] = useState<any>(null);
+  const [conclusionState, setConclusionState] = useState<ConclusionState>({
     text: '',
     responsibleParty: '',
     misconductType: '',
     primaryMotivation: ''
   });
-  const [showConclusionForm, setShowConclusionForm] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [analysis, setAnalysis] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLegalGuide, setShowLegalGuide] = useState<boolean>(false);
+  const [resetKey, setResetKey] = useState(0); // Add reset key for timer
   const [parseError, setParseError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [parsedData, setParsedData] = useState<{
-    simulationData: SimulationData | null;
-    markdownData: MarkdownSimulationData | null;
-  }>({
-    simulationData: null,
-    markdownData: null
-  });
-  const router = useRouter();
-  
-  // Toggle theme function
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [analysis, setAnalysis] = useState<string>('');
+  const [sessionStarted, setSessionStarted] = useState<boolean>(false);
+
+  const parsedData = useMemo(() => {
+    if (!simulationText) return { simulationData: null, markdownData: null, error: null };
+    
+    try {
+      // Try JSON parsing first (new format)
+      const simulationData = JSON.parse(simulationText) as SimulationData;
+      return { simulationData, markdownData: null, error: null };
+    } catch (error) {
+      try {
+        // Fallback to markdown parsing (old format)
+        const markdownData = parseMarkdownSimulation(simulationText);
+        return { simulationData: null, markdownData, error: null };
+      } catch (markdownError) {
+        return { simulationData: null, markdownData: null, error: `Failed to parse simulation data: ${markdownError instanceof Error ? markdownError.message : 'Unknown error'}` };
+      }
+    }
+  }, [simulationText]);
+
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
-  
-  // Parse simulation text into structured data
+
+  // Enhanced onStartNewCase to reset all states
+  const handleStartNewCase = () => {
+    setActiveTab('case');
+    setShowConclusionForm(false);
+    setHasSubmitted(false);
+    setSubmissionResponse(null);
+    setConclusionState({
+      text: '',
+      responsibleParty: '',
+      misconductType: '',
+      primaryMotivation: ''
+    });
+    setShowLegalGuide(false);
+    setResetKey(prev => prev + 1); // Increment reset key to trigger timer reset
+    onStartNewCase(); // Call the original function
+  };
+
+  // Set parse error state based on parsedData error
   useEffect(() => {
-    try {
-      // First, try to parse as JSON
-      try {
-        const jsonData = JSON.parse(simulationText);
-        if (jsonData) {
-          setParsedData({
-            simulationData: jsonData as SimulationData,
-            markdownData: null
-          });
-          setParseError(null);
-          return;
-        }
-      } catch (e) {
-        // If JSON parsing fails, try markdown format
-      }
-      
-      // If that fails, try to parse as markdown
-      const markdownData = parseMarkdownSimulation(simulationText);
-      setParsedData({
-        simulationData: null,
-        markdownData
+    setParseError(parsedData.error);
+  }, [parsedData.error]);
+
+  // Start session when simulation begins
+  useEffect(() => {
+    if (simulationText && !sessionStarted) {
+      startSession('simulation').then(() => {
+        console.log('✅ Complex simulation session started');
+        setSessionStarted(true);
+      }).catch(error => {
+        console.error('❌ Error starting simulation session:', error);
       });
-      setParseError(null);
-    } catch (e) {
-      console.error('Error parsing simulation data:', e);
-      setParseError(`Failed to parse simulation data: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
-  }, [simulationText]);
+  }, [simulationText, startSession, sessionStarted]);
   
   // Parse markdown format simulation
   const parseMarkdownSimulation = (text: string): MarkdownSimulationData => {
@@ -124,19 +141,19 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     
     try {
       // Set a default text value if not provided
-      if (!conclusion.text) {
-        setConclusion({
-          ...conclusion,
+      if (!conclusionState.text) {
+        setConclusionState({
+          ...conclusionState,
           text: "Conclusion submitted without detailed text explanation."
         });
       }
       
       // Create payload based on which format we have
       const payload = {
-        conclusion: conclusion.text || "Conclusion submitted without detailed text explanation.",
-        responsible: conclusion.responsibleParty,
-        misconduct: conclusion.misconductType,
-        motivation: conclusion.primaryMotivation,
+        conclusion: conclusionState.text || "Conclusion submitted without detailed text explanation.",
+        responsible: conclusionState.responsibleParty,
+        misconduct: conclusionState.misconductType,
+        motivation: conclusionState.primaryMotivation,
         hiddenInfo: parsedData.markdownData?.hiddenInfo || '',
         simulationData: parsedData.simulationData ? JSON.stringify(parsedData.simulationData) : null,
       };
@@ -156,6 +173,17 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
         setAnalysis(data.analysis);
         setHasSubmitted(true);
         setShowConclusionForm(false); // Hide the form after submission
+        
+        // End game session when simulation completes
+        const totalScore = calculateSimulationScore(data.analysis, conclusionState);
+        const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+        
+        try {
+          await handleGameEnd(caseSolved, totalScore);
+          console.log('✅ Complex simulation stats updated successfully');
+        } catch (error) {
+          console.error('❌ Error updating simulation stats:', error);
+        }
       } else {
         throw new Error(data.error || 'Failed to analyze conclusion');
       }
@@ -177,12 +205,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     
     return (
       <SimulationConclusion
-        conclusion={conclusion.text}
-        selectedResponsible={conclusion.responsibleParty}
-        selectedMisconduct={conclusion.misconductType}
-        selectedMotivation={conclusion.primaryMotivation}
+        conclusion={conclusionState.text}
+        selectedResponsible={conclusionState.responsibleParty}
+        selectedMisconduct={conclusionState.misconductType}
+        selectedMotivation={conclusionState.primaryMotivation}
         analysis={analysis}
-        onStartNewCase={onStartNewCase}
+        onStartNewCase={handleStartNewCase}
         correctResponsible={correctResponsible}
         correctMisconduct={correctMisconduct}
         correctMotivation={correctMotivation}
@@ -191,7 +219,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
   };
   
   const renderConclusionForm = () => {
-    const isFormValid = conclusion.responsibleParty && conclusion.misconductType && conclusion.primaryMotivation;
+    const isFormValid = conclusionState.responsibleParty && conclusionState.misconductType && conclusionState.primaryMotivation;
     
     return (
       <form onSubmit={handleSubmitConclusion} className={`${theme === 'dark' ? 'bg-green-800 text-gray-200' : 'bg-white text-gray-800'} rounded-lg shadow-lg p-6`}>
@@ -212,12 +240,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, responsibleParty: 'Respondent'})}
-                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Respondent' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, responsibleParty: 'Respondent'})}
+                className={`p-3 rounded-lg transition ${conclusionState.responsibleParty === 'Respondent' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.responsibleParty === 'Respondent'
+                background={conclusionState.responsibleParty === 'Respondent'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -225,12 +253,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, responsibleParty: 'Complainant'})}
-                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Complainant' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, responsibleParty: 'Complainant'})}
+                className={`p-3 rounded-lg transition ${conclusionState.responsibleParty === 'Complainant' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.responsibleParty === 'Complainant'
+                background={conclusionState.responsibleParty === 'Complainant'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -238,12 +266,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, responsibleParty: 'Both Parties'})}
-                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Both Parties' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, responsibleParty: 'Both Parties'})}
+                className={`p-3 rounded-lg transition ${conclusionState.responsibleParty === 'Both Parties' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.responsibleParty === 'Both Parties'
+                background={conclusionState.responsibleParty === 'Both Parties'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -251,19 +279,19 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, responsibleParty: 'Neither Party'})}
-                className={`p-3 rounded-lg transition ${conclusion.responsibleParty === 'Neither Party' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, responsibleParty: 'Neither Party'})}
+                className={`p-3 rounded-lg transition ${conclusionState.responsibleParty === 'Neither Party' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.responsibleParty === 'Neither Party'
+                background={conclusionState.responsibleParty === 'Neither Party'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Neither Party
               </ShimmerButton>
             </div>
-            {!conclusion.responsibleParty && (
+            {!conclusionState.responsibleParty && (
               <p className="mt-1 text-sm text-red-400">Please select a responsible party</p>
             )}
           </div>
@@ -275,12 +303,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, misconductType: 'Sexual Harassment'})}
-                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'Sexual Harassment' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, misconductType: 'Sexual Harassment'})}
+                className={`p-3 rounded-lg transition ${conclusionState.misconductType === 'Sexual Harassment' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.misconductType === 'Sexual Harassment'
+                background={conclusionState.misconductType === 'Sexual Harassment'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -288,12 +316,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, misconductType: 'Discrimination'})}
-                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'Discrimination' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, misconductType: 'Discrimination'})}
+                className={`p-3 rounded-lg transition ${conclusionState.misconductType === 'Discrimination' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.misconductType === 'Discrimination'
+                background={conclusionState.misconductType === 'Discrimination'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -301,12 +329,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, misconductType: 'Retaliation'})}
-                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'Retaliation' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, misconductType: 'Retaliation'})}
+                className={`p-3 rounded-lg transition ${conclusionState.misconductType === 'Retaliation' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.misconductType === 'Retaliation'
+                background={conclusionState.misconductType === 'Retaliation'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -314,19 +342,19 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, misconductType: 'No Misconduct'})}
-                className={`p-3 rounded-lg transition ${conclusion.misconductType === 'No Misconduct' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, misconductType: 'No Misconduct'})}
+                className={`p-3 rounded-lg transition ${conclusionState.misconductType === 'No Misconduct' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.misconductType === 'No Misconduct'
+                background={conclusionState.misconductType === 'No Misconduct'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 No Misconduct
               </ShimmerButton>
             </div>
-            {!conclusion.misconductType && (
+            {!conclusionState.misconductType && (
               <p className="mt-1 text-sm text-red-400">Please select a misconduct type</p>
             )}
           </div>
@@ -338,12 +366,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, primaryMotivation: 'Genuine Complaint'})}
-                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Genuine Complaint' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, primaryMotivation: 'Genuine Complaint'})}
+                className={`p-3 rounded-lg transition ${conclusionState.primaryMotivation === 'Genuine Complaint' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.primaryMotivation === 'Genuine Complaint'
+                background={conclusionState.primaryMotivation === 'Genuine Complaint'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -351,12 +379,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, primaryMotivation: 'Personal Vendetta'})}
-                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Personal Vendetta' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, primaryMotivation: 'Personal Vendetta'})}
+                className={`p-3 rounded-lg transition ${conclusionState.primaryMotivation === 'Personal Vendetta' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.primaryMotivation === 'Personal Vendetta'
+                background={conclusionState.primaryMotivation === 'Personal Vendetta'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -364,12 +392,12 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, primaryMotivation: 'Career Advancement'})}
-                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Career Advancement' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, primaryMotivation: 'Career Advancement'})}
+                className={`p-3 rounded-lg transition ${conclusionState.primaryMotivation === 'Career Advancement' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.primaryMotivation === 'Career Advancement'
+                background={conclusionState.primaryMotivation === 'Career Advancement'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
@@ -377,19 +405,19 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
               </ShimmerButton>
               <ShimmerButton
                 type="button"
-                onClick={() => setConclusion({...conclusion, primaryMotivation: 'Misunderstanding'})}
-                className={`p-3 rounded-lg transition ${conclusion.primaryMotivation === 'Misunderstanding' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
+                onClick={() => setConclusionState({...conclusionState, primaryMotivation: 'Misunderstanding'})}
+                className={`p-3 rounded-lg transition ${conclusionState.primaryMotivation === 'Misunderstanding' ? 'text-white' : theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
-                background={conclusion.primaryMotivation === 'Misunderstanding'
+                background={conclusionState.primaryMotivation === 'Misunderstanding'
                   ? 'rgb(37, 99, 235)'
                   : theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Misunderstanding
               </ShimmerButton>
             </div>
-            {!conclusion.primaryMotivation && (
+            {!conclusionState.primaryMotivation && (
               <p className="mt-1 text-sm text-red-400">Please select a primary motivation</p>
             )}
           </div>
@@ -447,7 +475,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
             <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}>{parseError}</p>
             <div className="flex justify-end space-x-4">
               <button
-                onClick={onStartNewCase}
+                onClick={handleStartNewCase}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 Start New Case
@@ -460,7 +488,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
   }
   
   // If no data is loaded yet, show loading
-  if (!parsedData.simulationData && !parsedData.markdownData) {
+  if (!parsedData.simulationData && !parsedData.markdownData && !parsedData.error) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'} flex items-center justify-center`}>
@@ -473,12 +501,34 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     );
   }
   
+  // Calculate score for complex simulation
+  const calculateSimulationScore = (analysis: string, conclusions: ConclusionState): number => {
+    let score = 50; // Base score
+    
+    // Score based on correct selections
+    if (conclusions.responsibleParty) score += 15;
+    if (conclusions.misconductType) score += 15;
+    if (conclusions.primaryMotivation) score += 15;
+    if (conclusions.text && conclusions.text.length > 50) score += 5;
+    
+    // Check analysis for quality indicators
+    if (analysis) {
+      const analysisLower = analysis.toLowerCase();
+      if (analysisLower.includes('correct') || analysisLower.includes('accurate')) score += 10;
+      if (analysisLower.includes('excellent') || analysisLower.includes('thorough')) score += 5;
+    }
+    
+    return Math.min(100, score);
+  };
+  
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
       <GameHeader 
         gameTitle="Complex Investigation" 
         showTimestamp={true}
         startTiming={!!(parsedData.simulationData || parsedData.markdownData) && !hasSubmitted}
+        gameEnded={hasSubmitted}
+        resetKey={resetKey}
       />
       <div className={`flex h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
@@ -586,7 +636,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
             <h3 className={`text-xs font-semibold ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider mb-2 px-2`}>ACTIONS</h3>
             
             <ShimmerButton
-              onClick={onStartNewCase}
+              onClick={handleStartNewCase}
               className="w-full py-3 text-center font-medium shadow-md text-white"
               shimmerColor="rgba(255, 255, 255, 0.8)"
               shimmerSize="0.1em"

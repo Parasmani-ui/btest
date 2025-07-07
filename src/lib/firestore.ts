@@ -11,7 +11,9 @@ import {
   addDoc, 
   deleteDoc,
   writeBatch,
-  Timestamp 
+  Timestamp,
+  FieldValue,
+  increment
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { 
@@ -26,9 +28,25 @@ import {
 // User-related functions
 export async function getUserGames(uid: string): Promise<UserStats> {
   try {
+    console.log(`📊 Fetching user stats for: ${uid}`);
+    
     // Get user data
     const userDoc = await getDoc(doc(db, 'users', uid));
     const userData = userDoc.data() as UserData;
+
+    if (!userData) {
+      console.warn(`⚠️  User ${uid} not found in database`);
+      return {
+        totalPlaytime: 0,
+        gamesPlayed: 0,
+        casesCompleted: 0,
+        averageScore: 0,
+        recentSessions: [],
+        gameTypeBreakdown: {}
+      };
+    }
+
+    console.log(`📈 User data found - gamesPlayed: ${userData.gamesPlayed || 0}, casesCompleted: ${userData.casesCompleted || 0}`);
 
     // Get user's game sessions - handle case where collection doesn't exist
     let sessions: GameSession[] = [];
@@ -43,35 +61,61 @@ export async function getUserGames(uid: string): Promise<UserStats> {
         id: doc.id,
         ...doc.data()
       })) as GameSession[];
+      console.log(`🎮 Found ${sessions.length} game sessions for user ${uid}`);
     } catch (sessionError) {
-      console.log('No game sessions found or collection does not exist:', sessionError);
+      console.log('ℹ️  No game sessions found or collection does not exist:', sessionError);
       sessions = [];
     }
 
-    // Calculate stats
-    const totalPlaytime = sessions.reduce((sum, session) => sum + session.duration, 0);
-    const gamesPlayed = sessions.length;
-    const casesCompleted = sessions.filter(session => session.caseSolved).length;
-    const averageScore = sessions.reduce((sum, session) => sum + (session.score || 0), 0) / sessions.length || 0;
+    // Use user document stats if available (preferred), otherwise calculate from sessions (fallback)
+    const gamesPlayed = userData?.gamesPlayed ?? sessions.length;
+    const casesCompleted = userData?.casesCompleted ?? sessions.filter(session => session.caseSolved).length;
+    const totalPlaytime = userData?.totalPlaytime ?? sessions.reduce((sum, session) => sum + session.duration, 0);
+    const averageScore = userData?.averageScore ?? (sessions.reduce((sum, session) => sum + (session.score || 0), 0) / sessions.length || 0);
 
-    // Game type breakdown
-    const gameTypeBreakdown: { [key: string]: { sessions: number; playtime: number; averageScore: number } } = {};
-    sessions.forEach(session => {
-      if (!gameTypeBreakdown[session.gameType]) {
-        gameTypeBreakdown[session.gameType] = {
-          sessions: 0,
-          playtime: 0,
-          averageScore: 0
+    console.log(`📊 Final stats - Games: ${gamesPlayed}, Cases: ${casesCompleted}, Playtime: ${totalPlaytime}m, Avg Score: ${averageScore.toFixed(1)}`);
+
+    // Game type breakdown - prefer user document data, fallback to session calculation
+    let gameTypeBreakdown: { [key: string]: { sessions: number; playtime: number; averageScore: number } } = {};
+
+    if (userData?.gameTypePerformance) {
+      // Use data from user document
+      console.log('📋 Using game type performance from user document');
+      gameTypeBreakdown = Object.entries(userData.gameTypePerformance).reduce((acc, [gameType, stats]) => {
+        acc[gameType] = {
+          sessions: stats.played,
+          playtime: 0, // We don't store playtime per game type in user doc, so calculate from sessions
+          averageScore: stats.averageScore
         };
-      }
-      gameTypeBreakdown[session.gameType].sessions++;
-      gameTypeBreakdown[session.gameType].playtime += session.duration;
-      gameTypeBreakdown[session.gameType].averageScore = 
-        (gameTypeBreakdown[session.gameType].averageScore * (gameTypeBreakdown[session.gameType].sessions - 1) + 
-         (session.score || 0)) / gameTypeBreakdown[session.gameType].sessions;
-    });
+        return acc;
+      }, {} as { [key: string]: { sessions: number; playtime: number; averageScore: number } });
 
-    return {
+      // Add playtime from sessions for each game type
+      sessions.forEach(session => {
+        if (gameTypeBreakdown[session.gameType]) {
+          gameTypeBreakdown[session.gameType].playtime += session.duration;
+        }
+      });
+    } else {
+      // Fallback: calculate from sessions
+      console.log('📋 Calculating game type performance from sessions');
+      sessions.forEach(session => {
+        if (!gameTypeBreakdown[session.gameType]) {
+          gameTypeBreakdown[session.gameType] = {
+            sessions: 0,
+            playtime: 0,
+            averageScore: 0
+          };
+        }
+        gameTypeBreakdown[session.gameType].sessions++;
+        gameTypeBreakdown[session.gameType].playtime += session.duration;
+        gameTypeBreakdown[session.gameType].averageScore = 
+          (gameTypeBreakdown[session.gameType].averageScore * (gameTypeBreakdown[session.gameType].sessions - 1) + 
+           (session.score || 0)) / gameTypeBreakdown[session.gameType].sessions;
+      });
+    }
+
+    const result = {
       totalPlaytime,
       gamesPlayed,
       casesCompleted,
@@ -79,8 +123,11 @@ export async function getUserGames(uid: string): Promise<UserStats> {
       recentSessions: sessions.slice(0, 10), // Last 10 sessions
       gameTypeBreakdown
     };
+
+    console.log(`✅ Successfully fetched stats for ${uid}:`, result);
+    return result;
   } catch (error) {
-    console.error('Error getting user games:', error);
+    console.error('❌ Error getting user games:', error);
     throw error;
   }
 }
@@ -353,6 +400,84 @@ export async function updateGameSession(sessionId: string, updates: Partial<Game
     await updateDoc(doc(db, 'gameSessions', sessionId), cleanedUpdates);
   } catch (error) {
     console.error('Error updating game session:', error);
+    throw error;
+  }
+}
+
+// Update user stats after a game session ends - FIXED VERSION
+export async function updateUserStatsAfterGame(
+  userId: string, 
+  gameType: string, 
+  caseSolved: boolean, 
+  score: number, 
+  duration: number
+): Promise<void> {
+  try {
+    console.log(`Updating user stats for ${userId}: game=${gameType}, solved=${caseSolved}, score=${score}, duration=${duration}m`);
+    
+    // Use transaction to ensure atomic updates
+    const userDocRef = doc(db, 'users', userId);
+    
+    // First update - increment counters atomically
+    const incrementUpdates: any = {
+      gamesPlayed: increment(1),
+      totalPlaytime: increment(duration),
+      [`gameTypePerformance.${gameType}.played`]: increment(1)
+    };
+
+    // Add solved increments if game was solved
+    if (caseSolved) {
+      incrementUpdates.casesCompleted = increment(1);
+      incrementUpdates[`gameTypePerformance.${gameType}.solved`] = increment(1);
+    }
+
+    // Apply increment operations first
+    await updateDoc(userDocRef, incrementUpdates);
+    
+    // Small delay to ensure increment operations are applied
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Then read fresh data and calculate averages
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data() as UserData;
+    
+    if (!userData) {
+      throw new Error('User not found after increment operations');
+    }
+
+    // Calculate new overall average score
+    const currentGamesPlayed = userData.gamesPlayed || 1;
+    const currentAverageScore = userData.averageScore || 0;
+    const totalCurrentScore = currentAverageScore * (currentGamesPlayed - 1); // Subtract 1 because we just incremented
+    const newAverageScore = (totalCurrentScore + score) / currentGamesPlayed;
+
+    // Get current game type performance
+    const gameTypePerformance = userData.gameTypePerformance || {};
+    const currentGameTypeStats = gameTypePerformance[gameType] || {
+      played: 1,
+      solved: 0,
+      averageScore: 0
+    };
+
+    // Calculate new game type average score
+    const currentGameTypePlayed = currentGameTypeStats.played || 1;
+    const currentGameTypeAverageScore = currentGameTypeStats.averageScore || 0;
+    const totalCurrentGameTypeScore = currentGameTypeAverageScore * (currentGameTypePlayed - 1); // Subtract 1 because we just incremented
+    const newGameTypeAverageScore = (totalCurrentGameTypeScore + score) / currentGameTypePlayed;
+
+    // Update only the average scores
+    const averageUpdates: any = {
+      averageScore: newAverageScore,
+      [`gameTypePerformance.${gameType}.averageScore`]: newGameTypeAverageScore,
+      lastUpdated: new Date().toISOString()
+    };
+
+    // Apply average updates
+    await updateDoc(userDocRef, averageUpdates);
+    
+    console.log(`✅ User stats updated successfully for ${userId}: games=${currentGamesPlayed}, avgScore=${newAverageScore.toFixed(1)}, gameType=${gameType} avgScore=${newGameTypeAverageScore.toFixed(1)}`);
+  } catch (error) {
+    console.error('❌ Error updating user stats:', error);
     throw error;
   }
 } 

@@ -131,4 +131,173 @@ export async function getDetectiveHint(caseDetails: string, murderer: string) {
   `;
   
   return await llm.predict(prompt);
+}
+
+export function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Game session helper for integrating with existing game flows
+export async function endGameSession(options: {
+  caseSolved: boolean;
+  finalScore: number;
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+}): Promise<void> {
+  try {
+    // Import dynamically to avoid circular dependencies
+    const { handleGameEnd } = await import('@/lib/gameSession');
+    await handleGameEnd(options.caseSolved, options.finalScore);
+    
+    if (options.onSuccess) {
+      options.onSuccess();
+    }
+  } catch (error) {
+    console.error('Failed to end game session:', error);
+    if (options.onError) {
+      options.onError(error as Error);
+    }
+  }
+}
+
+// Complete integration template for game components - UPDATED VERSION
+export const GameSessionIntegration = {
+  // Add to component imports:
+  imports: `
+import { useGameSession } from '@/lib/gameSession';
+  `,
+  
+  // Add to component state:
+  hooks: `
+const { startSession } = useGameSession();
+  `,
+  
+  // Add to game start function:
+  startGame: (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety') => `
+// Start game session tracking
+try {
+  await startSession('${gameType}');
+  console.log('✅ Game session started for ${gameType}');
+} catch (error) {
+  console.error('❌ Error starting game session:', error);
+}
+  `,
+  
+  // Add to game end logic:
+  endGame: `
+// Update user stats when game ends
+if (gameEnded) {
+  try {
+    // Calculate total score (adjust based on your scoring system)
+    const totalScore = scores ? 
+      ((scores.score1 + scores.score2) / maxPossibleScore) * 100 : 50;
+    
+    // Determine if case was solved (adjust based on your win condition)
+    const caseSolved = finalVerdict === 'success' || totalScore >= 70;
+    
+    await handleGameEnd(caseSolved, totalScore);
+    console.log('✅ User stats updated successfully');
+  } catch (error) {
+    console.error('❌ Error updating user stats:', error);
+  }
+}
+  `,
+  
+  // Integration examples for different game types:
+  examples: {
+    'fake-news': `
+// Example for fake-news simulation
+const totalScore = analysis?.overall_score || 50;
+const caseSolved = analysis?.analysis_type === 'final_judgment' && totalScore >= 70;
+await handleGameEnd(caseSolved, totalScore);
+    `,
+    
+    'chainfail': `
+// Example for chainfail simulation  
+const totalScore = analysis?.overall_score || 50;
+const caseSolved = analysis?.analysis_type === 'final_judgment' && totalScore >= 70;
+await handleGameEnd(caseSolved, totalScore);
+    `,
+    
+    'hospital': `
+// Example for hospital simulation
+const totalScore = finalData?.effectiveness_score || 50;
+const caseSolved = finalData?.crisis_resolved === true;
+await handleGameEnd(caseSolved, totalScore);
+    `,
+    
+    'forensic-audit': `
+// Example for forensic audit
+const totalScore = auditResults?.accuracy_score || 50;
+const caseSolved = auditResults?.audit_passed === true;
+await handleGameEnd(caseSolved, totalScore);
+    `,
+    
+    'quick': `
+// Example for quick game
+const totalScore = gameResults?.score || 50;
+const caseSolved = gameResults?.solved === true;
+await handleGameEnd(caseSolved, totalScore);
+    `,
+    
+    'simulation': `
+// Example for complex simulation
+const totalScore = simulationResults?.overall_score || 50;
+const caseSolved = simulationResults?.case_solved === true;
+await handleGameEnd(caseSolved, totalScore);
+    `
+  }
+};
+
+// Quick setup function for game components
+export async function setupGameSession(gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety') {
+  try {
+    const { useGameSession } = await import('@/lib/gameSession');
+    return useGameSession();
+  } catch (error) {
+    console.error('Error setting up game session:', error);
+    return null;
+  }
+}
+
+// Calculate score from different game formats
+export function calculateGameScore(scores: any, gameType: string): number {
+  switch (gameType) {
+    case 'food-safety':
+      return scores?.insightfulness && scores?.evidenceEvaluation 
+        ? ((scores.insightfulness + scores.evidenceEvaluation) / 10) * 100 
+        : 50;
+    
+    case 'forensic-audit':
+      return scores?.accuracy && scores?.thoroughness 
+        ? ((scores.accuracy + scores.thoroughness) / 10) * 100 
+        : 50;
+    
+    case 'hospital':
+      return scores?.decisionQuality && scores?.timeManagement 
+        ? ((scores.decisionQuality + scores.timeManagement) / 10) * 100 
+        : 50;
+    
+    default:
+      return scores?.overall || scores?.total || 50;
+  }
+}
+
+// Determine if case was solved based on game type
+export function determineCaseSolved(verdict: any, scores: any, gameType: string): boolean {
+  switch (gameType) {
+    case 'food-safety':
+      return verdict === 'ban_lifted';
+    
+    case 'forensic-audit':
+      return verdict === 'fraud_detected' || (scores && (scores.accuracy + scores.thoroughness) >= 8);
+    
+    case 'hospital':
+      return verdict === 'crisis_resolved' || (scores && (scores.decisionQuality + scores.timeManagement) >= 8);
+    
+    default:
+      return verdict === 'success' || verdict === 'solved';
+  }
 } 

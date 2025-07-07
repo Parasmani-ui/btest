@@ -31,8 +31,7 @@ export async function POST(request: NextRequest) {
     console.log('Starting ChainFail simulation generation...');
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.1",
-      // model: "gpt-4o-mini",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -59,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: cleanedResponse,
+      simulationText: cleanedResponse,
     });
 
   } catch (error) {

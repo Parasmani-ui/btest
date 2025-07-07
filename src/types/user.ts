@@ -12,6 +12,13 @@ export interface UserData {
   gamesPlayed?: number;
   casesCompleted?: number;
   averageScore?: number;
+  gameTypePerformance?: {
+    [gameType: string]: {
+      played: number;
+      solved: number;
+      averageScore: number;
+    };
+  };
 }
 
 export interface Organization {
@@ -28,7 +35,7 @@ export interface Organization {
 export interface GameSession {
   id: string;
   userId: string;
-  gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail';
+  gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety';
   startedAt: string;
   endedAt?: string;
   completedAt?: string;

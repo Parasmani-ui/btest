@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import GameHeader from '@/components/ui/GameHeader';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 
 // Define colors for the forensic audit theme (gold/amber theme)
 const SPARKLE_COLORS = {
@@ -29,8 +30,10 @@ interface ForensicAuditState {
 
 export default function ForensicAuditSimulationClientPage() {
   const router = useRouter();
+  const { startSession } = useGameSession();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   const [gameState, setGameState] = useState<ForensicAuditState>({
     caseTitle: '',
     keyAnomalies: [],
@@ -42,6 +45,7 @@ export default function ForensicAuditSimulationClientPage() {
   });
   const [userInput, setUserInput] = useState('');
   const [actionType, setActionType] = useState<string>('');
+  const [sessionStarted, setSessionStarted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -50,6 +54,13 @@ export default function ForensicAuditSimulationClientPage() {
   const startForensicAudit = async () => {
     setLoading(true);
     try {
+      // Start game session tracking
+      if (!sessionStarted) {
+        await startSession('forensic-audit');
+        console.log('✅ Forensic audit simulation session started');
+        setSessionStarted(true);
+      }
+      
       const response = await fetch('/api/forensic-audit-simulation/generate', {
         method: 'POST',
         headers: {
@@ -131,6 +142,19 @@ export default function ForensicAuditSimulationClientPage() {
           finalStatement: data.finalStatement
         }));
 
+        // End game session when simulation completes
+        if (data.gameEnded || gameState.currentRound + 1 >= gameState.maxRounds) {
+          const totalScore = calculateForensicScore(data.cfoScore, data.outcome);
+          const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+          
+          try {
+            await handleGameEnd(caseSolved, totalScore);
+            console.log('✅ Forensic audit simulation stats updated successfully');
+          } catch (error) {
+            console.error('❌ Error updating forensic audit simulation stats:', error);
+          }
+        }
+
         setUserInput('');
         setActionType('');
       }
@@ -186,6 +210,26 @@ export default function ForensicAuditSimulationClientPage() {
       gameStarted: false,
       gameEnded: false,
     });
+    setResetKey(prev => prev + 1);
+  };
+
+  // Calculate score for forensic audit simulation
+  const calculateForensicScore = (cfoScore?: number, outcome?: string): number => {
+    // Use the score from the API if available
+    if (cfoScore && cfoScore > 0) {
+      return cfoScore;
+    }
+    
+    // Otherwise calculate based on outcome
+    let score = 50; // Base score
+    
+    if (outcome === 'escalation') {
+      score += 30; // Successful escalation
+    } else if (outcome === 'internal_audit') {
+      score += 20; // Internal audit resolved
+    }
+    
+    return Math.min(100, score);
   };
 
   if (!mounted) {
@@ -197,7 +241,9 @@ export default function ForensicAuditSimulationClientPage() {
       <GameHeader 
         gameTitle="Forensic Audit Simulation"
         showTimestamp={true}
-        startTiming={gameState.gameStarted}
+        startTiming={gameState.gameStarted && !gameState.gameEnded}
+        gameEnded={gameState.gameEnded}
+        resetKey={resetKey}
       />
       
       <div className="container mx-auto px-4 py-8">
@@ -444,4 +490,4 @@ export default function ForensicAuditSimulationClientPage() {
       </div>
     </main>
   );
-} 
+}

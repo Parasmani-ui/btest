@@ -32,6 +32,7 @@ interface GameState {
   correctSuspect?: string;
   correctSuspectIdentified?: boolean;
   explanation?: string;
+  finalElapsedTime?: string;
   arrestResult?: {
     correct: boolean;
     murderer: string;
@@ -69,14 +70,22 @@ export default function GameContent() {
   });
   const [loading, setLoading] = useState(true);
   const [showGuide, setShowGuide] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const [sessionInfo, setSessionInfo] = useState(getCurrentSession());
+
+  // Update session info periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSessionInfo(getCurrentSession());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [getCurrentSession]);
 
   // start new game
   const startGame = useCallback(async () => {
     setLoading(true);
     try {
-      // Start game session tracking
-      await startSession('quick');
-      
       const response = await fetch('/api/start-game', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -88,6 +97,9 @@ export default function GameContent() {
       }
 
       const data = await response.json();
+      
+      // Start game session tracking AFTER AI response is received
+      await startSession('quick');
       
       setGameState(prevState => ({
         ...prevState,
@@ -101,8 +113,10 @@ export default function GameContent() {
         currentAction: null,
         currentResponse: '',
         gameOver: false,
-        arrestResult: undefined
+        arrestResult: undefined,
+        hints: data.hints || []
       }));
+      setResetKey(prev => prev + 1);
     } catch (error) {
       console.error('Error starting game:', error);
       alert('Something went wrong. Please try again.');
@@ -118,10 +132,10 @@ export default function GameContent() {
 
   // Cleanup session on component unmount or page leave
   useEffect(() => {
-    const handleBeforeUnload = async () => {
+    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
       const session = getCurrentSession();
-      if (session.isActive) {
-        // End session without score if user leaves unexpectedly
+      if (session.isActive && !gameState.gameOver) {
+        // Only end session if game is not over and user is actually leaving
         await endSession(false, 0);
       }
     };
@@ -142,13 +156,10 @@ export default function GameContent() {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      // End session when component unmounts
-      const session = getCurrentSession();
-      if (session.isActive && !gameState.gameOver) {
-        endSession(false, 0);
-      }
+      // Don't end session on unmount - let proper game end flow handle it
+      // This prevents race conditions where cleanup happens before proper game end
     };
-  }, []);
+  }, [gameState.gameOver]);
 
   // toggle theme
   const toggleTheme = () => {
@@ -157,7 +168,15 @@ export default function GameContent() {
 
   // interrogate suspect
   const interrogateSuspect = async (suspect: string) => {
+    if (loading) return;
+    
     setLoading(true);
+    setGameState(prev => ({ 
+      ...prev, 
+      currentAction: 'interrogate',
+      currentSuspect: suspect 
+    }));
+
     try {
       // Track this action in the session
       await addAction(`Interrogated ${suspect}`);
@@ -165,7 +184,11 @@ export default function GameContent() {
       const response = await fetch('/api/interrogate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ suspect })
+        body: JSON.stringify({
+          suspect,
+          caseDetails: gameState.caseDetails,
+          interrogatedSuspects: gameState.interrogatedSuspects
+        })
       });
 
       if (!response.ok) {
@@ -174,13 +197,11 @@ export default function GameContent() {
 
       const data = await response.json();
       
-      setGameState({
-        ...gameState,
-        currentAction: 'interrogate',
+      setGameState(prev => ({
+        ...prev,
         currentResponse: data.response,
-        interrogatedSuspects: [...gameState.interrogatedSuspects, suspect],
-        currentSuspect: suspect
-      });
+        interrogatedSuspects: [...prev.interrogatedSuspects, suspect]
+      }));
     } catch (error) {
       console.error('Error interrogating suspect:', error);
       alert('Something went wrong during interrogation.');
@@ -191,7 +212,15 @@ export default function GameContent() {
 
   // analyse evidence
   const analyzeEvidence = async (evidence: string) => {
+    if (loading) return;
+    
     setLoading(true);
+    setGameState(prev => ({ 
+      ...prev, 
+      currentAction: 'analyze',
+      currentSuspect: null 
+    }));
+
     try {
       // Track evidence analysis
       await addEvidence(`Analyzed: ${evidence}`);
@@ -200,7 +229,11 @@ export default function GameContent() {
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ evidence })
+        body: JSON.stringify({
+          evidence,
+          caseDetails: gameState.caseDetails,
+          analyzedEvidence: gameState.analyzedEvidence
+        })
       });
 
       if (!response.ok) {
@@ -209,12 +242,11 @@ export default function GameContent() {
 
       const data = await response.json();
       
-      setGameState({
-        ...gameState,
-        currentAction: 'analyze',
+      setGameState(prev => ({
+        ...prev,
         currentResponse: data.response,
-        analyzedEvidence: [...gameState.analyzedEvidence, evidence]
-      });
+        analyzedEvidence: [...prev.analyzedEvidence, evidence]
+      }));
     } catch (error) {
       console.error('Error analyzing evidence:', error);
       alert('Something went wrong during evidence analysis.');
@@ -225,11 +257,20 @@ export default function GameContent() {
 
   // make arrest
   const makeArrest = async (suspect: string) => {
+    if (loading) return;
+    
+    setLoading(true);
+    setGameState(prev => ({ 
+      ...prev, 
+      currentAction: 'arrest',
+      currentSuspect: suspect 
+    }));
+
     if (!confirm(`Are you sure you want to arrest ${suspect}? This will end the case.`)) {
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
       // Track the arrest action
       await addAction(`Arrested ${suspect}`);
@@ -241,11 +282,17 @@ export default function GameContent() {
         },
         body: JSON.stringify({
           suspectName: suspect,
-          gameState
+          gameState: {
+            suspects: gameState.suspects,
+            caseDetails: gameState.caseDetails,
+            interrogatedSuspects: gameState.interrogatedSuspects,
+            analyzedEvidence: gameState.analyzedEvidence
+          }
         }),
       });
       
       const data = await res.json();
+      console.log('Arrest API response:', data); // Debug logging
       
       if (data.success) {
         // Calculate score based on correctness and efficiency
@@ -258,24 +305,48 @@ export default function GameContent() {
         
         const finalScore = Math.max(0, baseScore + evidenceBonus + interrogationBonus - hintPenalty);
         
+        // Capture elapsed time before ending session
+        const finalElapsedMinutes = sessionInfo.timeSpent;
+        const minutes = Math.floor(finalElapsedMinutes);
+        const seconds = Math.floor((finalElapsedMinutes % 1) * 60);
+        const finalElapsedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
         // End the game session
         await endSession(isCorrect, finalScore);
         
-        setGameState({
-          ...gameState,
+        setGameState(prev => ({
+          ...prev,
           gameOver: true,
+          correctSuspect: data.correctSuspect,
+          correctSuspectIdentified: data.correctSuspectIdentified,
+          explanation: data.reasoning,
+          finalElapsedTime: finalElapsedTime,
           arrestResult: {
             correct: data.correctSuspectIdentified,
             murderer: data.correctSuspect,
             suspectArrested: suspect,
             reasoning: data.reasoning
           },
-          currentAction: 'arrest-result'
-        });
+          currentAction: null // Clear current action to show result
+        }));
+      } else {
+        // Handle API error response
+        alert('There was an error processing the arrest. Please try again.');
+        setGameState(prev => ({
+          ...prev,
+          currentAction: null
+        }));
       }
     } catch (error) {
       console.error('Error making arrest:', error);
-      alert('Something went wrong during arrest.');
+      alert('Something went wrong during arrest. Please try again.');
+      // Reset the action state so user can try again
+      setGameState(prev => ({
+        ...prev,
+        currentAction: null,
+        currentResponse: '',
+        currentSuspect: null
+      }));
     } finally {
       setLoading(false);
     }
@@ -283,77 +354,51 @@ export default function GameContent() {
 
   // navigate b/w hints
   const nextHint = async () => {
-    // Track hint usage
-    await incrementHints();
-    await addAction('Used a hint');
+    if (gameState.currentHint >= gameState.hints.length - 1) return;
     
-    // first check local hints list
-    if (gameState.currentHint < gameState.hints.length - 1) {
-      setGameState({
-        ...gameState,
-        currentHint: gameState.currentHint + 1
-      });
-      return;
-    }
-    
-    // new hints from server
-    try {
-      const response = await fetch('/api/hint');
-      
-      if (!response.ok) {
-        throw new Error('Failed to get hint');
-      }
-      
-      const data = await response.json();
-      
-      if (data.hint && data.hint.trim() !== '') {
-        setGameState({
-          ...gameState,
-          hints: [...gameState.hints, data.hint],
-          currentHint: gameState.hints.length
-        });
-      }
-    } catch (error) {
-      console.error('Error getting hint:', error);
-    }
+    setGameState(prev => ({
+      ...prev,
+      currentHint: prev.currentHint + 1
+    }));
   };
 
   // show hint
   const getCurrentHint = () => {
-    return gameState.hints[gameState.currentHint];
+    return gameState.hints[gameState.currentHint] || "No more hints available.";
   };
 
   // end interrogation or analyssis
   const endAction = () => {
-    setGameState({
-      ...gameState,
+    setGameState(prev => ({
+      ...prev,
       currentAction: null,
-      currentResponse: ''
-    });
+      currentResponse: '',
+      currentSuspect: null
+    }));
   };
 
   // show suspect
   const showSuspects = () => {
-    setGameState({
-      ...gameState,
+    setGameState(prev => ({
+      ...prev,
       currentAction: 'suspects'
-    });
+    }));
   };
 
   // show evidence
   const showEvidence = () => {
-    setGameState({
-      ...gameState,
+    setGameState(prev => ({
+      ...prev,
       currentAction: 'evidence'
-    });
+    }));
   };
 
   // arrest option show
   const showArrestOptions = () => {
-    setGameState({
-      ...gameState,
+    setGameState(prev => ({
+      ...prev,
       currentAction: 'arrest-options'
-    });
+    }));
   };
 
   // action panel content
@@ -481,7 +526,10 @@ export default function GameContent() {
       <GameHeader 
         gameTitle="Quick Investigation" 
         showTimestamp={true} 
-        startTiming={gameState.started && !loading}
+        startTiming={sessionInfo.isActive && !gameState.gameOver}
+        gameEnded={gameState.gameOver}
+        resetKey={resetKey}
+        sessionStartTime={sessionInfo.startTime}
       />
       <div className={`game-content min-h-screen p-4 ${theme === 'dark' ? 'bg-blue-900 text-white' : 'bg-slate-100 text-black'}`}>
         {/* Header and theme toggle */}

@@ -14,7 +14,9 @@ export default function ChainFailSimulationPage() {
   const [simulationText, setSimulationText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [resetKey, setResetKey] = useState(0);
   const { startSession } = useGameSession();
 
   const toggleTheme = () => {
@@ -26,81 +28,61 @@ export default function ChainFailSimulationPage() {
     setError(null);
     
     try {
-      // Start game session tracking
-      await startSession('chainfail');
-    } catch (sessionError) {
-      console.error('Error starting session:', sessionError);
-    }
-    
-    // Create an AbortController to handle request timeouts
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 70000); // 70 seconds timeout
-    
-    try {
       const response = await fetch('/api/chainfail-simulation/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        signal: controller.signal,
+        body: JSON.stringify({
+          action: 'generate_simulation'
+        }),
       });
-      
-      // Clear the timeout since request completed
-      clearTimeout(timeoutId);
-      
-      // Handle non-200 responses
+
       if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Error: ${response.status} ${response.statusText}`;
-        
-        try {
-          // Try to parse the error as JSON
-          const errorData = JSON.parse(errorText);
-          if (errorData.error) {
-            errorMessage = errorData.error;
-          }
-        } catch {
-          // If parsing fails, use the raw text with a fallback
-          errorMessage = errorText || 'Failed to generate simulation';
-        }
-        
-        throw new Error(errorMessage);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      setSimulationText(data.data || '');
-      setHasStarted(true);
-    } catch (err) {
-      // Clear the timeout in case of error
-      clearTimeout(timeoutId);
       
-      console.error('Error generating simulation:', err);
-      
-      // Special handling for AbortError (timeout)
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        setError('Request timed out. The server is taking too long to respond. Please try again later.');
+      if (data.success) {
+        setSimulationText(data.simulationText);
+        setHasStarted(true);
+        await startSession('chainfail');
       } else {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        throw new Error(data.error || 'Failed to generate simulation');
       }
+    } catch (error) {
+      console.error('Error generating simulation:', error);
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleGameEnd = () => {
+    setGameEnded(true);
+  };
+
   const handleStartNewCase = () => {
-    // Clear all state
-    setSimulationText('');
     setHasStarted(false);
+    setGameEnded(false);
+    setSimulationText('');
     setError(null);
-    
-    // Directly trigger a new simulation generation
+    setIsLoading(false);
+    setResetKey(prev => prev + 1);
     generateSimulation();
   };
 
   if (isLoading) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
-        <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={false} />
+        <GameHeader 
+          gameTitle="ChainFail - Industrial Safety Analysis" 
+          showTimestamp={true} 
+          startTiming={false}
+          gameEnded={gameEnded}
+          resetKey={resetKey}
+        />
         <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'}`}>
           <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
             <TextAnimate
@@ -129,7 +111,12 @@ export default function ChainFailSimulationPage() {
   if (error) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
-        <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={false} />
+        <GameHeader 
+          gameTitle="ChainFail - Industrial Safety Analysis" 
+          showTimestamp={true} 
+          startTiming={false}
+          resetKey={resetKey}
+        />
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'} flex items-center justify-center`}>
           <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <TextAnimate
@@ -224,10 +211,17 @@ export default function ChainFailSimulationPage() {
   if (hasStarted && simulationText) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
-        <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={true} />
+        <GameHeader 
+          gameTitle="ChainFail - Industrial Safety Analysis" 
+          showTimestamp={true} 
+          startTiming={hasStarted}
+          gameEnded={gameEnded}
+          resetKey={resetKey}
+        />
         <ChainFailSimulationClient
           simulationText={simulationText}
           onStartNewCase={handleStartNewCase}
+          onGameEnd={handleGameEnd}
         />
       </ThemeProvider>
     );
@@ -235,7 +229,13 @@ export default function ChainFailSimulationPage() {
 
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
-      <GameHeader gameTitle="ChainFail - Industrial Safety Analysis" showTimestamp={true} startTiming={false} />
+      <GameHeader 
+        gameTitle="ChainFail - Industrial Safety Analysis" 
+        showTimestamp={true} 
+        startTiming={false}
+        gameEnded={gameEnded}
+        resetKey={resetKey}
+      />
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'} flex items-center justify-center`}>
         <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-2xl w-full`}>
           <div className="text-center">

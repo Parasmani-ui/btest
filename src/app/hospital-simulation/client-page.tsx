@@ -8,6 +8,7 @@ import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
 import ReactMarkdown from 'react-markdown';
 import GameHeader from '@/components/ui/GameHeader';
+import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 
 // Define props for the component
 interface HospitalSimulationClientProps {
@@ -25,15 +26,19 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   onStartNewCase 
 }) => {
   const router = useRouter();
+  const { startSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [userInput, setUserInput] = useState<string>('');
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [resetKey, setResetKey] = useState(0);
   const [messages, setMessages] = useState<{role: string, content: string}[]>([]);
   const [currentRound, setCurrentRound] = useState<number>(1);
   const [role, setRole] = useState<string>('');
   const [scenarioText, setScenarioText] = useState<string>('');
   const [options, setOptions] = useState<ScenarioOption[]>([]);
+  const [sessionStarted, setSessionStarted] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Toggle theme
@@ -50,6 +55,19 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
         { role: 'assistant', content: simulationText }
       ]);
       
+      // Set game as started when simulation text is received
+      setGameStarted(true);
+      
+      // Start game session tracking
+      if (!sessionStarted) {
+        startSession('hospital').then(() => {
+          console.log('✅ Hospital simulation session started');
+          setSessionStarted(true);
+        }).catch(error => {
+          console.error('❌ Error starting hospital session:', error);
+        });
+      }
+      
       // Try to parse the role from the simulation text
       const roleMatch = simulationText.match(/Your role: ([A-Za-z\s]+)/);
       if (roleMatch && roleMatch[1]) {
@@ -59,7 +77,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
       // Parse the scenario and options
       parseScenarioAndOptions(simulationText);
     }
-  }, [simulationText]);
+  }, [simulationText, startSession, sessionStarted]);
   
   // Parse incoming AI messages to separate scenario text from options
   const parseScenarioAndOptions = (content: string) => {
@@ -82,6 +100,21 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
     if (content.includes('FINAL PERFORMANCE EVALUATION') || content.includes('Final Score:')) {
       setIsCompleted(true);
       setScenarioText(content);
+      
+      // End game session when simulation completes
+      const totalScore = calculateHospitalScore(messages, currentRound);
+      const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+      
+      try {
+        handleGameEnd(caseSolved, totalScore).then(() => {
+          console.log('✅ Hospital simulation stats updated successfully');
+        }).catch(error => {
+          console.error('❌ Error updating hospital simulation stats:', error);
+        });
+      } catch (error) {
+        console.error('❌ Error in handleGameEnd:', error);
+      }
+      
       return;
     }
     
@@ -327,9 +360,78 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
     }
   };
   
+  // Enhanced onStartNewCase to reset all states
+  const handleStartNewCase = () => {
+    setIsCompleted(false);
+    setGameStarted(false);
+    setMessages([]);
+    setCurrentRound(1);
+    setRole('');
+    setScenarioText('');
+    setOptions([]);
+    setUserInput('');
+    setIsThinking(false);
+    setResetKey(prev => prev + 1); // Increment reset key to trigger timer reset
+    onStartNewCase(); // Call the original function
+  };
+  
+  // Calculate score for hospital simulation
+  const calculateHospitalScore = (messages: {role: string, content: string}[], currentRound: number): number => {
+    const maxRounds = 10;
+    const completionBonus = (currentRound / maxRounds) * 60; // 60% for completion
+    
+    // Base score for reaching the end
+    let score = completionBonus;
+    
+    // Check final message for performance indicators
+    const finalMessage = messages[messages.length - 1];
+    if (finalMessage?.content) {
+      const content = finalMessage.content.toLowerCase();
+      
+      // Look for score in the final message
+      const scoreMatch = finalMessage.content.match(/final score[:\s]+(\d+)/i);
+      if (scoreMatch) {
+        return parseInt(scoreMatch[1]);
+      }
+      
+      // Look for positive indicators
+      const positiveIndicators = [
+        'excellent', 'outstanding', 'superior', 'exceptional', 'perfect',
+        'effective', 'successful', 'appropriate', 'well-handled', 'commendable'
+      ];
+      
+      const negativeIndicators = [
+        'poor', 'inadequate', 'failed', 'unsuccessful', 'inappropriate',
+        'missed', 'overlooked', 'delayed', 'ineffective', 'concerning'
+      ];
+      
+      let positiveCount = 0;
+      let negativeCount = 0;
+      
+      positiveIndicators.forEach(indicator => {
+        if (content.includes(indicator)) positiveCount++;
+      });
+      
+      negativeIndicators.forEach(indicator => {
+        if (content.includes(indicator)) negativeCount++;
+      });
+      
+      const qualityScore = Math.max(0, (positiveCount - negativeCount) * 10);
+      score += Math.min(40, qualityScore); // Max 40% for quality
+    }
+    
+    return Math.min(100, Math.max(0, score));
+  };
+  
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
-      <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={true} />
+      <GameHeader 
+        gameTitle="Hospital Crisis Management" 
+        showTimestamp={true} 
+        startTiming={gameStarted && !isCompleted}
+        gameEnded={isCompleted}
+        resetKey={resetKey}
+      />
       <div className={`flex flex-col h-screen ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
         {/* Game Info Bar */}
         <div className={`p-3 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} flex justify-between items-center shadow-sm border-b ${theme === 'dark' ? 'border-red-700' : 'border-gray-200'}`}>
@@ -405,7 +507,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
             {isCompleted ? (
               <div className="flex space-x-4">
                 <ShimmerButton
-                  onClick={onStartNewCase}
+                  onClick={handleStartNewCase}
                   className="flex-1 p-3 text-white"
                   shimmerColor="rgba(255, 255, 255, 0.8)"
                   shimmerSize="0.1em"

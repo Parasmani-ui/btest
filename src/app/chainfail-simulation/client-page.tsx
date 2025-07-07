@@ -6,6 +6,7 @@ import { ChevronLeft, Settings, User, Wrench, FileText, Target } from 'lucide-re
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 
 interface ChainFailDecisions {
   rootCause: string;
@@ -16,6 +17,7 @@ interface ChainFailDecisions {
 interface ChainFailSimulationClientProps {
   simulationText: string;
   onStartNewCase: () => void;
+  onGameEnd: () => void;
 }
 
 interface ParsedCaseData {
@@ -27,8 +29,9 @@ interface ParsedCaseData {
   rootCauseGuide: string;
 }
 
-export default function ChainFailSimulationClient({ simulationText, onStartNewCase }: ChainFailSimulationClientProps) {
+export default function ChainFailSimulationClient({ simulationText, onStartNewCase, onGameEnd }: ChainFailSimulationClientProps) {
   const router = useRouter();
+  const { startSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [caseData, setCaseData] = useState<string>('');
   const [parsedData, setParsedData] = useState<ParsedCaseData | null>(null);
@@ -42,6 +45,63 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
   const [analysis, setAnalysis] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [hasSubmittedFinal, setHasSubmittedFinal] = useState(false);
+  const [sessionStarted, setSessionStarted] = useState(false);
+
+  // Calculate score for chainfail simulation
+  const calculateChainFailScore = (analysis: string, decisions: ChainFailDecisions): number => {
+    let score = 0;
+    const maxScore = 100;
+
+    // Base score for having all required decisions
+    if (decisions.rootCause && decisions.preventiveAction) {
+      score += 30; // 30% for completing the analysis
+    }
+
+    // Score based on analysis content quality
+    if (analysis) {
+      // Check for positive indicators in the analysis
+      const positiveIndicators = [
+        'comprehensive', 'thorough', 'excellent', 'good', 'appropriate', 
+        'correct', 'accurate', 'well-identified', 'properly', 'effective'
+      ];
+      
+      const negativeIndicators = [
+        'insufficient', 'inadequate', 'poor', 'incorrect', 'missed', 
+        'failed', 'incomplete', 'lacking', 'not enough', 'superficial'
+      ];
+      
+      const analysisLower = analysis.toLowerCase();
+      let positiveCount = 0;
+      let negativeCount = 0;
+      
+      positiveIndicators.forEach(indicator => {
+        if (analysisLower.includes(indicator)) {
+          positiveCount++;
+        }
+      });
+      
+      negativeIndicators.forEach(indicator => {
+        if (analysisLower.includes(indicator)) {
+          negativeCount++;
+        }
+      });
+      
+      // Score based on positive vs negative indicators
+      const indicatorScore = Math.max(0, (positiveCount - negativeCount) * 10);
+      score += Math.min(40, indicatorScore); // Max 40% for analysis quality
+    }
+
+    // Score based on decision quality
+    if (decisions.rootCause && decisions.rootCause.length > 20) {
+      score += 15; // 15% for detailed root cause
+    }
+    
+    if (decisions.preventiveAction && decisions.preventiveAction.length > 20) {
+      score += 15; // 15% for detailed preventive action
+    }
+
+    return Math.min(maxScore, score);
+  };
 
   // Parse JSON data if it exists
   const parseSimulationData = (text: string): ParsedCaseData | null => {
@@ -136,8 +196,18 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
       setCaseData(simulationText);
       const parsed = parseSimulationData(simulationText);
       setParsedData(parsed);
+      
+      // Start game session tracking
+      if (!sessionStarted) {
+        startSession('chainfail').then(() => {
+          console.log('✅ Chainfail simulation session started');
+          setSessionStarted(true);
+        }).catch(error => {
+          console.error('❌ Error starting chainfail session:', error);
+        });
+      }
     }
-  }, [simulationText]);
+  }, [simulationText, startSession, sessionStarted]);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -171,6 +241,20 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
         if (analysisType === 'final_judgment') {
           setCurrentView('final_result');
           setHasSubmittedFinal(true);
+          
+          // Calculate score based on analysis and decisions
+          const totalScore = calculateChainFailScore(data.analysis, decisions);
+          const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+          
+          // Update user stats when game ends
+          try {
+            await handleGameEnd(caseSolved, totalScore);
+            console.log('✅ Chainfail simulation stats updated successfully');
+          } catch (error) {
+            console.error('❌ Error updating chainfail simulation stats:', error);
+          }
+          
+          onGameEnd();
         }
       } else {
         throw new Error(data.error || 'Failed to analyze case');
