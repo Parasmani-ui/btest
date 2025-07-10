@@ -7,6 +7,7 @@ import { ChevronLeft, AlertTriangle, Eye, Users, FileText, Target } from 'lucide
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 
 interface FakeNewsDecisions {
@@ -20,9 +21,11 @@ interface FakeNewsSimulationClientProps {
   simulationText: string;
   onStartNewCase: () => void;
   onGameEnd: () => void;
+  onSessionStart?: (startTime: Date) => void;
+  onSessionEnd?: (endTime: Date, elapsedTime: string) => void;
 }
 
-export default function FakeNewsSimulationClient({ simulationText, onStartNewCase, onGameEnd }: FakeNewsSimulationClientProps) {
+export default function FakeNewsSimulationClient({ simulationText, onStartNewCase, onGameEnd, onSessionStart, onSessionEnd }: FakeNewsSimulationClientProps) {
   const router = useRouter();
   const { startSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -40,23 +43,28 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
   const [hasSubmittedFinal, setHasSubmittedFinal] = useState(false);
   const [loadedAnalysisType, setLoadedAnalysisType] = useState<string>('');
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
 
   // Initialize with the passed simulation text
   useEffect(() => {
     if (simulationText) {
       setCaseData(simulationText);
       
-      // Start game session tracking
+      // Start game session tracking when case is loaded and ready
       if (!sessionStarted) {
+        const startTime = new Date();
         startSession('fake-news').then(() => {
-          console.log('✅ Fake news simulation session started');
+          setSessionStartTime(startTime);
           setSessionStarted(true);
+          onSessionStart?.(startTime); // Notify parent of session start
+          console.log('✅ Fake news simulation session started when case loaded');
         }).catch(error => {
           console.error('❌ Error starting fake news session:', error);
         });
       }
     }
-  }, [simulationText, startSession, sessionStarted]);
+  }, [simulationText, startSession, sessionStarted, onSessionStart]);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -91,6 +99,17 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
         if (analysisType === 'final_judgment') {
           setCurrentView('final_result');
           setHasSubmittedFinal(true);
+          
+          // Capture elapsed time before ending session
+          if (sessionStartTime) {
+            const endTime = new Date();
+            const elapsedMs = endTime.getTime() - sessionStartTime.getTime();
+            const elapsedMinutes = Math.floor(elapsedMs / 60000);
+            const elapsedSeconds = Math.floor((elapsedMs % 60000) / 1000);
+            const elapsedTimeStr = `${elapsedMinutes}m ${elapsedSeconds}s`;
+            setFinalElapsedTime(elapsedTimeStr);
+            onSessionEnd?.(endTime, elapsedTimeStr); // Notify parent of session end
+          }
           
           // Calculate score based on analysis and decisions
           const totalScore = calculateFakeNewsScore(data.analysis, decisions);
@@ -518,6 +537,13 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
             >
               📊 Analysis Results
             </TextAnimate>
+            {finalElapsedTime && (
+              <div className="text-center">
+                <div className={`text-lg font-semibold ${theme === 'dark' ? 'text-orange-300' : 'text-orange-600'}`}>
+                  Total Time: {finalElapsedTime}
+                </div>
+              </div>
+            )}
             <div className={`${theme === 'dark' ? 'bg-orange-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
               <div className="prose prose-invert max-w-none">
                 {formatAnalysisContent(analysis)}

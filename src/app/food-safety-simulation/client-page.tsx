@@ -48,6 +48,8 @@ export default function FoodSafetySimulationClientPage() {
   });
   const [userInput, setUserInput] = useState('');
   const { startSession } = useGameSession();
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
 
   useEffect(() => {
     setMounted(true);
@@ -56,9 +58,6 @@ export default function FoodSafetySimulationClientPage() {
   const startFoodSafetySimulation = async () => {
     setLoading(true);
     try {
-      // Start game session tracking
-      await startSession('food-safety');
-      
       const response = await fetch('/api/food-safety-simulation/generate', {
         method: 'POST',
         headers: {
@@ -71,6 +70,13 @@ export default function FoodSafetySimulationClientPage() {
 
       if (response.ok) {
         const data = await response.json();
+        
+        // Start game session tracking after AI response is received
+        const startTime = new Date();
+        await startSession('food-safety');
+        setSessionStartTime(startTime);
+        console.log('✅ Food safety simulation session started after AI response');
+        
         setGameState(prev => ({
           ...prev,
           caseTitle: data.caseTitle,
@@ -142,15 +148,24 @@ export default function FoodSafetySimulationClientPage() {
 
         // Update user stats when game ends
         if (data.gameEnded || gameState.currentRound + 1 >= gameState.maxRounds) {
+          // Capture elapsed time before ending session
+          if (sessionStartTime) {
+            const endTime = new Date();
+            const elapsedMs = endTime.getTime() - sessionStartTime.getTime();
+            const elapsedMinutes = Math.floor(elapsedMs / 60000);
+            const elapsedSeconds = Math.floor((elapsedMs % 60000) / 1000);
+            setFinalElapsedTime(`${elapsedMinutes}m ${elapsedSeconds}s`);
+          }
+          
           try {
             const totalScore = data.scores ? 
               ((data.scores.insightfulness + data.scores.evidenceEvaluation) / 10) * 100 : 50;
             const caseSolved = data.finalVerdict === 'ban_lifted';
             
             await handleGameEnd(caseSolved, totalScore);
-            console.log('User stats updated after food safety simulation');
+            console.log('✅ Food safety simulation stats updated successfully');
           } catch (error) {
-            console.error('Error updating user stats:', error);
+            console.error('❌ Error updating food safety simulation stats:', error);
           }
         }
 
@@ -208,6 +223,9 @@ export default function FoodSafetySimulationClientPage() {
       gameStarted: false,
       gameEnded: false,
     });
+    // Reset all session timing state
+    setSessionStartTime(null);
+    setFinalElapsedTime('');
     setResetKey(prev => prev + 1);
   };
 
@@ -220,9 +238,10 @@ export default function FoodSafetySimulationClientPage() {
       <GameHeader 
         gameTitle="Food Safety Simulation"
         showTimestamp={true}
-        startTiming={gameState.gameStarted && !gameState.gameEnded}
+        startTiming={sessionStartTime !== null && !gameState.gameEnded}
         gameEnded={gameState.gameEnded}
         resetKey={resetKey}
+        sessionStartTime={sessionStartTime}
       />
       
       <div className="container mx-auto px-4 py-8">
@@ -428,6 +447,13 @@ export default function FoodSafetySimulationClientPage() {
                 <h3 className="text-xl font-bold mb-4 text-cyan-800 dark:text-cyan-200">
                   Crisis Results
                 </h3>
+                {finalElapsedTime && (
+                  <div className="text-center mb-4">
+                    <div className="text-lg font-semibold text-cyan-600 dark:text-cyan-400">
+                      Total Time: {finalElapsedTime}
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>

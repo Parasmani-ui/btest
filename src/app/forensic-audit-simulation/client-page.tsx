@@ -46,6 +46,8 @@ export default function ForensicAuditSimulationClientPage() {
   const [userInput, setUserInput] = useState('');
   const [actionType, setActionType] = useState<string>('');
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
 
   useEffect(() => {
     setMounted(true);
@@ -54,13 +56,6 @@ export default function ForensicAuditSimulationClientPage() {
   const startForensicAudit = async () => {
     setLoading(true);
     try {
-      // Start game session tracking
-      if (!sessionStarted) {
-        await startSession('forensic-audit');
-        console.log('✅ Forensic audit simulation session started');
-        setSessionStarted(true);
-      }
-      
       const response = await fetch('/api/forensic-audit-simulation/generate', {
         method: 'POST',
         headers: {
@@ -73,6 +68,16 @@ export default function ForensicAuditSimulationClientPage() {
 
       if (response.ok) {
         const data = await response.json();
+        
+        // Start game session tracking after AI response is received
+        if (!sessionStarted) {
+          const startTime = new Date();
+          await startSession('forensic-audit');
+          setSessionStartTime(startTime);
+          setSessionStarted(true);
+          console.log('✅ Forensic audit simulation session started after AI response');
+        }
+        
         setGameState(prev => ({
           ...prev,
           caseTitle: data.caseTitle,
@@ -144,6 +149,15 @@ export default function ForensicAuditSimulationClientPage() {
 
         // End game session when simulation completes
         if (data.gameEnded || gameState.currentRound + 1 >= gameState.maxRounds) {
+          // Capture elapsed time before ending session
+          if (sessionStartTime) {
+            const endTime = new Date();
+            const elapsedMs = endTime.getTime() - sessionStartTime.getTime();
+            const elapsedMinutes = Math.floor(elapsedMs / 60000);
+            const elapsedSeconds = Math.floor((elapsedMs % 60000) / 1000);
+            setFinalElapsedTime(`${elapsedMinutes}m ${elapsedSeconds}s`);
+          }
+          
           const totalScore = calculateForensicScore(data.cfoScore, data.outcome);
           const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
           
@@ -210,6 +224,10 @@ export default function ForensicAuditSimulationClientPage() {
       gameStarted: false,
       gameEnded: false,
     });
+    // Reset all session timing state
+    setSessionStarted(false);
+    setSessionStartTime(null);
+    setFinalElapsedTime('');
     setResetKey(prev => prev + 1);
   };
 
@@ -241,9 +259,10 @@ export default function ForensicAuditSimulationClientPage() {
       <GameHeader 
         gameTitle="Forensic Audit Simulation"
         showTimestamp={true}
-        startTiming={gameState.gameStarted && !gameState.gameEnded}
+        startTiming={sessionStarted && !gameState.gameEnded}
         gameEnded={gameState.gameEnded}
         resetKey={resetKey}
+        sessionStartTime={sessionStartTime}
       />
       
       <div className="container mx-auto px-4 py-8">
@@ -442,6 +461,13 @@ export default function ForensicAuditSimulationClientPage() {
                 <h3 className="text-xl font-bold mb-4 text-amber-800 dark:text-amber-200">
                   Audit Results
                 </h3>
+                {finalElapsedTime && (
+                  <div className="text-center mb-4">
+                    <div className="text-lg font-semibold text-amber-600 dark:text-amber-400">
+                      Total Time: {finalElapsedTime}
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>

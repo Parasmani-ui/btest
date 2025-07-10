@@ -44,6 +44,8 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [analysis, setAnalysis] = useState<string>('');
   const [sessionStarted, setSessionStarted] = useState<boolean>(false);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
 
   const parsedData = useMemo(() => {
     if (!simulationText) return { simulationData: null, markdownData: null, error: null };
@@ -89,17 +91,19 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     setParseError(parsedData.error);
   }, [parsedData.error]);
 
-  // Start session when simulation begins
+  // Start session when simulation is loaded and ready for analysis
   useEffect(() => {
-    if (simulationText && !sessionStarted) {
+    if (simulationText && (parsedData.simulationData || parsedData.markdownData) && !sessionStarted) {
+      const startTime = new Date();
       startSession('simulation').then(() => {
-        console.log('✅ Complex simulation session started');
+        setSessionStartTime(startTime);
         setSessionStarted(true);
+        console.log('✅ Complex simulation session started when case loaded');
       }).catch(error => {
         console.error('❌ Error starting simulation session:', error);
       });
     }
-  }, [simulationText, startSession, sessionStarted]);
+  }, [simulationText, parsedData, startSession, sessionStarted]);
   
   // Parse markdown format simulation
   const parseMarkdownSimulation = (text: string): MarkdownSimulationData => {
@@ -173,6 +177,15 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
         setAnalysis(data.analysis);
         setHasSubmitted(true);
         setShowConclusionForm(false); // Hide the form after submission
+        
+        // Capture elapsed time before ending session
+        if (sessionStartTime) {
+          const endTime = new Date();
+          const elapsedMs = endTime.getTime() - sessionStartTime.getTime();
+          const elapsedMinutes = Math.floor(elapsedMs / 60000);
+          const elapsedSeconds = Math.floor((elapsedMs % 60000) / 1000);
+          setFinalElapsedTime(`${elapsedMinutes}m ${elapsedSeconds}s`);
+        }
         
         // End game session when simulation completes
         const totalScore = calculateSimulationScore(data.analysis, conclusionState);
@@ -526,9 +539,10 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
       <GameHeader 
         gameTitle="Complex Investigation" 
         showTimestamp={true}
-        startTiming={!!(parsedData.simulationData || parsedData.markdownData) && !hasSubmitted}
+        startTiming={sessionStarted && !hasSubmitted}
         gameEnded={hasSubmitted}
         resetKey={resetKey}
+        sessionStartTime={sessionStartTime}
       />
       <div className={`flex h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}

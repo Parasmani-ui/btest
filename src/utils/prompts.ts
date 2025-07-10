@@ -534,14 +534,6 @@ Simulation Steps:
    - Escalation to Board/Regulator
    - Recommendation for internal audit
 
-NAVIGATION MENU:
-- [Button: Request Excel File Metadata]
-- [Button: Request SAP Logs]
-- [Button: Probe Vendor GST Compliance]
-- [Button: Challenge Emergency Approvals]
-- [Button: Submit Final Position]
-- [Button: 🔍 Hint]
-
 </GAME_MECHANICS>
 
 <HINT_SYSTEM>

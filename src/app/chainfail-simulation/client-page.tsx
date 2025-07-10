@@ -6,7 +6,9 @@ import { ChevronLeft, Settings, User, Wrench, FileText, Target } from 'lucide-re
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { SparklesText } from '@/components/magicui/sparkles-text';
+import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
+import { useRef } from 'react';
 
 interface ChainFailDecisions {
   rootCause: string;
@@ -18,6 +20,8 @@ interface ChainFailSimulationClientProps {
   simulationText: string;
   onStartNewCase: () => void;
   onGameEnd: () => void;
+  onSessionStart?: (startTime: Date) => void;
+  onSessionEnd?: (endTime: Date, elapsedTime: string) => void;
 }
 
 interface ParsedCaseData {
@@ -29,7 +33,7 @@ interface ParsedCaseData {
   rootCauseGuide: string;
 }
 
-export default function ChainFailSimulationClient({ simulationText, onStartNewCase, onGameEnd }: ChainFailSimulationClientProps) {
+export default function ChainFailSimulationClient({ simulationText, onStartNewCase, onGameEnd, onSessionStart, onSessionEnd }: ChainFailSimulationClientProps) {
   const router = useRouter();
   const { startSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -46,6 +50,9 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
   const [error, setError] = useState<string>('');
   const [hasSubmittedFinal, setHasSubmittedFinal] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
+  const sessionInitialized = useRef(false);
 
   // Calculate score for chainfail simulation
   const calculateChainFailScore = (analysis: string, decisions: ChainFailDecisions): number => {
@@ -196,30 +203,37 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
       setCaseData(simulationText);
       const parsed = parseSimulationData(simulationText);
       setParsedData(parsed);
-      
-      // Start game session tracking
-      if (!sessionStarted) {
-        startSession('chainfail').then(() => {
-          console.log('✅ Chainfail simulation session started');
-          setSessionStarted(true);
-        }).catch(error => {
-          console.error('❌ Error starting chainfail session:', error);
-        });
-      }
     }
-  }, [simulationText, startSession, sessionStarted]);
+  }, [simulationText]);
+
+  // Separate effect for starting the session
+  useEffect(() => {
+    if (simulationText && !sessionStarted && !sessionInitialized.current) {
+      sessionInitialized.current = true;
+      const startTime = new Date();
+      startSession('chainfail').then(() => {
+        setSessionStartTime(startTime);
+        setSessionStarted(true);
+        onSessionStart?.(startTime); // Notify parent of session start
+        console.log('✅ Chainfail simulation session started when case loaded');
+      }).catch(error => {
+        console.error('❌ Error starting chainfail session:', error);
+      });
+    }
+  }, [simulationText, sessionStarted, onSessionStart]);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   const analyzeCase = async (analysisType: string) => {
-    if (analysisType !== 'final_judgment' && analysisType !== 'review_operator' && analysisType !== 'review_supervisor' && analysisType !== 'review_maintenance' && analysisType !== 'analyze_artifact') {
+    if (analysisType !== 'final_analysis' && analysisType !== 'view_operator' && analysisType !== 'view_supervisor' && analysisType !== 'view_maintenance' && analysisType !== 'view_artifact') {
       return;
     }
 
     setIsAnalyzing(true);
     setError('');
+    setAnalysis(''); // Clear previous analysis
     
     try {
       const response = await fetch('/api/chainfail-simulation/analyze', {
@@ -238,9 +252,20 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
       
       if (data.success) {
         setAnalysis(data.analysis);
-        if (analysisType === 'final_judgment') {
+        if (analysisType === 'final_analysis') {
           setCurrentView('final_result');
           setHasSubmittedFinal(true);
+          
+          // Capture elapsed time before ending session
+          if (sessionStartTime) {
+            const endTime = new Date();
+            const elapsedMs = endTime.getTime() - sessionStartTime.getTime();
+            const elapsedMinutes = Math.floor(elapsedMs / 60000);
+            const elapsedSeconds = Math.floor((elapsedMs % 60000) / 1000);
+            const elapsedTimeStr = `${elapsedMinutes}m ${elapsedSeconds}s`;
+            setFinalElapsedTime(elapsedTimeStr);
+            onSessionEnd?.(endTime, elapsedTimeStr); // Notify parent of session end
+          }
           
           // Calculate score based on analysis and decisions
           const totalScore = calculateChainFailScore(data.analysis, decisions);
@@ -665,7 +690,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               {/* Submit Button */}
               <div className="flex justify-center pt-4">
                 <ShimmerButton
-                  onClick={() => analyzeCase('final_judgment')}
+                  onClick={() => analyzeCase('final_analysis')}
                   disabled={!canMakeFinalAnalysis() || isAnalyzing || hasSubmittedFinal}
                   className="px-8 py-4 text-white text-lg font-semibold"
                   shimmerColor="rgba(255, 255, 255, 0.8)"
@@ -706,6 +731,13 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             >
               Investigation Results
             </TextAnimate>
+            {finalElapsedTime && (
+              <div className="text-center mb-4">
+                <div className={`text-lg font-semibold ${theme === 'dark' ? 'text-purple-300' : 'text-purple-600'}`}>
+                  Total Time: {finalElapsedTime}
+                </div>
+              </div>
+            )}
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
               {formatAnalysisContent(analysis)}
             </div>

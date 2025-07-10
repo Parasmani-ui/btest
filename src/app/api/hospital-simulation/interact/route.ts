@@ -10,47 +10,24 @@ export async function POST(request: NextRequest) {
   try {
     // Parse request body
     const body = await request.json();
-    const { simulationHistory, userInput, isExit } = body;
+    const { messages, currentRound } = body;
 
-    if (!simulationHistory) {
-      return NextResponse.json({ error: 'Missing simulation history' }, { status: 400 });
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json({ error: 'Missing or invalid messages array' }, { status: 400 });
     }
 
-    if (!userInput && !isExit) {
-      return NextResponse.json({ error: 'Missing user input' }, { status: 400 });
+    // Get the last user message
+    const lastUserMessage = messages[messages.length - 1];
+    if (!lastUserMessage || lastUserMessage.role !== 'user') {
+      return NextResponse.json({ error: 'No user message found' }, { status: 400 });
     }
+
+    const userInput = lastUserMessage.content;
 
     // Check if we're at round 10 and need to auto-complete
     let isRound10Complete = false;
-    try {
-      // Check the last assistant message for round number
-      for (let i = simulationHistory.length - 1; i >= 0; i--) {
-        if (simulationHistory[i].role === 'assistant') {
-          // Try to extract round number
-          const roundMatch = simulationHistory[i].content.match(/Round (\d+)\/10/);
-          if (roundMatch && roundMatch[1] && parseInt(roundMatch[1]) >= 10) {
-            isRound10Complete = true;
-            break;
-          }
-          
-          // Also try JSON format
-          if (simulationHistory[i].content.trim().startsWith('{')) {
-            try {
-              const jsonData = JSON.parse(simulationHistory[i].content);
-              if (jsonData.roundNumber && jsonData.roundNumber >= 10) {
-                isRound10Complete = true;
-                break;
-              }
-            } catch (e) {
-              // Not valid JSON, continue checking
-            }
-          }
-          break;
-        }
-      }
-    } catch (e) {
-      // Error parsing round, continue normally
-      console.log("Error detecting round:", e);
+    if (currentRound >= 10 || userInput.toLowerCase().includes('exit')) {
+      isRound10Complete = true;
     }
 
     // Get API key
@@ -69,18 +46,16 @@ export async function POST(request: NextRequest) {
     
     // Create the user message based on input
     let userMessage = "";
-    if (isExit || isRound10Complete) {
+    if (isRound10Complete) {
       userMessage = "exit and provide a performance evaluation";
     } else {
-      // Append next round instruction to user input
-      userMessage = `${userInput}`;
+      userMessage = userInput;
     }
 
     // Make the API call
     try {
       const completion = await openai.chat.completions.create({
-        model: "gpt-4.1",
-        // model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
           {
             role: 'system',
@@ -94,7 +69,7 @@ export async function POST(request: NextRequest) {
             role: 'system',
             content: "PROGRESS REQUIREMENT: Each time a user submits a decision, increment the round number and present an entirely new scenario using the simple text format specified in your instructions."
           },
-          ...simulationHistory.map((msg: any) => ({
+          ...messages.map((msg: any) => ({
             role: msg.role,
             content: msg.content
           })),
@@ -116,9 +91,9 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
       
-      // Return the response
+      // Return the response in the format the client expects
       return NextResponse.json({ 
-        responseText: responseText 
+        response: responseText 
       });
     } catch (apiError) {
       console.error('API Error:', apiError);

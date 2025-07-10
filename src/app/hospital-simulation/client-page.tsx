@@ -14,6 +14,8 @@ import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 interface HospitalSimulationClientProps {
   simulationText: string;
   onStartNewCase: () => void;
+  onSessionStart?: (startTime: Date) => void;
+  onSessionEnd?: (endTime: Date, elapsedTime: string) => void;
 }
 
 interface ScenarioOption {
@@ -23,7 +25,9 @@ interface ScenarioOption {
 
 const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({ 
   simulationText, 
-  onStartNewCase 
+  onStartNewCase,
+  onSessionStart,
+  onSessionEnd
 }) => {
   const router = useRouter();
   const { startSession } = useGameSession();
@@ -40,13 +44,16 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   const [options, setOptions] = useState<ScenarioOption[]>([]);
   const [sessionStarted, setSessionStarted] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
+  const sessionInitialized = useRef<boolean>(false);
   
   // Toggle theme
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
   
-  // Initialize simulation
+  // Initialize simulation content
   useEffect(() => {
     if (simulationText) {
       // Initialize with the first message from the AI
@@ -58,16 +65,6 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
       // Set game as started when simulation text is received
       setGameStarted(true);
       
-      // Start game session tracking
-      if (!sessionStarted) {
-        startSession('hospital').then(() => {
-          console.log('✅ Hospital simulation session started');
-          setSessionStarted(true);
-        }).catch(error => {
-          console.error('❌ Error starting hospital session:', error);
-        });
-      }
-      
       // Try to parse the role from the simulation text
       const roleMatch = simulationText.match(/Your role: ([A-Za-z\s]+)/);
       if (roleMatch && roleMatch[1]) {
@@ -77,7 +74,23 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
       // Parse the scenario and options
       parseScenarioAndOptions(simulationText);
     }
-  }, [simulationText, startSession, sessionStarted]);
+  }, [simulationText]);
+
+  // Separate effect for starting the session
+  useEffect(() => {
+    if (simulationText && !sessionStarted && !sessionInitialized.current) {
+      sessionInitialized.current = true;
+      const startTime = new Date();
+      startSession('hospital').then(() => {
+        setSessionStartTime(startTime);
+        setSessionStarted(true);
+        onSessionStart?.(startTime); // Notify parent of session start
+        console.log('✅ Hospital simulation session started when scenario loaded');
+      }).catch(error => {
+        console.error('❌ Error starting hospital session:', error);
+      });
+    }
+  }, [simulationText, sessionStarted]);
   
   // Parse incoming AI messages to separate scenario text from options
   const parseScenarioAndOptions = (content: string) => {
@@ -229,82 +242,72 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   // Handle user input submission
   const handleSubmit = async (event: React.FormEvent | null, optionInput?: string) => {
     if (event) event.preventDefault();
+    if (isThinking || isCompleted) return;
     
-    const input = optionInput || userInput;
+    const inputText = optionInput || userInput.trim();
+    if (!inputText) return;
     
-    if (!input.trim() && !isCompleted) return;
-    
-    // Check for exit command
-    const isExit = input.trim().toLowerCase() === 'exit' || 
-                  input.trim().toLowerCase() === 'quit';
-    
-    // Add user message to the chat
-    const updatedMessages = [
-      ...messages,
-      { role: 'user', content: input }
-    ];
-    setMessages(updatedMessages);
-    setUserInput('');
     setIsThinking(true);
+    setUserInput(''); // Clear the input immediately
+    
+    // Add user message to the conversation
+    const userMessage = { role: 'user', content: inputText };
+    setMessages(prev => [...prev, userMessage]);
     
     try {
-      // Make API call to get the next scenario
+      // Send the conversation to the API
       const response = await fetch('/api/hospital-simulation/interact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          simulationHistory: updatedMessages,
-          userInput: input,
-          isExit: isExit
+          messages: [...messages, userMessage],
+          currentRound: currentRound
         }),
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-      
-      const data = await response.json();
-      const responseText = data.responseText;
-      
-      // Create a new array with the AI response (don't modify the existing one)
-      const newMessagesWithResponse = [
-        ...updatedMessages,
-        { role: 'assistant', content: responseText }
-      ];
-      
-      // Set the updated messages
-      setMessages(newMessagesWithResponse);
-      
-      // Check if this is the final round or performance evaluation
-      if (responseText.includes('performance summary') || 
-          responseText.includes('final score') || 
-          responseText.toLowerCase().includes('evaluation') || 
-          isExit) {
-        setIsCompleted(true);
-      } else {
-        try {
-          // Try to update the current round from JSON if possible
-          const jsonData = JSON.parse(responseText);
-          if (jsonData && jsonData.roundNumber) {
-            setCurrentRound(jsonData.roundNumber);
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Add AI response to the conversation
+        const aiMessage = { role: 'assistant', content: data.response };
+        setMessages(prev => [...prev, aiMessage]);
+        
+        // Parse the new response for options and scenario
+        parseScenarioAndOptions(data.response);
+        
+        // Check if the simulation is completed
+        if (data.response.includes('FINAL PERFORMANCE EVALUATION') || data.response.includes('Final Score:')) {
+          setIsCompleted(true);
+          
+          // Capture elapsed time before ending session
+          if (sessionStartTime) {
+            const endTime = new Date();
+            const elapsedMs = endTime.getTime() - sessionStartTime.getTime();
+            const elapsedMinutes = Math.floor(elapsedMs / 60000);
+            const elapsedSeconds = Math.floor((elapsedMs % 60000) / 1000);
+            const elapsedTimeStr = `${elapsedMinutes}m ${elapsedSeconds}s`;
+            setFinalElapsedTime(elapsedTimeStr);
+            onSessionEnd?.(endTime, elapsedTimeStr); // Notify parent of session end
           }
-        } catch (e) {
-          // Try to update the current round from text matching
-          const roundMatch = responseText.match(/Round (\d+)\/10/);
-          if (roundMatch && roundMatch[1]) {
-            setCurrentRound(parseInt(roundMatch[1]));
+          
+          // End game session when simulation completes
+          const totalScore = calculateHospitalScore(messages, currentRound);
+          const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+          
+          try {
+            await handleGameEnd(caseSolved, totalScore);
+            console.log('✅ Hospital simulation stats updated successfully');
+          } catch (error) {
+            console.error('❌ Error updating hospital simulation stats:', error);
           }
         }
+      } else {
+        console.error('Failed to get response from hospital simulation API');
       }
     } catch (error) {
-      console.error('Error:', error);
-      // Add error message
-      setMessages([
-        ...updatedMessages,
-        { role: 'assistant', content: 'Sorry, there was an error processing your response. Please try again.' }
-      ]);
+      console.error('Error in hospital simulation:', error);
     } finally {
       setIsThinking(false);
     }
@@ -371,6 +374,11 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
     setOptions([]);
     setUserInput('');
     setIsThinking(false);
+    // Reset all session timing state
+    setSessionStarted(false);
+    setSessionStartTime(null);
+    setFinalElapsedTime('');
+    sessionInitialized.current = false; // Reset session initialization flag
     setResetKey(prev => prev + 1); // Increment reset key to trigger timer reset
     onStartNewCase(); // Call the original function
   };
@@ -425,13 +433,6 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
-      <GameHeader 
-        gameTitle="Hospital Crisis Management" 
-        showTimestamp={true} 
-        startTiming={gameStarted && !isCompleted}
-        gameEnded={isCompleted}
-        resetKey={resetKey}
-      />
       <div className={`flex flex-col h-screen ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
         {/* Game Info Bar */}
         <div className={`p-3 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} flex justify-between items-center shadow-sm border-b ${theme === 'dark' ? 'border-red-700' : 'border-gray-200'}`}>
@@ -505,29 +506,38 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
         <div className={`p-4 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} border-t ${theme === 'dark' ? 'border-red-700' : 'border-gray-200'}`}>
           <div className="max-w-4xl mx-auto">
             {isCompleted ? (
-              <div className="flex space-x-4">
-                <ShimmerButton
-                  onClick={handleStartNewCase}
-                  className="flex-1 p-3 text-white"
-                  shimmerColor="rgba(255, 255, 255, 0.8)"
-                  shimmerSize="0.1em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background="rgb(220, 38, 38)"
-                >
-                  Start New Simulation
-                </ShimmerButton>
-                <ShimmerButton
-                  onClick={() => router.push('/')}
-                  className="flex-1 p-3"
-                  shimmerColor="rgba(255, 255, 255, 0.5)"
-                  shimmerSize="0.05em"
-                  shimmerDuration="2s"
-                  borderRadius="0.5rem"
-                  background={theme === 'dark' ? 'rgb(127, 29, 29)' : 'rgb(229, 231, 235)'}
-                >
-                  Return Home
-                </ShimmerButton>
+              <div className="space-y-4">
+                {finalElapsedTime && (
+                  <div className="text-center">
+                    <div className={`text-lg font-semibold ${theme === 'dark' ? 'text-red-300' : 'text-red-600'}`}>
+                      Total Time: {finalElapsedTime}
+                    </div>
+                  </div>
+                )}
+                <div className="flex space-x-4">
+                  <ShimmerButton
+                    onClick={handleStartNewCase}
+                    className="flex-1 p-3 text-white"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(220, 38, 38)"
+                  >
+                    Start New Simulation
+                  </ShimmerButton>
+                  <ShimmerButton
+                    onClick={() => router.push('/')}
+                    className="flex-1 p-3"
+                    shimmerColor="rgba(255, 255, 255, 0.5)"
+                    shimmerSize="0.05em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background={theme === 'dark' ? 'rgb(127, 29, 29)' : 'rgb(229, 231, 235)'}
+                  >
+                    Return Home
+                  </ShimmerButton>
+                </div>
               </div>
             ) : (
               <form onSubmit={(e) => handleSubmit(e)} className="flex space-x-2">

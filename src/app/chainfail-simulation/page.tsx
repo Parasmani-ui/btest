@@ -17,6 +17,8 @@ export default function ChainFailSimulationPage() {
   const [gameEnded, setGameEnded] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [resetKey, setResetKey] = useState(0);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [sessionActive, setSessionActive] = useState(false);
   const { startSession } = useGameSession();
 
   const toggleTheme = () => {
@@ -59,8 +61,18 @@ export default function ChainFailSimulationPage() {
     }
   };
 
+  const handleSessionStart = (startTime: Date) => {
+    setSessionStartTime(startTime);
+    setSessionActive(true);
+  };
+
+  const handleSessionEnd = (endTime: Date, elapsedTime: string) => {
+    setSessionActive(false);
+  };
+
   const handleGameEnd = () => {
     setGameEnded(true);
+    setSessionActive(false);
   };
 
   const handleStartNewCase = () => {
@@ -69,6 +81,8 @@ export default function ChainFailSimulationPage() {
     setSimulationText('');
     setError(null);
     setIsLoading(false);
+    setSessionStartTime(null);
+    setSessionActive(false);
     setResetKey(prev => prev + 1);
     generateSimulation();
   };
@@ -208,20 +222,24 @@ export default function ChainFailSimulationPage() {
     );
   }
 
-  if (hasStarted && simulationText) {
+  // Show simulation client when we have text and not ended
+  if (simulationText && hasStarted && !error) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
         <GameHeader 
           gameTitle="ChainFail - Industrial Safety Analysis" 
           showTimestamp={true} 
-          startTiming={hasStarted}
+          startTiming={sessionActive}
           gameEnded={gameEnded}
           resetKey={resetKey}
+          sessionStartTime={sessionStartTime}
         />
-        <ChainFailSimulationClient
+        <ChainFailSimulationClient 
           simulationText={simulationText}
           onStartNewCase={handleStartNewCase}
           onGameEnd={handleGameEnd}
+          onSessionStart={handleSessionStart}
+          onSessionEnd={handleSessionEnd}
         />
       </ThemeProvider>
     );

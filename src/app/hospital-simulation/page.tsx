@@ -15,6 +15,9 @@ export default function HospitalSimulationPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [sessionActive, setSessionActive] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
   const { startSession } = useGameSession();
 
   const toggleTheme = () => {
@@ -87,11 +90,24 @@ export default function HospitalSimulationPage() {
     }
   };
 
+  const handleSessionStart = (startTime: Date) => {
+    setSessionStartTime(startTime);
+    setSessionActive(true);
+  };
+
+  const handleSessionEnd = (endTime: Date, elapsedTime: string) => {
+    setSessionActive(false);
+    setGameEnded(true);
+  };
+
   const handleStartNewCase = () => {
     // Clear all state
     setSimulationText('');
     setHasStarted(false);
     setError(null);
+    setSessionStartTime(null);
+    setSessionActive(false);
+    setGameEnded(false);
     
     // Directly trigger a new simulation generation
     generateSimulation();
@@ -100,7 +116,13 @@ export default function HospitalSimulationPage() {
   if (isLoading) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
-        <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={false} />
+        <GameHeader 
+          gameTitle="Hospital Crisis Management" 
+          showTimestamp={true} 
+          startTiming={false}
+          gameEnded={gameEnded}
+          sessionStartTime={sessionStartTime}
+        />
         <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'}`}>
           <div className={`${theme === 'dark' ? 'bg-red-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
             <TextAnimate
@@ -129,7 +151,13 @@ export default function HospitalSimulationPage() {
   if (error) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
-        <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={false} />
+        <GameHeader 
+          gameTitle="Hospital Crisis Management" 
+          showTimestamp={true} 
+          startTiming={false}
+          gameEnded={gameEnded}
+          sessionStartTime={sessionStartTime}
+        />
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'} flex items-center justify-center`}>
           <div className={`${theme === 'dark' ? 'bg-red-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <TextAnimate
@@ -223,17 +251,34 @@ export default function HospitalSimulationPage() {
 
   if (hasStarted && simulationText) {
     return (
-      <HospitalSimulationClient
-        simulationText={simulationText}
-        onStartNewCase={handleStartNewCase}
-      />
+      <ThemeProvider value={{ theme, toggleTheme }}>
+        <GameHeader 
+          gameTitle="Hospital Crisis Management" 
+          showTimestamp={true} 
+          startTiming={sessionActive}
+          gameEnded={gameEnded}
+          sessionStartTime={sessionStartTime}
+        />
+        <HospitalSimulationClient
+          simulationText={simulationText}
+          onStartNewCase={handleStartNewCase}
+          onSessionStart={handleSessionStart}
+          onSessionEnd={handleSessionEnd}
+        />
+      </ThemeProvider>
     );
   }
 
   // Landing page for simulation
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
-      <GameHeader gameTitle="Hospital Crisis Management" showTimestamp={true} startTiming={false} />
+      <GameHeader 
+        gameTitle="Hospital Crisis Management" 
+        showTimestamp={true} 
+        startTiming={sessionActive}
+        gameEnded={gameEnded}
+        sessionStartTime={sessionStartTime}
+      />
       <div className={`flex h-screen ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
         <div className={`w-64 ${theme === 'dark' ? 'bg-red-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-red-700' : 'border-gray-300'}`}>
