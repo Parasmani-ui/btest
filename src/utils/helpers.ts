@@ -175,7 +175,7 @@ const { startSession } = useGameSession();
   `,
   
   // Add to game start function:
-  startGame: (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety') => `
+  startGame: (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation') => `
 // Start game session tracking
 try {
   await startSession('${gameType}');
@@ -252,7 +252,7 @@ await handleGameEnd(caseSolved, totalScore);
 };
 
 // Quick setup function for game components
-export async function setupGameSession(gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety') {
+export async function setupGameSession(gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation') {
   try {
     const { useGameSession } = await import('@/lib/gameSession');
     return useGameSession();

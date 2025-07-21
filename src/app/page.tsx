@@ -27,6 +27,22 @@ export default function Home() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mounted, setMounted] = useState(false);
   const [showCaseOptions, setShowCaseOptions] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+
+  // Sub-games data
+  const negotiationSubGames = [
+    "Contract Negotiation",
+    "Salary Negotiation", 
+    "Business Partnership",
+    "Conflict Resolution",
+    "International Trade"
+  ];
+
+  const financialSubGames = [
+    "Expense Fraud Investigation",
+    "Project Cost Overrun Audit",
+    "Financial Fraud Investigation"
+  ];
 
   // Component mounted after hydration
   useEffect(() => {
@@ -65,6 +81,14 @@ export default function Home() {
     router.push(`/food-safety-simulation`);
   };
 
+  const startNegotiationSimulation = () => {
+    router.push(`/negotiation-simulation`);
+  };
+
+  const startFinancialNegotiationSimulation = () => {
+    router.push(`/financial-negotiation`);
+  };
+
   // Don't render until client-side
   if (!mounted) {
     return null;
@@ -75,8 +99,8 @@ export default function Home() {
       <Header />
       <main className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-900 text-gray-900'}`}>
         <div className="flex">
-          {/* Sidebar */}
-          <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
+          {/* Sidebar - Increased width from w-48 to w-64 */}
+          <div className={`w-64 sticky top-0 h-screen overflow-y-auto ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
             <div className="flex flex-col h-full">
               {/* <div className="p-4 flex justify-center">
                 <Link href="/">
@@ -84,11 +108,11 @@ export default function Home() {
                 </Link>
               </div> */}
               
-              <div className="p-4 flex-grow">
+              <div className="p-6 flex-grow">
                 <div className="mb-4 relative space-y-4">
                   <ShimmerButton
                     onClick={startGame}
-                    className="w-full p-3 text-white text-sm"
+                    className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -100,7 +124,7 @@ export default function Home() {
                   
                   <ShimmerButton
                     onClick={startSimulation}
-                    className="w-full p-3 text-white"
+                    className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -112,7 +136,7 @@ export default function Home() {
 
                   <ShimmerButton
                     onClick={startHospitalSimulation}
-                    className="w-full p-3 text-white text-sm"
+                    className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -124,7 +148,7 @@ export default function Home() {
 
                   <ShimmerButton
                     onClick={startFakeNewsSimulation}
-                    className="w-full p-3 text-white"
+                    className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -136,7 +160,7 @@ export default function Home() {
 
                   <ShimmerButton
                     onClick={startChainFailSimulation}
-                    className="w-full p-3 text-white"
+                    className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -148,7 +172,7 @@ export default function Home() {
 
                   <ShimmerButton
                     onClick={startForensicAuditSimulation}
-                    className="w-full p-3 text-white"
+                    className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -160,7 +184,7 @@ export default function Home() {
 
                   <ShimmerButton
                     onClick={startFoodSafetySimulation}
-                    className="w-full p-3 text-white"
+                    className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
                     shimmerDuration="2s"
@@ -168,6 +192,34 @@ export default function Home() {
                     background="rgb(8, 145, 178)"
                   >
                     Food Safety
+                  </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startNegotiationSimulation}
+                    className="w-full p-4 text-white text-sm font-medium"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(147, 51, 234)"
+                  >
+                    <div className="text-center">
+                      Negotiation Simulation
+                    </div>
+                  </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startFinancialNegotiationSimulation}
+                    className="w-full p-4 text-white text-sm font-medium"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(34, 197, 94)"
+                  >
+                    <div className="text-center">
+                      Financial Negotiation
+                    </div>
                   </ShimmerButton>
                 </div>
               </div>
@@ -188,7 +240,7 @@ export default function Home() {
           </div>
           
           {/* Main Content */}
-          <div className="ml-48 flex-grow p-8 overflow-y-auto">
+          <div className="flex-grow p-8 overflow-y-auto">
             <div className="max-w-6xl mx-auto">
               {/* Header Section */}
               <div className="text-center mb-12">
@@ -311,7 +363,7 @@ export default function Home() {
                     >
                     Financial Forensic
                     </SparklesText>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Integrity Ledger</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Integrity Ledger</p>
                   </div>
                   
                   {/* Food Safety card */}
@@ -329,15 +381,68 @@ export default function Home() {
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Thinking</p>
                   </div>
                   
-                  {/* Placeholder cards for future games */}
-                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
-                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
-                    <p className="text-sm text-gray-400">New Game Mode</p>
+                  {/* Negotiation Simulation - Enhanced with hover */}
+                  <div 
+                    className={`relative p-6 rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300`} 
+                    onClick={startNegotiationSimulation}
+                    onMouseEnter={() => setHoveredCard('negotiation')}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={SPARKLE_COLORS.purple}
+                      sparklesCount={6}
+                    >
+                      Negotiation Simulation
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-10m | Multiple modes</p>
+                    
+                    {/* Hover overlay */}
+                    {hoveredCard === 'negotiation' && (
+                      <div className={`absolute inset-0 rounded-lg p-4 ${theme === 'dark' ? 'bg-gray-900/95' : 'bg-white/95'} border border-purple-400 z-10 backdrop-blur-sm`}>
+                        <div className="text-sm font-semibold mb-2 text-purple-600">5 Negotiation Scenarios:</div>
+                        <ul className={`text-xs space-y-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {negotiationSubGames.map((game, index) => (
+                            <li key={index} className="flex items-center">
+                              <span className="text-purple-500 mr-2">•</span>
+                              {game}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   
-                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
-                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
-                    <p className="text-sm text-gray-400">New Game Mode</p>
+                  {/* Financial Negotiation card - Enhanced with hover */}
+                  <div 
+                    className={`relative p-6 rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300`} 
+                    onClick={startFinancialNegotiationSimulation}
+                    onMouseEnter={() => setHoveredCard('financial')}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    <SparklesText 
+                      className="text-lg font-bold mb-2"
+                      colors={SPARKLE_COLORS.green}
+                      sparklesCount={6}
+                    >
+                      Financial Negotiation
+                    </SparklesText>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | 3 modes</p>
+                    
+                    {/* Hover overlay */}
+                    {hoveredCard === 'financial' && (
+                      <div className={`absolute inset-0 rounded-lg p-4 ${theme === 'dark' ? 'bg-gray-900/95' : 'bg-white/95'} border border-green-400 z-10 backdrop-blur-sm`}>
+                        <div className="text-sm font-semibold mb-2 text-green-600">3 Investigation Modes:</div>
+                        <ul className={`text-xs space-y-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {financialSubGames.map((game, index) => (
+                            <li key={index} className="flex items-center">
+                              <span className="text-green-500 mr-2">•</span>
+                              {game}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   
                   <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>

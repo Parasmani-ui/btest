@@ -717,3 +717,380 @@ At the end of 5 rounds, auto-generate a performance report with:
 "WHAT WOULD YOU LIKE TO DO NEXT?"
 </OUTPUT_RULES>
 `;
+
+export const NEGOTIATION_SIMULATION_PROMPTS = [
+  {
+    GAME_INTENT: "Teach players foundational negotiation skills through realistic, role-based simulations. Players must communicate persuasively, defend their interests, and achieve win-win outcomes.",
+    
+    GAME_BOUNDARIES: `
+- Dialogue-based simulation limited to 5 exchanges.
+- Only verbal negotiation, no legal or violent escalation.
+- Player is always in a decision-making role (employee, lead, manager, etc.)
+- All decisions influence score based on empathy, assertiveness, and outcome.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Negotiating Your First Salary Offer
+Level: Beginner
+
+You're a recent graduate who has received your first job offer from a prestigious tech company. The HR representative has offered INR 6.8 LPA. You've done your research and found that the average market rate for this role is INR 8.2 LPA. You're excited about the company but also want to advocate for fair compensation.
+
+Your goal is to negotiate the offer respectfully without appearing greedy or losing the opportunity.
+
+The HR representative will push back gently and may use lines like:
+- “That’s our standard package for freshers.”
+- “We also offer great learning opportunities and benefits.”
+`,
+
+    GAME_MECHANICS: `
+- Game continues for 5 dialogue turns.
+- Player gets 4 dialogue choices per turn(A,B,C,D Options).
+- Choices update internal scores (Confidence, Data-Driven Arguments, Relationship Maintenance).
+- Each scenario ends with an HR decision: increased offer, unchanged, or withdrawn.
+- Hints are available once per round.
+`,
+
+    EXAMPLE_SCENARIO: `
+HR: “We’re excited to have you. The compensation for this role is INR 6.8 LPA.”
+
+Choices:
+A. “Thank you. I was hoping we could discuss the offer — based on my research, similar roles are offering INR 8.2 LPA.”
+B. “Thanks, I accept the offer.”
+C. “Is that number flexible at all? I was expecting something higher.”
+D. “6.8? That’s too low. I won’t join for less than 9 LPA.”
+`,
+
+    HINT_LOGIC: `
+If player struggles or delays decision, show:
+“💡 Hint: Express enthusiasm but present your case with researched data. Avoid ultimatums.”
+`,
+
+    SCORING_MATRIX: {
+      assertiveness: 0,
+      dataDriven: 0,
+      empathy: 0,
+      outcome: "", // values: "Win-Win", "Acceptable", "Stalemate", "Loss"
+    },
+
+    FACILITATOR_NOTE: `
+Facilitators should observe whether the player maintains professionalism under pressure, uses data, and balances assertiveness with empathy. Discuss post-game: Was the negotiation style appropriate for a first-time role?
+`
+  },
+
+  // Scenario 2 – Tech Project Timeline Negotiation
+  {
+    GAME_INTENT: "Help players manage stakeholder expectations and push back on unrealistic deadlines while maintaining project confidence.",
+
+    GAME_BOUNDARIES: `
+- Set in a corporate tech team.
+- No escalation to upper management unless player fails.
+- The player is a tech lead negotiating with a product manager.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Tech Project Timeline Negotiation
+Level: Advanced
+
+As a Tech Lead, you're handed a project plan with a go-live deadline of 4 weeks. You know realistically it will take at least 8 weeks to implement the requested features safely. The product manager insists it must launch “before the investor meeting.”
+
+Goal: Negotiate a timeline that ensures code quality and team sanity, without appearing obstructive.
+`,
+
+    GAME_MECHANICS: `
+- 5-turn simulation.
+- Options influence "Technical Credibility", "Negotiation Diplomacy", and "Project Realism".
+`,
+
+    EXAMPLE_SCENARIO: `
+PM: “We need this MVP in 4 weeks. Can your team handle it?”
+
+Choices:
+
+A. “Not without compromising testing and security. Can we align on a phased launch to meet the most critical needs in 4 weeks?”
+
+B. “Sure, if the team works weekends and we cut down on QA.”
+
+C. “That’s impossible. I won’t risk my team’s well-being or the product's quality.”
+
+D. “What are the absolute must-have features for the meeting? Let's scope down to a realistic 4-week plan.”
+`,
+
+    HINT_LOGIC: `
+“💡 Hint: Avoid flat refusals. Suggest alternatives grounded in delivery trade-offs.”
+`,
+
+    SCORING_MATRIX: {
+      credibility: 0,
+      diplomacy: 0,
+      realism: 0,
+      outcome: ""
+    },
+
+    FACILITATOR_NOTE: `
+Review player’s ability to de-escalate while defending technical feasibility. Highlight effective phasing or MVP framing approaches.
+`
+  },
+
+  // Scenario 3 – Vendor Discount Conflict
+  {
+    GAME_INTENT: "Teach procurement negotiation focused on value, not just cost-cutting.",
+
+    GAME_BOUNDARIES: `
+- Player is a procurement executive.
+- Vendor is long-term partner.
+- Game rewards sustainable win-win pricing, not bullying.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Vendor Discount Conflict
+Level: Beginner
+
+You need to negotiate a 12% discount due to internal cost controls. The vendor insists their margins are already thin and threatens to deprioritize your orders if pushed too hard.
+
+Your goal is to achieve savings without damaging a strategic relationship.
+`,
+
+    GAME_MECHANICS: `
+- Dialogue influences “Relationship Management”, “Negotiation Strategy”, and “Outcome Effectiveness”.
+`,
+
+    EXAMPLE_SCENARIO: `
+Vendor: “We can’t go below 5%. We’ve been your supplier for 6 years.”
+
+Choices:
+A. “I understand your constraints. Could we explore other ways to find savings, like in delivery terms or a larger volume commitment?”
+B. “If you can't do 12%, we'll have to take our business to one of your competitors.”
+C. “Your costs haven’t increased—you should be able to match last year’s discount.”
+D. “Okay, 5% is a start. Let's sign the deal there for now.”
+`,
+
+    HINT_LOGIC: `
+“💡 Hint: Consider concessions beyond price. Loyalty often brings negotiation room.”
+`,
+
+    SCORING_MATRIX: {
+      relationship: 0,
+      creativity: 0,
+      firmness: 0,
+      outcome: ""
+    },
+
+    FACILITATOR_NOTE: `
+Track how player avoids transactional mindset. Did they build trust or issue threats? Discuss post-game about long-term vendor dynamics.
+`
+  },
+
+  // Scenario 4 – Cross-Functional Team Negotiation
+  {
+    GAME_INTENT: "Simulate internal negotiation across departments with competing priorities.",
+
+    GAME_BOUNDARIES: `
+- Player is a marketing head negotiating with finance and operations.
+- Scenario rewards collaboration over control.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Cross-Functional Team Negotiation
+Level: Advanced
+
+You want to launch a campaign that requires a 3x ad budget increase. Finance says it’s unjustifiable, and operations warns fulfillment might fall short.
+
+Goal: Align stakeholders behind a modified plan with realistic ROI projections.
+`,
+
+    GAME_MECHANICS: `
+- Player must use trade-offs and ROI framing.
+- Key metrics: “Cross-functional alignment”, “Data Persuasion”, “Flexibility”.
+`,
+
+    EXAMPLE_SCENARIO: `
+Finance: “Why do you need triple the budget in Q2?”
+
+Choices:
+A. “Our projections show a 2.6x return based on a new conversion-focused model. I can walk you through the ROAS data.”
+B. “Because our competitors are outspending us and we need to increase brand visibility.”
+C. “I hear your concerns. What if we start with a smaller pilot program to prove the ROI before scaling to the full budget?”
+D. “The CMO has approved this direction. We need to find a way to make it happen.”
+`,
+
+    HINT_LOGIC: `
+“💡 Hint: Frame data in a way that aligns with each department’s goals.”
+`,
+
+    SCORING_MATRIX: {
+      alignment: 0,
+      dataUse: 0,
+      flexibility: 0,
+      outcome: ""
+    },
+
+    FACILITATOR_NOTE: `
+Use this simulation to evaluate how well the player practices stakeholder management. Score based on how trade-offs were navigated.
+`
+  },
+
+  // Scenario 5 – Crisis Negotiation in Product Recall
+  {
+    GAME_INTENT: "Test player’s ability to negotiate during a high-pressure crisis without sacrificing brand integrity.",
+
+    GAME_BOUNDARIES: `
+- Player is a brand director handling a faulty product recall.
+- Must negotiate with legal, logistics, and media.
+- Success is defined by public trust and damage control.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Crisis Negotiation in Product Recall
+Level: Advanced
+
+A batch of your flagship product may be contaminated. Initial reports are unconfirmed, but media pressure is building. You must negotiate how and when to disclose the issue internally and externally.
+
+Goal: Balance transparency with brand protection and avoid litigation or panic.
+`,
+
+    GAME_MECHANICS: `
+- Simulated 5-exchange press/boardroom dialogue.
+- Metrics: “Risk Management”, “Empathy”, “Transparency”.
+`,
+
+    EXAMPLE_SCENARIO: `
+Legal: “We can’t confirm contamination. If you admit fault now, we open the door to lawsuits.”
+
+Choices:
+A. “Let’s publicly acknowledge the reports and our internal investigation, but hold off on a recall until we have confirmation.”
+B. “We must issue a full and immediate recall. Customer safety comes before any potential lawsuit.”
+C. “Say nothing publicly. We handle this internally and hope it blows over.”
+D. “Let's draft a statement now that's ready to go, but get PR and Operations aligned on the logistics before we decide to release it.”
+`,
+
+    HINT_LOGIC: `
+“💡 Hint: Crisis control needs transparency, but also timing. Think steps ahead.”
+`,
+
+    SCORING_MATRIX: {
+      transparency: 0,
+      riskManagement: 0,
+      empathy: 0,
+      outcome: ""
+    },
+
+    FACILITATOR_NOTE: `
+Guide reflection on ethical decision-making under pressure. Was the player too reactive or too cautious?
+`
+  }
+];
+
+
+export const FINANCIAL_NAGOTIATION_SIMULATION_PROMPTS = [
+  {
+    GAME_INTENT: "Introduce players to basic forensic techniques in expense fraud detection using structured dialogue and light audit evidence.",
+
+    GAME_BOUNDARIES: `
+- Dialogue-based simulation with 5 exchanges.
+- No physical inspection or legal intervention.
+- Player acts as an internal auditor.
+- Player decisions impact outcome on accuracy, professionalism, and documentation.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Expense Fraud Investigation
+Level: Beginner
+
+You’re a junior forensic auditor reviewing travel claims for Q2. One manager’s claims seem excessive — INR 2.3 lakhs in hotel stays alone. The documentation includes handwritten bills and identical invoice numbers across different vendors.
+
+Goal: Identify inconsistencies, probe professionally, and prepare escalation or closure memo.
+`,
+
+    GAME_MECHANICS: `
+- 4 dialogue options per exchange (A,B,C,D Options).
+- Player can request documents or raise red flags.
+- Hints available once per round.
+`,
+
+    EXAMPLE_SCENARIO: `
+Manager: "These bills are all valid. I travel a lot for regional reviews."
+
+Choices:
+A. “I noticed several identical invoice numbers across different cities — could you clarify?”
+B. “Understood. I’ll mark these as cleared.”
+C. “We’re escalating this to the fraud committee.”
+D. “Can you resend these with GST breakdowns and vendor contact info?”
+`,
+
+    FACILITATOR_NOTE: `
+Evaluate how the player handles suspicion without overreach. Was their language neutral? Did they follow internal audit protocol?
+`
+  },
+
+  {
+    GAME_INTENT: "Help players identify causes behind project cost overruns using audit logic and stakeholder probing.",
+
+    GAME_BOUNDARIES: `
+- Internal audit simulation — no legal action.
+- Player plays an experienced project auditor.
+- Scenario bounded to procurement and planning departments.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Project Cost Overrun Audit
+Level: Intermediate
+
+A bridge construction project overran its budget by 19%. Site inspection logs were backdated. Steel prices rose 6%, but cost overrun attributed to ‘material wastage and overtime’. Your job: find the truth.
+`,
+
+    GAME_MECHANICS: `
+- 4 dialogue options per exchange (A,B,C,D Options).
+- Player can ask about bills of quantity, procurement entries, and site logs.
+- Dialogue influences: Diligence, Cross-checking, Escalation Logic.
+`,
+
+    EXAMPLE_SCENARIO: `
+Project Head: “The steel wastage was unpredictable. Also, we added 12 weekend shifts.”
+
+Choices:
+A. “Can I see the timecard approvals and steel scrap logs for those weekends?”
+B. “That’s reasonable. Cost overruns happen.”
+C. “We will call in external auditors for a full probe.”
+D. “Could this have been prevented with better planning?”
+`,
+
+    FACILITATOR_NOTE: `
+Discuss whether the player followed a systematic audit trail. How well did they separate negligence from possible intent?
+`
+  },
+
+  {
+    GAME_INTENT: "Test the player’s ability to detect and respond to deep financial fraud under pressure.",
+
+    GAME_BOUNDARIES: `
+- No media or regulator access in simulation.
+- CFO and Finance Head are key characters.
+- Scenario includes Excel logs, vendor data, and SAP extracts.
+`,
+
+    SCENARIO_GENERATION: `
+Scenario Title: Financial Fraud Investigation
+Level: Advanced
+
+A whistleblower has flagged a 9.3 Cr payment to a vendor flagged for non-compliance. GRN was force-entered under a terminated user ID. Another 6.4 Cr was reversed via Excel logs, not SAP. The vendor has filed nil GST.
+
+Player’s job: confront the Finance Head, escalate if needed, and preserve audit trail.
+`,
+
+    GAME_MECHANICS: `
+- 5 dialogue rounds.
+- Do not show dialogue choice options for the advanced level.
+- Player may ask for metadata, SAP logs, or vendor GST filings.
+- Hint system enabled per turn.
+`,
+
+    EXAMPLE_SCENARIO: `
+Finance Head: “We used emergency codes to process the payment — operations couldn’t halt.”
+`,
+
+
+    FACILITATOR_NOTE: `
+Assess how the player balances evidence, escalation, and internal accountability. Ideal discussion: When to report versus when to probe further internally.
+`
+  }
+];
