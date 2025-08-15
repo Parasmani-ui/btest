@@ -3,13 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import GameHeader from '@/components/ui/GameHeader';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 
-// Define colors for the forensic audit theme (gold/amber theme)
-const SPARKLE_COLORS = {
-  gold: { first: "#f59e0b", second: "#fbbf24" }
-};
+
 
 interface ForensicAuditState {
   caseTitle: string;
@@ -269,12 +266,9 @@ export default function ForensicAuditSimulationClientPage() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <SparklesText 
-              className="text-4xl font-bold mb-4"
-              colors={SPARKLE_COLORS.gold}
-            >
+            <h1 className="text-4xl font-bold mb-4">
               Forensic Audit Simulation
-            </SparklesText>
+            </h1>
             <p className="text-lg text-amber-700 dark:text-amber-300">
               Critical Ledger | Financial Anomaly Investigation
             </p>

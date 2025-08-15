@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import ReactMarkdown from 'react-markdown';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';

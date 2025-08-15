@@ -4,23 +4,13 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import { TextReveal } from '@/components/magicui/text-reveal';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { Header } from '@/components/ui/Header';
 
-// Define colors outside component to prevent recreating on every render
-const SPARKLE_COLORS = {
-  main: { first: "#3b82f6", second: "#10b981" },
-  blue: { first: "#3b82f6", second: "#60a5fa" },
-  green: { first: "#10b981", second: "#34d399" },
-  red: { first: "#dc2626", second: "#ef4444" },
-  orange: { first: "#f56527", second: "#fb923c" },
-  purple: { first: "#a855f7", second: "#c084fc" },
-  gold: { first: "#f59e0b", second: "#fbbf24" },
-  cyan: { first: "#0891b2", second: "#06b6d4" }
-};
+
 
 export default function Home() {
   const router = useRouter();
@@ -247,12 +237,9 @@ export default function Home() {
                 <Image src="/img.png" alt="Parasmani Skills Logo" width={200} height={200} className="mx-auto mb-6" priority/>
                 
                 <div className="mb-6">
-                  <SparklesText 
-                    className="text-2xl sm:text-3xl font-bold mb-2"
-                    colors={SPARKLE_COLORS.main}
-                  >
+                  <h1 className="text-2xl sm:text-3xl font-bold mb-2">
                     Your Trusted Company
-                  </SparklesText>
+                  </h1>
                   <h2 className="text-xl font-semibold mb-4">Skills Assessment Agency</h2>
                   <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-4xl mx-auto`}>
                     "Parasmani Skills" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
@@ -278,13 +265,9 @@ export default function Home() {
                     className={`p-6 rounded-lg border border-[rgb(37,99,235)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
                     onClick={startGame}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.blue}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                       Police Investigation
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Procedural Blind Spot</p>
                   </div>
                   
@@ -293,13 +276,9 @@ export default function Home() {
                     className={`p-6 rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
                     onClick={startSimulation}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.green}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                       POSH Investigation
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | Culture Compass</p>
                   </div>
                   
@@ -308,13 +287,9 @@ export default function Home() {
                     className={`p-6 rounded-lg border border-[rgb(220,38,38)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
                     onClick={startHospitalSimulation}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.red}
-                      sparklesCount={6}
-                    >
-                      Hospital Crisis Management
-                    </SparklesText>
+                    <h3 className="text-lg font-bold mb-2">
+                      Hospital Management
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>10-20m | Lifeline & Leverage</p>
                   </div>
                   
@@ -323,13 +298,9 @@ export default function Home() {
                     className={`p-6 rounded-lg border border-[rgb(245,101,39)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
                     onClick={startFakeNewsSimulation}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.orange}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                       Social Media Misinformation
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>8-15m | Cyber Scrutiny</p>
                   </div>
                   
@@ -338,13 +309,9 @@ export default function Home() {
                     className={`p-6 rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
                     onClick={startChainFailSimulation}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.purple}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                       Chain Analysis
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>12-25m | Critical ChainFail</p>
                   </div>
                 </div>
@@ -356,13 +323,9 @@ export default function Home() {
                     className={`p-6 rounded-lg border border-[rgb(245,158,11)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
                     onClick={startForensicAuditSimulation}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.gold}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                     Financial Forensic
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Integrity Ledger</p>
                   </div>
                   
@@ -371,13 +334,9 @@ export default function Home() {
                     className={`p-6 rounded-lg border border-[rgb(8,145,178)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
                     onClick={startFoodSafetySimulation}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.cyan}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                       Food Safety
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Thinking</p>
                   </div>
                   
@@ -388,13 +347,9 @@ export default function Home() {
                     onMouseEnter={() => setHoveredCard('negotiation')}
                     onMouseLeave={() => setHoveredCard(null)}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.purple}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                       Negotiation Simulation
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-10m | Multiple modes</p>
                     
                     {/* Hover overlay */}
@@ -420,13 +375,9 @@ export default function Home() {
                     onMouseEnter={() => setHoveredCard('financial')}
                     onMouseLeave={() => setHoveredCard(null)}
                   >
-                    <SparklesText 
-                      className="text-lg font-bold mb-2"
-                      colors={SPARKLE_COLORS.green}
-                      sparklesCount={6}
-                    >
+                    <h3 className="text-lg font-bold mb-2">
                       Financial Negotiation
-                    </SparklesText>
+                    </h3>
                     <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | 3 modes</p>
                     
                     {/* Hover overlay */}

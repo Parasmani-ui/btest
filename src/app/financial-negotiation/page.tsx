@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import FinancialNegotiationClient from './client-page';
 
 export default function FinancialNegotiationPage() {
@@ -165,12 +165,9 @@ export default function FinancialNegotiationPage() {
           {/* Compact Header */}
           <div className="text-center mb-8">
             <div className="mb-4">
-              <SparklesText 
-                className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
-                sparklesCount={8}
-              >
+              <h1 className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Financial Negotiation Training
-              </SparklesText>
+              </h1>
             </div>
             <TextAnimate
               className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto`}

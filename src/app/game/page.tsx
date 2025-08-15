@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import GameContent from './client-page';
@@ -117,14 +117,10 @@ export default function CriticalReadingPage() {
               {/* Main description */}
               <div className="my-6 text-lg relative min-h-[100px] overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <SparklesText 
-                    className="text-xl sm:text-2xl font-normal"
-                    colors={{ first: "#3b82f6", second: "#60a5fa" }}
-                    sparklesCount={8}
-                  >
+                  <p className="text-xl sm:text-2xl font-normal">
                     Play as a detective solving procedurally generated murder mysteries. 
                     Examine evidence, interrogate suspects, and solve cases.
-                  </SparklesText>
+                  </p>
                 </div>
               </div>
 
@@ -134,13 +130,9 @@ export default function CriticalReadingPage() {
                   className={`p-8 rounded-lg ${theme === 'dark' ? 'bg-blue-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition max-w-md w-full`} 
                   onClick={startGame}
                 >
-                  <SparklesText 
-                    className="text-2xl font-bold mb-4"
-                    colors={{ first: "#3b82f6", second: "#60a5fa" }}
-                    sparklesCount={10}
-                  >
+                  <h2 className="text-2xl font-bold mb-4">
                     Police Investigation
-                  </SparklesText>
+                  </h2>
                   <p className="text-lg mb-4">5-8m | Procedural Blind Spot</p>
                   <TextAnimate
                     className={`${theme === 'dark' ? 'text-blue-300' : 'text-gray-600'} mb-6 leading-relaxed`}

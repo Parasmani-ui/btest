@@ -3,14 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import GameHeader from '@/components/ui/GameHeader';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import { handleGameEnd } from '@/lib/gameSession';
 import { useGameSession } from '@/lib/gameSession';
 
-// Define colors for the food safety theme (cyan/teal theme)
-const SPARKLE_COLORS = {
-  cyan: { first: "#0891b2", second: "#06b6d4" }
-};
+
 
 interface FoodSafetyState {
   caseTitle: string;
@@ -248,12 +245,9 @@ export default function FoodSafetySimulationClientPage() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <SparklesText 
-              className="text-4xl font-bold mb-4"
-              colors={SPARKLE_COLORS.cyan}
-            >
+            <h1 className="text-4xl font-bold mb-4">
               Food Safety Crisis
-            </SparklesText>
+            </h1>
             <p className="text-lg text-cyan-700 dark:text-cyan-300">
               Critical Thinking | Maggi Crisis Simulation
             </p>

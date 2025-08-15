@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, Settings, User, Wrench, FileText, Target } from 'lucide-react';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 import { useRef } from 'react';
@@ -769,13 +769,9 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             
             <div className="flex items-center gap-2">
               <Settings className="h-6 w-6 text-purple-500" />
-              <SparklesText 
-                className="text-xl font-bold"
-                colors={{ first: "#a855f7", second: "#c084fc" }}
-                sparklesCount={5}
-              >
+              <h1 className="text-xl font-bold">
                 GAMECHAIN - Critical ChainFail Training
-              </SparklesText>
+              </h1>
             </div>
           </div>
 

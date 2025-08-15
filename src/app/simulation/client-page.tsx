@@ -7,7 +7,7 @@ import { SimulationConclusion } from '@/simulation';
 import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import { useRouter } from 'next/navigation';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession } from '@/lib/gameSession';

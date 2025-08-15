@@ -11,7 +11,7 @@ import ArrestResult from './Components/ArrestResult';
 import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { TextAnimate } from "@/components/magicui/text-animate";
-import { SparklesText } from "@/components/magicui/sparkles-text";
+
 import { useGameSession } from '@/lib/gameSession';
 import GameHeader from '@/components/ui/GameHeader';
 
@@ -630,13 +630,9 @@ export default function GameContent() {
                     
                     {gameState.started && (
                       <div className="mt-8">
-                        <SparklesText
-                          className="text-sm text-amber-500 font-normal mb-2"
-                          colors={{ first: "#f59e0b", second: "#d97706" }}
-                          sparklesCount={4}
-                        >
+                        <p className="text-sm text-amber-500 font-normal mb-2">
                           Case Info
-                        </SparklesText>
+                        </p>
                         <div className={`mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
                           {(gameState.mode || 'Quick').charAt(0).toUpperCase() + (gameState.mode || 'Quick').slice(1)} Case
                         </div>

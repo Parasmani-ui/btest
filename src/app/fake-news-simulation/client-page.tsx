@@ -6,7 +6,7 @@ import { ChevronLeft, AlertTriangle, Eye, Users, FileText, Target } from 'lucide
 
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 
@@ -663,13 +663,9 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
             
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-6 w-6 text-orange-500" />
-              <SparklesText 
-                className="text-xl font-bold"
-                colors={{ first: "#f97316", second: "#fb923c" }}
-                sparklesCount={5}
-              >
+              <h1 className="text-xl font-bold">
                 FACTLOCK - Critical Misinformation Training
-              </SparklesText>
+              </h1>
             </div>
           </div>
 

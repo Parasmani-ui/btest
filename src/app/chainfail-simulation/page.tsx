@@ -5,7 +5,7 @@ import ChainFailSimulationClient from './client-page';
 import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import { useGameSession } from '@/lib/gameSession';
 import GameHeader from '@/components/ui/GameHeader';
 
@@ -258,13 +258,9 @@ export default function ChainFailSimulationPage() {
         <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-2xl w-full`}>
           <div className="text-center">
             <div className="mb-6">
-              <SparklesText 
-                className="text-3xl font-bold mb-4"
-                colors={{ first: "#a855f7", second: "#d8b4fe" }}
-                sparklesCount={8}
-              >
+              <h1 className="text-3xl font-bold mb-4">
                 GAMECHAIN - Critical ChainFail Training
-              </SparklesText>
+              </h1>
               <TextAnimate
                 className={`text-lg ${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'}`}
                 animation="slideUp"

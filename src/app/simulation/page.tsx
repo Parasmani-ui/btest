@@ -5,7 +5,7 @@ import SimulationClient from './client-page';
 import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 import { useGameSession } from '@/lib/gameSession';
 import GameHeader from '@/components/ui/GameHeader';
 
@@ -310,9 +310,9 @@ export default function SimulationPage() {
             
             {/* Description */}
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-5 rounded-lg shadow-lg mb-4 transition hover:translate-y-[-5px]`}>
-              <SparklesText className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-3`}>
+              <h1 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-3`}>
                 POSH Training Simulation
-              </SparklesText>
+              </h1>
               <TextAnimate
                 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-3 text-sm`}
                 animation="slideUp"

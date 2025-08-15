@@ -4,7 +4,7 @@ import { GameState } from '@/types/gameState';
 import Button from './Button';
 import { useTheme } from '@/utils/theme';
 import { TextAnimate } from '@/components/magicui/text-animate';
-import { SparklesText } from '@/components/magicui/sparkles-text';
+
 
 interface ArrestResultProps {
   gameState: GameState;
@@ -60,23 +60,15 @@ const ArrestResult: React.FC<ArrestResultProps> = ({ gameState, resetGame }) => 
         
         {arrestResult.correct ? (
           <div className={`p-3 rounded ${theme === 'dark' ? 'bg-green-900 text-white' : 'bg-green-100 text-green-800 border border-green-200'}`}>
-            <SparklesText
-              className="text-lg" 
-              colors={{ first: "#10b981", second: "#34d399" }}
-              sparklesCount={6}
-            >
+            <p className="text-lg">
               Congratulations, Detective! You've successfully identified the killer and brought them to justice.
-            </SparklesText>
+            </p>
           </div>
         ) : (
           <div className={`p-3 rounded mb-4 ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-red-100 text-red-800 border border-red-200'}`}>
-            <SparklesText
-              className="text-lg"
-              colors={{ first: "#ef4444", second: "#f87171" }}
-              sparklesCount={6}
-            >
+            <p className="text-lg">
               Unfortunately, you've arrested the wrong person.
-            </SparklesText>
+            </p>
           </div>
         )}
 
