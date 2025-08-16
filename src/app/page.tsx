@@ -9,6 +9,8 @@ import { TextReveal } from '@/components/magicui/text-reveal';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { Header } from '@/components/ui/Header';
+import { useGameAuth } from '@/hooks/useGameAuth';
+import { SignInPopup } from '@/components/auth/SignInPopup';
 
 
 
@@ -18,6 +20,9 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [showCaseOptions, setShowCaseOptions] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  
+  // Authentication hook
+  const { checkAuthAndProceed, showSignInPopup, closeSignInPopup, onSignInSuccess } = useGameAuth();
 
   // Sub-games data
   const negotiationSubGames = [
@@ -44,39 +49,57 @@ export default function Home() {
   };
 
   const startGame = () => {
-    router.push(`/game?mode=quick`);
+    checkAuthAndProceed(() => {
+      router.push(`/game?mode=quick`);
+    }, 'Police Investigation');
   };
 
   const startSimulation = () => {
-    router.push(`/simulation`);
+    checkAuthAndProceed(() => {
+      router.push(`/simulation`);
+    }, 'POSH Investigation');
   };
 
   const startHospitalSimulation = () => {
-    router.push(`/hospital-simulation`);
+    checkAuthAndProceed(() => {
+      router.push(`/hospital-simulation`);
+    }, 'Hospital Management');
   };
 
   const startFakeNewsSimulation = () => {
-    router.push(`/fake-news-simulation`);
+    checkAuthAndProceed(() => {
+      router.push(`/fake-news-simulation`);
+    }, 'Social Media Misinformation');
   };
 
   const startChainFailSimulation = () => {
-    router.push(`/chainfail-simulation`);
+    checkAuthAndProceed(() => {
+      router.push(`/chainfail-simulation`);
+    }, 'Chain Analysis');
   };
 
   const startForensicAuditSimulation = () => {
-    router.push(`/forensic-audit-simulation`);
+    checkAuthAndProceed(() => {
+      router.push(`/forensic-audit-simulation`);
+    }, 'Financial Forensic');
   };
 
   const startFoodSafetySimulation = () => {
-    router.push(`/food-safety-simulation`);
+    checkAuthAndProceed(() => {
+      router.push(`/food-safety-simulation`);
+    }, 'Food Safety');
   };
 
   const startNegotiationSimulation = () => {
-    router.push(`/negotiation-simulation`);
+    checkAuthAndProceed(() => {
+      router.push(`/negotiation-simulation`);
+    }, 'Negotiation Simulation');
   };
 
   const startFinancialNegotiationSimulation = () => {
-    router.push(`/financial-negotiation`);
+    checkAuthAndProceed(() => {
+      router.push(`/financial-negotiation`);
+    }, 'Financial Negotiation');
   };
 
   // Don't render until client-side
@@ -478,6 +501,13 @@ export default function Home() {
           </div>
         </div>
       </main>
+      
+      {/* Sign In Popup */}
+      <SignInPopup
+        isOpen={showSignInPopup}
+        onClose={closeSignInPopup}
+        onSuccess={onSignInSuccess}
+      />
     </>
   );
 }

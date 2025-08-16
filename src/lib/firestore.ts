@@ -11,6 +11,7 @@ import {
   addDoc, 
   deleteDoc,
   writeBatch,
+  runTransaction,
   Timestamp,
   FieldValue,
   increment
@@ -404,7 +405,7 @@ export async function updateGameSession(sessionId: string, updates: Partial<Game
   }
 }
 
-// Update user stats after a game session ends - FIXED VERSION
+// Update user stats after a game session ends - IMPROVED VERSION WITH TRANSACTION
 export async function updateUserStatsAfterGame(
   userId: string, 
   gameType: string, 
@@ -413,69 +414,74 @@ export async function updateUserStatsAfterGame(
   duration: number
 ): Promise<void> {
   try {
-    console.log(`Updating user stats for ${userId}: game=${gameType}, solved=${caseSolved}, score=${score}, duration=${duration}m`);
+    console.log(`🎯 Updating user stats for ${userId}: game=${gameType}, solved=${caseSolved}, score=${score}, duration=${duration}m`);
     
-    // Use transaction to ensure atomic updates
     const userDocRef = doc(db, 'users', userId);
     
-    // First update - increment counters atomically
-    const incrementUpdates: any = {
-      gamesPlayed: increment(1),
-      totalPlaytime: increment(duration),
-      [`gameTypePerformance.${gameType}.played`]: increment(1)
-    };
+    // Use runTransaction to prevent race conditions
+    await runTransaction(db, async (transaction) => {
+      // Read current user data within transaction
+      const userDoc = await transaction.get(userDocRef);
+      
+      if (!userDoc.exists()) {
+        throw new Error('User document does not exist');
+      }
+      
+      const userData = userDoc.data() as UserData;
+      
+      // Calculate new values
+      const currentGamesPlayed = (userData.gamesPlayed || 0) + 1;
+      const currentCasesCompleted = (userData.casesCompleted || 0) + (caseSolved ? 1 : 0);
+      const currentTotalPlaytime = (userData.totalPlaytime || 0) + duration;
+      
+      // Calculate new overall average score
+      const currentAverageScore = userData.averageScore || 0;
+      const previousGamesPlayed = userData.gamesPlayed || 0;
+      const totalPreviousScore = currentAverageScore * previousGamesPlayed;
+      const newAverageScore = previousGamesPlayed > 0 
+        ? (totalPreviousScore + score) / currentGamesPlayed
+        : score;
 
-    // Add solved increments if game was solved
-    if (caseSolved) {
-      incrementUpdates.casesCompleted = increment(1);
-      incrementUpdates[`gameTypePerformance.${gameType}.solved`] = increment(1);
-    }
+      // Get current game type performance
+      const gameTypePerformance = userData.gameTypePerformance || {};
+      const currentGameTypeStats = gameTypePerformance[gameType] || {
+        played: 0,
+        solved: 0,
+        averageScore: 0
+      };
 
-    // Apply increment operations first
-    await updateDoc(userDocRef, incrementUpdates);
+      // Calculate new game type stats
+      const newGameTypePlayed = currentGameTypeStats.played + 1;
+      const newGameTypeSolved = currentGameTypeStats.solved + (caseSolved ? 1 : 0);
+      const previousGameTypeTotal = currentGameTypeStats.averageScore * currentGameTypeStats.played;
+      const newGameTypeAverageScore = currentGameTypeStats.played > 0
+        ? (previousGameTypeTotal + score) / newGameTypePlayed
+        : score;
+
+      // Prepare the update data
+      const updateData = {
+        gamesPlayed: currentGamesPlayed,
+        casesCompleted: currentCasesCompleted,
+        totalPlaytime: currentTotalPlaytime,
+        averageScore: newAverageScore,
+        gameTypePerformance: {
+          ...gameTypePerformance,
+          [gameType]: {
+            played: newGameTypePlayed,
+            solved: newGameTypeSolved,
+            averageScore: newGameTypeAverageScore
+          }
+        },
+        lastUpdated: new Date().toISOString()
+      } as Partial<UserData>;
+
+      // Perform the atomic update
+      transaction.update(userDocRef, updateData);
+      
+      console.log(`✅ Transaction prepared for ${userId}: games=${currentGamesPlayed}, cases=${currentCasesCompleted}, avgScore=${newAverageScore.toFixed(1)}`);
+    });
     
-    // Small delay to ensure increment operations are applied
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Then read fresh data and calculate averages
-    const userDoc = await getDoc(userDocRef);
-    const userData = userDoc.data() as UserData;
-    
-    if (!userData) {
-      throw new Error('User not found after increment operations');
-    }
-
-    // Calculate new overall average score
-    const currentGamesPlayed = userData.gamesPlayed || 1;
-    const currentAverageScore = userData.averageScore || 0;
-    const totalCurrentScore = currentAverageScore * (currentGamesPlayed - 1); // Subtract 1 because we just incremented
-    const newAverageScore = (totalCurrentScore + score) / currentGamesPlayed;
-
-    // Get current game type performance
-    const gameTypePerformance = userData.gameTypePerformance || {};
-    const currentGameTypeStats = gameTypePerformance[gameType] || {
-      played: 1,
-      solved: 0,
-      averageScore: 0
-    };
-
-    // Calculate new game type average score
-    const currentGameTypePlayed = currentGameTypeStats.played || 1;
-    const currentGameTypeAverageScore = currentGameTypeStats.averageScore || 0;
-    const totalCurrentGameTypeScore = currentGameTypeAverageScore * (currentGameTypePlayed - 1); // Subtract 1 because we just incremented
-    const newGameTypeAverageScore = (totalCurrentGameTypeScore + score) / currentGameTypePlayed;
-
-    // Update only the average scores
-    const averageUpdates: any = {
-      averageScore: newAverageScore,
-      [`gameTypePerformance.${gameType}.averageScore`]: newGameTypeAverageScore,
-      lastUpdated: new Date().toISOString()
-    };
-
-    // Apply average updates
-    await updateDoc(userDocRef, averageUpdates);
-    
-    console.log(`✅ User stats updated successfully for ${userId}: games=${currentGamesPlayed}, avgScore=${newAverageScore.toFixed(1)}, gameType=${gameType} avgScore=${newGameTypeAverageScore.toFixed(1)}`);
+    console.log(`🎉 User stats updated successfully for ${userId}`);
   } catch (error) {
     console.error('❌ Error updating user stats:', error);
     throw error;

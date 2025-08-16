@@ -8,6 +8,8 @@ import { TextAnimate } from '@/components/magicui/text-animate';
 
 import { useGameSession } from '@/lib/gameSession';
 import GameHeader from '@/components/ui/GameHeader';
+import { useGameAuth } from '@/hooks/useGameAuth';
+import { SignInPopup } from '@/components/auth/SignInPopup';
 
 export default function HospitalSimulationPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,9 +21,16 @@ export default function HospitalSimulationPage() {
   const [sessionActive, setSessionActive] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
   const { startSession } = useGameSession();
+  
+  // Authentication hook
+  const { checkAuthAndProceed, showSignInPopup, closeSignInPopup, onSignInSuccess } = useGameAuth();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleStartSimulation = () => {
+    checkAuthAndProceed(generateSimulation, 'Hospital Management');
   };
 
   const generateSimulation = async () => {
@@ -232,7 +241,7 @@ export default function HospitalSimulationPage() {
                 Go Back
               </ShimmerButton>
               <ShimmerButton
-                onClick={generateSimulation}
+                onClick={handleStartSimulation}
                 className="px-4 py-2 text-white"
                 shimmerColor="rgba(255, 255, 255, 0.8)"
                 shimmerSize="0.1em"
@@ -324,7 +333,7 @@ export default function HospitalSimulationPage() {
           
           {/* New Case Button */}
           <ShimmerButton
-            onClick={generateSimulation}
+            onClick={handleStartSimulation}
             className="group mb-4 w-full py-2 px-4 text-white flex items-center justify-center transition"
             shimmerColor="rgba(255, 255, 255, 0.8)"
             shimmerSize="0.1em"
@@ -378,7 +387,7 @@ export default function HospitalSimulationPage() {
               
               {/* Start Button */}
               <ShimmerButton
-                onClick={generateSimulation}
+                onClick={handleStartSimulation}
                 className="w-full py-3 text-white text-lg font-medium transition hover:shadow-lg"
                 shimmerColor="rgba(255, 255, 255, 0.8)"
                 shimmerSize="0.1em"
@@ -446,6 +455,14 @@ export default function HospitalSimulationPage() {
           </div>
         </div>
       </div>
+      
+      {/* Sign In Popup */}
+      <SignInPopup
+        isOpen={showSignInPopup}
+        onClose={closeSignInPopup}
+        onSuccess={onSignInSuccess}
+        gameName="Hospital Management"
+      />
     </ThemeProvider>
   );
 } 

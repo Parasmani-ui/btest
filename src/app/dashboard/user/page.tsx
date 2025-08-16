@@ -6,6 +6,7 @@ import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useState, useEffect } from 'react';
 import { getUserGames } from '@/lib/firestore';
 import { UserStats } from '@/types/user';
+import { useUserDataRefresh } from '@/hooks/useUserDataRefresh';
 import Link from 'next/link';
 import { 
   UserIcon, 
@@ -27,6 +28,7 @@ export default function UserDashboardPage() {
   const { userData } = useAuth();
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const { refresh: refreshUserData, isRefreshing } = useUserDataRefresh();
 
   const loadUserStats = async () => {
     try {
@@ -48,6 +50,11 @@ export default function UserDashboardPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefreshData = async () => {
+    await refreshUserData(); // Refresh auth context data
+    await loadUserStats(); // Reload dashboard stats
   };
 
   useEffect(() => {
@@ -114,9 +121,9 @@ export default function UserDashboardPage() {
   }, [userData?.uid]);
 
   // Manual refresh function
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     console.log('Manual refresh requested...');
-    loadUserStats();
+    await handleRefreshData();
   };
 
   const formatDuration = (minutes: number) => {
@@ -245,11 +252,11 @@ export default function UserDashboardPage() {
               <div className="flex space-x-2">
                 <button
                   onClick={handleRefresh}
-                  className="inline-flex items-center px-4 py-2 bg-blue-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
-                  disabled={loading}
+                  className="inline-flex items-center px-4 py-2 bg-blue-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors disabled:opacity-50"
+                  disabled={loading || isRefreshing}
                 >
-                  <TrendingUpIcon className="w-5 h-5 mr-2" />
-                  Refresh
+                  <TrendingUpIcon className={`w-5 h-5 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
                 </button>
                 <button
                   onClick={exportToCSV}

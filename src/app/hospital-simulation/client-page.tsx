@@ -47,6 +47,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
   const sessionInitialized = useRef<boolean>(false);
+  const gameEndedRef = useRef<boolean>(false); // Flag to prevent duplicate game end calls
   
   // Toggle theme
   const toggleTheme = () => {
@@ -114,18 +115,23 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
       setIsCompleted(true);
       setScenarioText(content);
       
-      // End game session when simulation completes
-      const totalScore = calculateHospitalScore(messages, currentRound);
-      const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
-      
-      try {
-        handleGameEnd(caseSolved, totalScore).then(() => {
-          console.log('✅ Hospital simulation stats updated successfully');
-        }).catch(error => {
-          console.error('❌ Error updating hospital simulation stats:', error);
-        });
-      } catch (error) {
-        console.error('❌ Error in handleGameEnd:', error);
+      // End game session when simulation completes (only if not already ended)
+      if (!gameEndedRef.current) {
+        gameEndedRef.current = true;
+        const totalScore = calculateHospitalScore(messages, currentRound);
+        const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+        
+        try {
+          handleGameEnd(caseSolved, totalScore).then(() => {
+            console.log('✅ Hospital simulation stats updated successfully');
+          }).catch(error => {
+            console.error('❌ Error updating hospital simulation stats:', error);
+          });
+        } catch (error) {
+          console.error('❌ Error in handleGameEnd:', error);
+        }
+      } else {
+        console.log('🔄 Game already ended, skipping duplicate handleGameEnd call');
       }
       
       return;
@@ -292,15 +298,20 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
             onSessionEnd?.(endTime, elapsedTimeStr); // Notify parent of session end
           }
           
-          // End game session when simulation completes
-          const totalScore = calculateHospitalScore(messages, currentRound);
-          const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
-          
-          try {
-            await handleGameEnd(caseSolved, totalScore);
-            console.log('✅ Hospital simulation stats updated successfully');
-          } catch (error) {
-            console.error('❌ Error updating hospital simulation stats:', error);
+          // End game session when simulation completes (only if not already ended)
+          if (!gameEndedRef.current) {
+            gameEndedRef.current = true;
+            const totalScore = calculateHospitalScore(messages, currentRound);
+            const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+            
+            try {
+              await handleGameEnd(caseSolved, totalScore);
+              console.log('✅ Hospital simulation stats updated successfully');
+            } catch (error) {
+              console.error('❌ Error updating hospital simulation stats:', error);
+            }
+          } else {
+            console.log('🔄 Game already ended, skipping duplicate handleGameEnd call');
           }
         }
       } else {

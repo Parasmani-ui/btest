@@ -108,8 +108,11 @@ export class GameSessionManager {
       console.log(`🏁 Ending game session: ${sessionId}, solved: ${caseSolved}, score: ${finalScore}`);
       
       const endTime = new Date();
-      const duration = Math.round((endTime.getTime() - this.startTime.getTime()) / 1000 / 60); // Duration in minutes
+      const durationMs = endTime.getTime() - this.startTime.getTime();
+      const duration = Math.max(1, Math.round(durationMs / 1000 / 60)); // Minimum 1 minute, round to nearest minute
       const timeSpent = this.getTimeSpent();
+
+      console.log(`⏱️  Session duration calculation: startTime=${this.startTime.toISOString()}, endTime=${endTime.toISOString()}, durationMs=${durationMs}, duration=${duration}m`);
 
       await updateGameSession(sessionId, {
         endedAt: endTime.toISOString(),
@@ -228,7 +231,7 @@ export class GameSessionManager {
 
 // React hook for game session management
 export function useGameSession() {
-  const { userData } = useAuth();
+  const { userData, refreshUserData } = useAuth();
   const sessionManager = GameSessionManager.getInstance();
 
   const startSession = async (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation') => {
@@ -269,6 +272,10 @@ export function useGameSession() {
     try {
       await sessionManager.endSession(caseSolved, finalScore);
       console.log('Game ended and user stats updated successfully');
+      
+      // Refresh user data to reflect the latest stats
+      await refreshUserData();
+      console.log('✅ User data refreshed after game completion');
     } catch (error) {
       console.error('Error ending game session:', error);
       throw error;

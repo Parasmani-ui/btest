@@ -27,6 +27,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateUserProfile: (data: Partial<UserData>) => Promise<void>;
+  refreshUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -198,6 +199,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const refreshUserData = async () => {
+    if (!user) {
+      console.warn('No user to refresh data for');
+      return;
+    }
+
+    try {
+      console.log('🔄 Refreshing user data...');
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const freshUserData = userDoc.data() as UserData;
+        setUserData(freshUserData);
+        console.log('✅ User data refreshed successfully');
+      } else {
+        console.warn('User document not found during refresh');
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing user data:', error);
+    }
+  };
+
   const value = {
     user,
     userData,
@@ -208,6 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     resetPassword,
     updateUserProfile,
+    refreshUserData,
   };
 
   return (

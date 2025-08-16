@@ -8,6 +8,8 @@ import { TextAnimate } from '@/components/magicui/text-animate';
 
 import { useGameSession } from '@/lib/gameSession';
 import GameHeader from '@/components/ui/GameHeader';
+import { useGameAuth } from '@/hooks/useGameAuth';
+import { SignInPopup } from '@/components/auth/SignInPopup';
 
 export default function SimulationPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,9 +18,16 @@ export default function SimulationPage() {
   const [hasStarted, setHasStarted] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const { startSession } = useGameSession();
+  
+  // Authentication hook
+  const { checkAuthAndProceed, showSignInPopup, closeSignInPopup, onSignInSuccess } = useGameAuth();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleStartSimulation = () => {
+    checkAuthAndProceed(generateSimulation, 'POSH Investigation');
   };
 
   const generateSimulation = async () => {
@@ -204,7 +213,7 @@ export default function SimulationPage() {
                 Go Back
               </ShimmerButton>
               <ShimmerButton
-                onClick={generateSimulation}
+                onClick={handleStartSimulation}
                 className="px-4 py-2 text-white"
                 shimmerColor="rgba(255, 255, 255, 0.8)"
                 shimmerSize="0.1em"
@@ -333,7 +342,7 @@ export default function SimulationPage() {
               
               {/* Start Button */}
               <ShimmerButton
-                onClick={generateSimulation}
+                onClick={handleStartSimulation}
                 className="w-full py-3 text-white text-lg font-medium transition hover:shadow-lg"
                 shimmerColor="rgba(255, 255, 255, 0.8)"
                 shimmerSize="0.1em"
@@ -401,6 +410,14 @@ export default function SimulationPage() {
           </div>
         </div>
       </div>
+      
+      {/* Sign In Popup */}
+      <SignInPopup
+        isOpen={showSignInPopup}
+        onClose={closeSignInPopup}
+        onSuccess={onSignInSuccess}
+        gameName="POSH Investigation"
+      />
     </ThemeProvider>
   );
 } 

@@ -7,14 +7,25 @@ import Image from 'next/image';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import GameContent from './client-page';
+import { useGameAuth } from '@/hooks/useGameAuth';
+import { SignInPopup } from '@/components/auth/SignInPopup';
 
 export default function CriticalReadingPage() {
   const router = useRouter();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [hasStarted, setHasStarted] = useState(false);
+  
+  // Authentication hook
+  const { checkAuthAndProceed, showSignInPopup, closeSignInPopup, onSignInSuccess } = useGameAuth();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleStartGame = () => {
+    checkAuthAndProceed(() => {
+      setHasStarted(true);
+    }, 'Police Investigation');
   };
 
   const startGame = () => {
@@ -28,6 +39,7 @@ export default function CriticalReadingPage() {
 
   // Landing page for Critical Reading
   return (
+    <>
     <main className={`min-h-screen ${theme === 'dark' ? 'bg-blue-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="flex">
         {/* Sidebar */}
@@ -72,7 +84,7 @@ export default function CriticalReadingPage() {
 
                 {/* Start New Case Button */}
                 <ShimmerButton
-                  onClick={startGame}
+                  onClick={handleStartGame}
                   className="w-full p-3 text-white"
                   shimmerColor="rgba(255, 255, 255, 0.8)"
                   shimmerSize="0.1em"
@@ -128,7 +140,7 @@ export default function CriticalReadingPage() {
               <div className="my-4 flex justify-center">
                 <div 
                   className={`p-8 rounded-lg ${theme === 'dark' ? 'bg-blue-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition max-w-md w-full`} 
-                  onClick={startGame}
+                  onClick={handleStartGame}
                 >
                   <h2 className="text-2xl font-bold mb-4">
                     Police Investigation
@@ -144,7 +156,7 @@ export default function CriticalReadingPage() {
                   </TextAnimate>
                   
                   <ShimmerButton
-                    onClick={startGame}
+                    onClick={handleStartGame}
                     className="w-full py-3 text-white text-lg font-medium transition hover:shadow-lg"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
                     shimmerSize="0.1em"
@@ -272,5 +284,14 @@ export default function CriticalReadingPage() {
         </div>
       </div>
     </main>
+    
+    {/* Sign In Popup */}
+    <SignInPopup
+      isOpen={showSignInPopup}
+      onClose={closeSignInPopup}
+      onSuccess={onSignInSuccess}
+      gameName="Police Investigation"
+    />
+    </>
   );
 }

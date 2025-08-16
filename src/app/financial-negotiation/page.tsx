@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { ThemeProvider } from '@/utils/theme';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
+import { useGameAuth } from '@/hooks/useGameAuth';
+import { SignInPopup } from '@/components/auth/SignInPopup';
 
 import FinancialNegotiationClient from './client-page';
 
@@ -13,6 +15,9 @@ export default function FinancialNegotiationPage() {
   const [selectedSubGame, setSelectedSubGame] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  
+  // Authentication hook
+  const { checkAuthAndProceed, showSignInPopup, closeSignInPopup, onSignInSuccess } = useGameAuth();
 
   // Toggle theme
   const toggleTheme = () => {
@@ -48,6 +53,12 @@ export default function FinancialNegotiationPage() {
   ];
 
   // Start simulation for selected sub-game
+  const handleStartSimulation = (subGameIndex: number) => {
+    checkAuthAndProceed(() => {
+      startSimulation(subGameIndex);
+    }, 'Financial Negotiation');
+  };
+
   const startSimulation = async (subGameIndex: number) => {
     setIsGenerating(true);
     try {
@@ -232,7 +243,7 @@ export default function FinancialNegotiationPage() {
                       </div>
                       
                       <ShimmerButton
-                        onClick={() => startSimulation(index)}
+                        onClick={() => handleStartSimulation(index)}
                         disabled={isGenerating}
                         className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
                           subGame.color === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' :
@@ -264,6 +275,14 @@ export default function FinancialNegotiationPage() {
           </div>
         </main>
       </div>
+      
+      {/* Sign In Popup */}
+      <SignInPopup
+        isOpen={showSignInPopup}
+        onClose={closeSignInPopup}
+        onSuccess={onSignInSuccess}
+        gameName="Financial Negotiation"
+      />
     </ThemeProvider>
   );
 }

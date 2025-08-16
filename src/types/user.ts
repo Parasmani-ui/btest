@@ -12,6 +12,7 @@ export interface UserData {
   gamesPlayed?: number;
   casesCompleted?: number;
   averageScore?: number;
+  lastUpdated?: string; // timestamp of last stats update
   gameTypePerformance?: {
     [gameType: string]: {
       played: number;
