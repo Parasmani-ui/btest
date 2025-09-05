@@ -103,3 +103,6 @@ setupAuthUsers.js
 setupTestData.js
 
 caseCache.json
+
+report
+report/

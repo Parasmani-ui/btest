@@ -291,7 +291,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       Police Investigation
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Procedural Blind Spot</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Procedural Blind Spot</p>
                   </div>
                   
                   {/* Critical Investigation card */}
@@ -302,7 +302,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       POSH Investigation
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | Culture Compass</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Culture Compass</p>
                   </div>
                   
                   {/* Crisis Management card */}
@@ -313,7 +313,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       Hospital Management
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>10-20m | Lifeline & Leverage</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Lifeline & Leverage</p>
                   </div>
                   
                   {/* Critical Misinformation card */}
@@ -324,7 +324,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       Social Media Misinformation
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>8-15m | Cyber Scrutiny</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Cyber Scrutiny</p>
                   </div>
                   
                   {/* Critical ChainFail card */}
@@ -335,7 +335,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       Chain Analysis
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>12-25m | Critical ChainFail</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Critical ChainFail</p>
                   </div>
                 </div>
 
@@ -349,7 +349,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                     Financial Forensic
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Integrity Ledger</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Integrity Ledger</p>
                   </div>
                   
                   {/* Food Safety card */}
@@ -360,7 +360,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       Food Safety
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-8m | Critical Thinking</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Critical Thinking</p>
                   </div>
                   
                   {/* Negotiation Simulation - Enhanced with hover */}
@@ -373,7 +373,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       Negotiation Simulation
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>5-10m | Multiple modes</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Multiple modes</p>
                     
                     {/* Hover overlay */}
                     {hoveredCard === 'negotiation' && (
@@ -401,7 +401,7 @@ export default function Home() {
                     <h3 className="text-lg font-bold mb-2">
                       Financial Negotiation
                     </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>15-30m | 3 modes</p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> 3 modes</p>
                     
                     {/* Hover overlay */}
                     {hoveredCard === 'financial' && (
