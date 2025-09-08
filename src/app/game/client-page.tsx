@@ -408,7 +408,7 @@ export default function GameContent() {
     switch (gameState.currentAction) {
       case 'suspects':
         return (
-          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-800' : 'bg-gray-300'}`}>
+          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-300'}`}>
             <h3 className="text-xl font-bold mb-4">Suspects</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {gameState.suspects.map((suspect, index) => (
@@ -418,7 +418,7 @@ export default function GameContent() {
                   className={`p-3 rounded-lg ${
                     gameState.interrogatedSuspects.includes(suspect)
                       ? theme === 'dark' ? 'bg-green-800' : 'bg-green-600 text-white'
-                      : theme === 'dark' ? 'bg-blue-700' : 'bg-white text-gray-800'
+                      : theme === 'dark' ? 'bg-gray-700' : 'bg-white text-gray-800'
                   } hover:bg-blue-600 hover:text-white`}
                 >
                   {suspect}
@@ -430,7 +430,7 @@ export default function GameContent() {
         
       case 'evidence':
         return (
-          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-800' : 'bg-gray-300'}`}>
+          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-300'}`}>
             <h3 className="text-xl font-bold mb-4">Evidence</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {gameState.evidence.map((item, index) => (
@@ -440,7 +440,7 @@ export default function GameContent() {
                   className={`p-3 rounded-lg ${
                     gameState.analyzedEvidence.includes(item)
                       ? theme === 'dark' ? 'bg-green-800' : 'bg-green-600 text-white'
-                      : theme === 'dark' ? 'bg-blue-700' : 'bg-white text-gray-800'
+                      : theme === 'dark' ? 'bg-gray-700' : 'bg-white text-gray-800'
                   } hover:bg-blue-600 hover:text-white`}
                 >
                   {item}
@@ -452,7 +452,7 @@ export default function GameContent() {
         
       case 'arrest-options':
         return (
-          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-800' : 'bg-gray-300'}`}>
+          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-300'}`}>
             <h3 className="text-xl font-bold mb-4">Make an Arrest</h3>
             <p className="mb-4">Who do you think is the murderer?</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -473,7 +473,7 @@ export default function GameContent() {
       case 'analyze':
       case 'arrest':
         return (
-          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-800' : 'bg-gray-300'}`}>
+          <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-300'}`}>
             <h3 className="text-xl font-bold mb-4">
               {gameState.currentAction === 'interrogate'
                 ? `Interrogation: ${gameState.currentSuspect}`
@@ -481,7 +481,7 @@ export default function GameContent() {
                 ? 'Evidence Analysis'
                 : 'Case Resolution'}
             </h3>
-            <div className={`p-3 rounded-lg mb-4 whitespace-pre-wrap ${theme === 'dark' ? 'bg-blue-700' : 'bg-white text-gray-800'}`}>
+            <div className={`p-3 rounded-lg mb-4 whitespace-pre-wrap ${theme === 'dark' ? 'bg-gray-700' : 'bg-white text-gray-800'}`}>
               {gameState.currentResponse.split('\n\n').map((section, index) => {
                 if (section.startsWith('INVESTIGATION SUGGESTIONS:')) {
                   return (
@@ -531,7 +531,7 @@ export default function GameContent() {
         resetKey={resetKey}
         sessionStartTime={sessionInfo.startTime}
       />
-      <div className={`game-content min-h-screen p-4 ${theme === 'dark' ? 'bg-blue-900 text-white' : 'bg-slate-100 text-black'}`}>
+      <div className={`game-content min-h-screen p-4 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-slate-100 text-black'}`}>
         {/* Header and theme toggle */}
         <div className="flex justify-between items-center mb-4">
           <TextAnimate
@@ -578,7 +578,7 @@ export default function GameContent() {
             {/* Rest of game content */}
             <div className="flex">
               {/* sidebar */}
-              <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-blue-800' : 'bg-gray-200'}`}>
+              <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
                 <div className="flex flex-col h-full">
                   <div className="p-4 flex justify-center">
                     <Link href="/">

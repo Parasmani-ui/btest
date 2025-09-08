@@ -444,30 +444,30 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
-      <div className={`flex flex-col h-screen ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+      <div className={`flex flex-col h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
         {/* Game Info Bar */}
-        <div className={`p-3 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} flex justify-between items-center shadow-sm border-b ${theme === 'dark' ? 'border-red-700' : 'border-gray-200'}`}>
+        <div className={`p-3 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} flex justify-between items-center shadow-sm border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="flex items-center space-x-4">
             {role && (
-              <div className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-red-900 text-white' : 'bg-red-100 text-red-800'}`}>
+              <div className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-red-100 text-red-800'}`}>
                 Role: {role}
               </div>
             )}
-            <div className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-red-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
+            <div className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
               Round: {currentRound}/10
             </div>
           </div>
           
           <button 
             onClick={toggleTheme}
-            className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-red-700' : 'hover:bg-gray-200'}`}
+            className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
           </button>
         </div>
         
         {/* Chat Messages */}
-        <div className={`flex-1 overflow-y-auto p-4 ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-50'}`}>
+        <div className={`flex-1 overflow-y-auto p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
           <div className="max-w-4xl mx-auto space-y-4">
             {messages.map((message, index) => {
               // Skip system messages
@@ -478,18 +478,18 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                   key={index}
                   className={`p-4 rounded-lg max-w-3xl ${
                     message.role === 'assistant' 
-                      ? theme === 'dark' ? 'bg-red-800 ml-auto mr-auto' : 'bg-white ml-auto mr-auto shadow' 
-                      : theme === 'dark' ? 'bg-red-700 mr-auto' : 'bg-blue-100 mr-auto'
+                      ? theme === 'dark' ? 'bg-gray-800 ml-auto mr-auto' : 'bg-white ml-auto mr-auto shadow' 
+                      : theme === 'dark' ? 'bg-gray-700 mr-auto' : 'bg-blue-100 mr-auto'
                   }`}
                 >
                   <div className={`text-sm font-semibold mb-1 ${
                     message.role === 'assistant' 
                       ? theme === 'dark' ? 'text-red-400' : 'text-red-600'
-                      : theme === 'dark' ? 'text-red-300' : 'text-blue-700'
+                      : theme === 'dark' ? 'text-gray-300' : 'text-blue-700'
                   }`}>
                     {message.role === 'assistant' ? 'MEDICRUX' : 'You'}
                   </div>
-                  <div className={`${theme === 'dark' ? 'text-red-100' : 'text-gray-800'}`}>
+                  <div className={`${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
                     {message.role === 'assistant' 
                       ? renderAssistantMessage(message.content, index)
                       : formatMessage(message.content)
@@ -502,7 +502,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
             
             {isThinking && (
               <div className={`p-4 rounded-lg max-w-3xl ${
-                theme === 'dark' ? 'bg-red-800' : 'bg-white shadow'
+                theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow'
               } ml-auto mr-auto flex items-center space-x-2`}>
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse delay-100"></div>
@@ -514,13 +514,13 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
         </div>
         
         {/* Input Area */}
-        <div className={`p-4 ${theme === 'dark' ? 'bg-red-800' : 'bg-white'} border-t ${theme === 'dark' ? 'border-red-700' : 'border-gray-200'}`}>
+        <div className={`p-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
           <div className="max-w-4xl mx-auto">
             {isCompleted ? (
               <div className="space-y-4">
                 {finalElapsedTime && (
                   <div className="text-center">
-                    <div className={`text-lg font-semibold ${theme === 'dark' ? 'text-red-300' : 'text-red-600'}`}>
+                    <div className={`text-lg font-semibold ${theme === 'dark' ? 'text-gray-300' : 'text-red-600'}`}>
                       Total Time: {finalElapsedTime}
                     </div>
                   </div>
@@ -544,7 +544,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                     shimmerSize="0.05em"
                     shimmerDuration="2s"
                     borderRadius="0.5rem"
-                    background={theme === 'dark' ? 'rgb(127, 29, 29)' : 'rgb(229, 231, 235)'}
+                    background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
                   >
                     Return Home
                   </ShimmerButton>
@@ -581,7 +581,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
                   shimmerSize="0.1em"
                   shimmerDuration="2s"
                   borderRadius="0.5rem"
-                  background={isThinking ? "rgb(156, 163, 175)" : "rgb(127, 29, 29)"}
+                  background={isThinking ? "rgb(156, 163, 175)" : "rgb(55, 65, 81)"}
                   disabled={isThinking}
                 >
                   End

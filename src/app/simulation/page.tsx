@@ -110,8 +110,8 @@ export default function SimulationPage() {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
         <GameHeader gameTitle="Complex Investigation" showTimestamp={true} startTiming={false} />
-        <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'}`}>
-          <div className={`${theme === 'dark' ? 'bg-green-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
+        <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
             <TextAnimate
               className="text-2xl font-bold mb-4"
               animation="blurInUp"
@@ -121,7 +121,7 @@ export default function SimulationPage() {
               Generating Simulation
             </TextAnimate>
             <TextAnimate
-              className={`${theme === 'dark' ? 'text-green-300' : 'text-gray-600'} mb-6`}
+              className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}
               animation="slideUp"
               by="word"
               duration={0.2}
@@ -139,8 +139,8 @@ export default function SimulationPage() {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
         <GameHeader gameTitle="Complex Investigation" showTimestamp={true} startTiming={false} />
-        <div className={`min-h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'} flex items-center justify-center`}>
-          <div className={`${theme === 'dark' ? 'bg-green-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} flex items-center justify-center`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <TextAnimate
               className="text-2xl font-bold mb-4"
               animation="blurInUp"
@@ -150,14 +150,14 @@ export default function SimulationPage() {
               Error
             </TextAnimate>
             <TextAnimate
-              className={`${theme === 'dark' ? 'text-green-300' : 'text-gray-600'} mb-6`}
+              className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}
               animation="slideUp"
               by="word"
               duration={0.2}
             >
               {error}
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'text-green-300' : 'text-gray-600'} text-sm mb-4`}>
+            <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} text-sm mb-4`}>
               <TextAnimate
                 className="mb-2"
                 animation="slideUp"
@@ -203,12 +203,12 @@ export default function SimulationPage() {
             <div className="flex justify-end space-x-4">
               <ShimmerButton
                 onClick={() => setError(null)}
-                className={`px-4 py-2 ${theme === 'dark' ? 'text-green-300' : 'text-gray-700'}`}
+                className={`px-4 py-2 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
-                background={theme === 'dark' ? 'rgb(20, 83, 45)' : 'rgb(229, 231, 235)'}
+                background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Go Back
               </ShimmerButton>
@@ -243,9 +243,9 @@ export default function SimulationPage() {
   return (
     <ThemeProvider value={{ theme, toggleTheme }}>
       <GameHeader gameTitle="Complex Investigation" showTimestamp={true} startTiming={false} />
-      <div className={`flex h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'}`}>
+      <div className={`flex h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
-        <div className={`w-64 ${theme === 'dark' ? 'bg-green-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-green-700' : 'border-gray-300'}`}>
+        <div className={`w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`}>
           {/* Logo */}
           <div className="mb-4 flex justify-center">
             <div className="w-24 h-24 relative">
@@ -265,7 +265,7 @@ export default function SimulationPage() {
             shimmerSize="0.05em"
             shimmerDuration="2s"
             borderRadius="0.375rem"
-            background={theme === 'dark' ? 'rgb(20, 83, 45)' : 'rgb(229, 231, 235)'}
+            background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 transition ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -281,7 +281,7 @@ export default function SimulationPage() {
             shimmerSize="0.05em"
             shimmerDuration="2s"
             borderRadius="0.375rem"
-            background={theme === 'dark' ? 'rgb(20, 83, 45)' : 'rgb(229, 231, 235)'}
+            background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
           >
             {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
           </ShimmerButton>

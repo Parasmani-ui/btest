@@ -132,8 +132,8 @@ export default function HospitalSimulationPage() {
           gameEnded={gameEnded}
           sessionStartTime={sessionStartTime}
         />
-        <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'}`}>
-          <div className={`${theme === 'dark' ? 'bg-red-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
+        <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
             <TextAnimate
               className="text-2xl font-bold mb-4"
               animation="blurInUp"
@@ -143,7 +143,7 @@ export default function HospitalSimulationPage() {
               Generating Hospital Crisis Simulation
             </TextAnimate>
             <TextAnimate
-              className={`${theme === 'dark' ? 'text-red-300' : 'text-gray-600'} mb-6`}
+              className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}
               animation="slideUp"
               by="word"
               duration={0.2}
@@ -167,8 +167,8 @@ export default function HospitalSimulationPage() {
           gameEnded={gameEnded}
           sessionStartTime={sessionStartTime}
         />
-        <div className={`min-h-screen ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'} flex items-center justify-center`}>
-          <div className={`${theme === 'dark' ? 'bg-red-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} flex items-center justify-center`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <TextAnimate
               className="text-2xl font-bold mb-4"
               animation="blurInUp"
@@ -178,14 +178,14 @@ export default function HospitalSimulationPage() {
               Error
             </TextAnimate>
             <TextAnimate
-              className={`${theme === 'dark' ? 'text-red-300' : 'text-gray-600'} mb-6`}
+              className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}
               animation="slideUp"
               by="word"
               duration={0.2}
             >
               {error}
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'text-red-300' : 'text-gray-600'} text-sm mb-4`}>
+            <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} text-sm mb-4`}>
               <TextAnimate
                 className="mb-2"
                 animation="slideUp"
@@ -231,12 +231,12 @@ export default function HospitalSimulationPage() {
             <div className="flex justify-end space-x-4">
               <ShimmerButton
                 onClick={() => setError(null)}
-                className={`px-4 py-2 ${theme === 'dark' ? 'text-red-300' : 'text-gray-700'}`}
+                className={`px-4 py-2 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
-                background={theme === 'dark' ? 'rgb(127, 29, 29)' : 'rgb(229, 231, 235)'}
+                background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Go Back
               </ShimmerButton>
@@ -288,9 +288,9 @@ export default function HospitalSimulationPage() {
         gameEnded={gameEnded}
         sessionStartTime={sessionStartTime}
       />
-      <div className={`flex h-screen ${theme === 'dark' ? 'bg-red-900' : 'bg-gray-100'}`}>
+      <div className={`flex h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
-        <div className={`w-64 ${theme === 'dark' ? 'bg-red-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-red-700' : 'border-gray-300'}`}>
+        <div className={`w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`}>
           {/* Logo */}
           <div className="mb-4 flex justify-center">
             <div className="w-24 h-24 relative">
@@ -310,7 +310,7 @@ export default function HospitalSimulationPage() {
             shimmerSize="0.05em"
             shimmerDuration="2s"
             borderRadius="0.375rem"
-            background={theme === 'dark' ? 'rgb(127, 29, 29)' : 'rgb(229, 231, 235)'}
+            background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 transition ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -326,7 +326,7 @@ export default function HospitalSimulationPage() {
             shimmerSize="0.05em"
             shimmerDuration="2s"
             borderRadius="0.375rem"
-            background={theme === 'dark' ? 'rgb(127, 29, 29)' : 'rgb(229, 231, 235)'}
+            background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
           >
             {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
           </ShimmerButton>
@@ -364,11 +364,11 @@ export default function HospitalSimulationPage() {
             
             {/* Description */}
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-5 rounded-lg shadow-lg mb-4 transition hover:translate-y-[-5px]`}>
-              <h1 className={`text-2xl font-bold ${theme === 'dark' ? 'text-red-600' : 'text-gray-800'} mb-3`}>
+              <h1 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-3`}>
                 Hospital Crisis Management Simulation
               </h1>
               <TextAnimate
-                className={`${theme === 'dark' ? 'text-red-300' : 'text-gray-600'} mb-3 text-sm`}
+                className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-3 text-sm`}
                 animation="slideUp"
                 by="word"
                 duration={0.3}
@@ -376,7 +376,7 @@ export default function HospitalSimulationPage() {
                 This simulation is designed for healthcare professionals who want to practice decision-making in high-pressure hospital crisis scenarios.
               </TextAnimate>
               <TextAnimate
-                className={`${theme === 'dark' ? 'text-red-300' : 'text-gray-600'} mb-4 text-sm`}
+                className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-4 text-sm`}
                 animation="slideUp"
                 by="word"
                 duration={0.3}
@@ -402,14 +402,14 @@ export default function HospitalSimulationPage() {
             {/* Rules and Guidelines */}
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-5 rounded-lg shadow-lg transition hover:translate-y-[-5px]`}>
               <TextAnimate
-                className={`text-xl font-bold ${theme === 'dark' ? 'text-red-600' : 'text-gray-800'} mb-3`}
+                className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-3`}
                 animation="blurInUp"
                 by="word"
                 duration={0.3}
               >
                 Simulation Rules and Guidelines
               </TextAnimate>
-              <ul className={`${theme === 'dark' ? 'text-red-300' : 'text-gray-600'} space-y-2 text-sm`}>
+              <ul className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} space-y-2 text-sm`}>
                 <li className="flex items-start transition hover:translate-x-1">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-red-500 flex-shrink-0 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

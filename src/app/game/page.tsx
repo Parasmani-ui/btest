@@ -40,10 +40,10 @@ export default function CriticalReadingPage() {
   // Landing page for Critical Reading
   return (
     <>
-    <main className={`min-h-screen ${theme === 'dark' ? 'bg-blue-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+    <main className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="flex">
         {/* Sidebar */}
-        <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-blue-800' : 'bg-gray-200'}`}>
+        <div className={`w-48 fixed h-full ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'}`}>
           <div className="flex flex-col h-full">
             <div className="p-4 flex justify-center">
               <div onClick={() => router.push('/')} className="cursor-pointer">
@@ -61,7 +61,7 @@ export default function CriticalReadingPage() {
                   shimmerSize="0.05em"
                   shimmerDuration="2s"
                   borderRadius="0.5rem"
-                  background={theme === 'dark' ? 'rgb(29, 78, 216)' : 'rgb(229, 231, 235)'}
+                  background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 transition ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -77,7 +77,7 @@ export default function CriticalReadingPage() {
                   shimmerSize="0.05em"
                   shimmerDuration="2s"
                   borderRadius="0.5rem"
-                  background={theme === 'dark' ? 'rgb(29, 78, 216)' : 'rgb(229, 231, 235)'}
+                  background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
                 >
                   {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
                 </ShimmerButton>
@@ -139,7 +139,7 @@ export default function CriticalReadingPage() {
               {/* Game Mode Card */}
               <div className="my-4 flex justify-center">
                 <div 
-                  className={`p-8 rounded-lg ${theme === 'dark' ? 'bg-blue-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition max-w-md w-full`} 
+                  className={`p-8 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition max-w-md w-full`} 
                   onClick={handleStartGame}
                 >
                   <h2 className="text-2xl font-bold mb-4">
@@ -147,7 +147,7 @@ export default function CriticalReadingPage() {
                   </h2>
                   <p className="text-lg mb-4">5-8m | Procedural Blind Spot</p>
                   <TextAnimate
-                    className={`${theme === 'dark' ? 'text-blue-300' : 'text-gray-600'} mb-6 leading-relaxed`}
+                    className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6 leading-relaxed`}
                     animation="slideUp"
                     by="word"
                     duration={0.2}
@@ -170,7 +170,7 @@ export default function CriticalReadingPage() {
               </div>
               
               {/* How to Play section */}
-              <div className={`${theme === 'dark' ? 'bg-blue-800' : 'bg-white'} p-8 rounded-lg shadow-lg mb-8`}>
+              <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-8 rounded-lg shadow-lg mb-8`}>
                 <TextAnimate
                   className="text-2xl font-bold mb-6"
                   animation="slideUp"
@@ -237,7 +237,7 @@ export default function CriticalReadingPage() {
               </div>
 
               {/* Game Features */}
-              <div className={`${theme === 'dark' ? 'bg-blue-800' : 'bg-white'} p-8 rounded-lg shadow-lg`}>
+              <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-8 rounded-lg shadow-lg`}>
                 <TextAnimate
                   className="text-2xl font-bold mb-6"
                   animation="slideUp"

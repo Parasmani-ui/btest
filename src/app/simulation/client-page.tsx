@@ -235,7 +235,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     const isFormValid = conclusionState.responsibleParty && conclusionState.misconductType && conclusionState.primaryMotivation;
     
     return (
-      <form onSubmit={handleSubmitConclusion} className={`${theme === 'dark' ? 'bg-green-800 text-gray-200' : 'bg-white text-gray-800'} rounded-lg shadow-lg p-6`}>
+      <form onSubmit={handleSubmitConclusion} className={`${theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'} rounded-lg shadow-lg p-6`}>
         <TextAnimate
           className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
           animation="blurInUp"
@@ -482,8 +482,8 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
   if (parseError) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
-        <div className={`min-h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'} flex items-center justify-center`}>
-          <div className={`${theme === 'dark' ? 'bg-green-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} flex items-center justify-center`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <h2 className="text-2xl font-bold mb-4">Error Loading Simulation</h2>
             <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}>{parseError}</p>
             <div className="flex justify-end space-x-4">
@@ -504,8 +504,8 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
   if (!parsedData.simulationData && !parsedData.markdownData && !parsedData.error) {
     return (
       <ThemeProvider value={{ theme, toggleTheme }}>
-        <div className={`min-h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'} flex items-center justify-center`}>
-          <div className={`${theme === 'dark' ? 'bg-green-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} flex items-center justify-center`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <h2 className="text-2xl font-bold mb-4">Loading Simulation</h2>
             <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}>Please wait while we prepare your case...</p>
           </div>
@@ -544,9 +544,9 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
         resetKey={resetKey}
         sessionStartTime={sessionStartTime}
       />
-      <div className={`flex h-screen ${theme === 'dark' ? 'bg-green-900' : 'bg-gray-100'}`}>
+      <div className={`flex h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
-        <div className={`w-64 ${theme === 'dark' ? 'bg-green-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-green-700' : 'border-gray-300'}`}>
+        <div className={`w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`}>
           {/* Logo */}
           <div className="mb-4 flex justify-center">
             <Link href="/">
@@ -675,7 +675,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
             ) : (
               <div className="space-y-6">
                 {/* Content Display Area */}
-                <div className={`${theme === 'dark' ? 'bg-green-800' : 'bg-white'} p-5 rounded-lg shadow-lg overflow-hidden`}>
+                <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-5 rounded-lg shadow-lg overflow-hidden`}>
                   {/* Colored header bar based on active tab */}
                   <div className={`h-1 -mx-5 -mt-5 mb-4 ${
                     activeTab === 'case' ? 'bg-blue-600' :
@@ -733,7 +733,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
                 </div>
 
                 {/* Investigation Tools */}
-                <div className={`${theme === 'dark' ? 'bg-green-800' : 'bg-white'} p-4 rounded-lg shadow-lg`}>
+                <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-lg`}>
                   <TextAnimate
                     // className="text-xl font-bold mb-3"
                     className={`text-xl font-bold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
