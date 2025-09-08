@@ -283,97 +283,185 @@ export default function Home() {
                 
                 {/* First Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
-                  {/* Critical Reading card */}
+                  {/* Police Investigation card */}
                   <div 
-                    className={`p-6 rounded-lg border border-[rgb(37,99,235)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    className={`rounded-lg border border-[rgb(37,99,235)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startGame}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      Police Investigation
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Procedural Blind Spot</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/01_police_investigation.png" 
+                        alt="Police Investigation" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Police Investigation
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Procedural Blind Spot</p>
+                    </div>
                   </div>
                   
-                  {/* Critical Investigation card */}
+                  {/* POSH Investigation card */}
                   <div 
-                    className={`p-6 rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    className={`rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startSimulation}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      POSH Investigation
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Culture Compass</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/02_posh.png" 
+                        alt="POSH Investigation" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        POSH Investigation
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Culture Compass</p>
+                    </div>
                   </div>
                   
-                  {/* Crisis Management card */}
+                  {/* Hospital Management card */}
                   <div 
-                    className={`p-6 rounded-lg border border-[rgb(220,38,38)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    className={`rounded-lg border border-[rgb(220,38,38)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startHospitalSimulation}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      Hospital Management
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Lifeline & Leverage</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/03_hospital_management.png" 
+                        alt="Hospital Management" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Hospital Management
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Lifeline & Leverage</p>
+                    </div>
                   </div>
                   
-                  {/* Critical Misinformation card */}
+                  {/* Social Media Misinformation card */}
                   <div 
-                    className={`p-6 rounded-lg border border-[rgb(245,101,39)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    className={`rounded-lg border border-[rgb(245,101,39)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startFakeNewsSimulation}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      Social Media Misinformation
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Cyber Scrutiny</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/04_fakeNews.png" 
+                        alt="Social Media Misinformation" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Social Media Misinformation
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Cyber Scrutiny</p>
+                    </div>
                   </div>
                   
-                  {/* Critical ChainFail card */}
+                  {/* Chain Analysis card */}
                   <div 
-                    className={`p-6 rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    className={`rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startChainFailSimulation}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      Chain Analysis
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Critical ChainFail</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/05_chain_analysis.png" 
+                        alt="Chain Analysis" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold mb-2">
+                        Chain Analysis
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Critical ChainFail</p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Second Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-                  {/* Forensic Audit card */}
+                  {/* Financial Forensic card */}
                   <div 
-                    className={`p-6 rounded-lg border border-[rgb(245,158,11)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    className={`rounded-lg border border-[rgb(245,158,11)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startForensicAuditSimulation}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                    Financial Forensic
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Integrity Ledger</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/06_financial_forensic.png" 
+                        alt="Financial Forensic" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Financial Forensic
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Integrity Ledger</p>
+                    </div>
                   </div>
                   
                   {/* Food Safety card */}
                   <div 
-                    className={`p-6 rounded-lg border border-[rgb(8,145,178)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition`} 
+                    className={`rounded-lg border border-[rgb(8,145,178)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startFoodSafetySimulation}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      Food Safety
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Critical Thinking</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/07_food_safety.png" 
+                        alt="Food Safety" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Food Safety
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Critical Thinking</p>
+                    </div>
                   </div>
                   
                   {/* Negotiation Simulation - Enhanced with hover */}
                   <div 
-                    className={`relative p-6 rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300`} 
+                    className={`relative rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden`} 
                     onClick={startNegotiationSimulation}
                     onMouseEnter={() => setHoveredCard('negotiation')}
                     onMouseLeave={() => setHoveredCard(null)}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      Negotiation Simulation
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Multiple modes</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/08_negotiation.png" 
+                        alt="Negotiation Simulation" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Negotiation Simulation
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Multiple modes</p>
+                    </div>
                     
                     {/* Hover overlay */}
                     {hoveredCard === 'negotiation' && (
@@ -393,15 +481,26 @@ export default function Home() {
                   
                   {/* Financial Negotiation card - Enhanced with hover */}
                   <div 
-                    className={`relative p-6 rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300`} 
+                    className={`relative rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden`} 
                     onClick={startFinancialNegotiationSimulation}
                     onMouseEnter={() => setHoveredCard('financial')}
                     onMouseLeave={() => setHoveredCard(null)}
                   >
-                    <h3 className="text-lg font-bold mb-2">
-                      Financial Negotiation
-                    </h3>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> 3 modes</p>
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/09_financial negotiation.png" 
+                        alt="Financial Negotiation" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Financial Negotiation
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>3 modes</p>
+                    </div>
                     
                     {/* Hover overlay */}
                     {hoveredCard === 'financial' && (
@@ -419,9 +518,14 @@ export default function Home() {
                     )}
                   </div>
                   
-                  <div className={`p-6 rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50`}>
-                    <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
-                    <p className="text-sm text-gray-400">New Game Mode</p>
+                  <div className={`rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50 overflow-hidden`}>
+                    <div className="h-40 w-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-gray-400 text-sm">Coming Soon</span>
+                    </div>
+                    <div className="p-4">
+                      <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
+                      <p className="text-sm text-gray-400">New Game Mode</p>
+                    </div>
                   </div>
                 </div>
               </div>

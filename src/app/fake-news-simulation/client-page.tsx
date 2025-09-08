@@ -337,7 +337,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                   ].map((option) => (
                     <label key={option.value} className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
                       decisions.postFactuality === option.value 
-                        ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' 
+                        ? 'border-orange-500 bg-orange-200 dark:bg-orange-900/20' 
                         : theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'
                     }`}>
                       <input
@@ -374,7 +374,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                   className={`w-full p-4 rounded-lg border-2 transition-all ${
                     decisions.keyAmplifier 
                       ? 'border-orange-500' 
-                      : theme === 'dark' ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'
+                      : theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-300' : 'border-gray-300 bg-blue-200 text-gray-900'
                   } focus:border-orange-500 focus:outline-none`}
                 >
                   <option value="">Choose the key amplifier...</option>
@@ -456,7 +456,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                   ].map((option) => (
                     <label key={option.value} className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       decisions.consequenceSeverity === option.value 
-                        ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' 
+                        ? 'border-orange-500 bg-orange-200 dark:bg-orange-900/20' 
                         : theme === 'dark' ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400'
                     }`}>
                       <input

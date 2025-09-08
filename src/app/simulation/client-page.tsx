@@ -247,7 +247,7 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
         
         <div className="space-y-6">
           <div>
-            <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} mb-2`}>
+            <label className={`block text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-700'} mb-2`}>
               Responsible Individual <span className="text-red-400">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
