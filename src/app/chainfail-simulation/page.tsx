@@ -97,8 +97,8 @@ export default function ChainFailSimulationPage() {
           gameEnded={gameEnded}
           resetKey={resetKey}
         />
-        <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'}`}>
-          <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
+        <div className={`flex min-h-screen items-center justify-center ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full text-center`}>
             <TextAnimate
               className="text-2xl font-bold mb-4"
               animation="blurInUp"
@@ -108,7 +108,7 @@ export default function ChainFailSimulationPage() {
               Generating Investigation
             </TextAnimate>
             <TextAnimate
-              className={`${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'} mb-6`}
+              className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}
               animation="slideUp"
               by="word"
               duration={0.2}
@@ -131,8 +131,8 @@ export default function ChainFailSimulationPage() {
           startTiming={false}
           resetKey={resetKey}
         />
-        <div className={`min-h-screen ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'} flex items-center justify-center`}>
-          <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} flex items-center justify-center`}>
+          <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-md w-full`}>
             <TextAnimate
               className="text-2xl font-bold mb-4"
               animation="blurInUp"
@@ -142,14 +142,14 @@ export default function ChainFailSimulationPage() {
               Error
             </TextAnimate>
             <TextAnimate
-              className={`${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'} mb-6`}
+              className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}
               animation="slideUp"
               by="word"
               duration={0.2}
             >
               {error}
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'} text-sm mb-4`}>
+            <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} text-sm mb-4`}>
               <TextAnimate
                 className="mb-2"
                 animation="slideUp"
@@ -195,12 +195,12 @@ export default function ChainFailSimulationPage() {
             <div className="flex justify-end space-x-4">
               <ShimmerButton
                 onClick={() => setError(null)}
-                className={`px-4 py-2 ${theme === 'dark' ? 'text-purple-300' : 'text-gray-700'}`}
+                className={`px-4 py-2 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}
                 shimmerColor="rgba(255, 255, 255, 0.5)"
                 shimmerSize="0.05em"
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
-                background={theme === 'dark' ? 'rgb(107, 33, 168)' : 'rgb(229, 231, 235)'}
+                background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
               >
                 Go Back
               </ShimmerButton>
@@ -254,15 +254,15 @@ export default function ChainFailSimulationPage() {
         gameEnded={gameEnded}
         resetKey={resetKey}
       />
-      <div className={`min-h-screen ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'} flex items-center justify-center`}>
-        <div className={`${theme === 'dark' ? 'bg-purple-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-2xl w-full`}>
+      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} flex items-center justify-center`}>
+        <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} p-8 rounded-lg shadow-lg max-w-2xl w-full`}>
           <div className="text-center">
             <div className="mb-6">
               <h1 className="text-3xl font-bold mb-4">
                 GAMECHAIN - Critical ChainFail Training
               </h1>
               <TextAnimate
-                className={`text-lg ${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'}`}
+                className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
                 animation="slideUp"
                 by="word"
                 duration={0.3}
@@ -271,11 +271,11 @@ export default function ChainFailSimulationPage() {
               </TextAnimate>
             </div>
             
-            <div className={`text-left mb-8 p-6 ${theme === 'dark' ? 'bg-purple-700' : 'bg-gray-50'} rounded-lg`}>
+            <div className={`text-left mb-8 p-6 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
               <h3 className={`text-lg font-semibold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 🔧 What You'll Experience:
               </h3>
-              <ul className={`space-y-2 text-sm ${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'}`}>
+              <ul className={`space-y-2 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 <li>• Investigate complex workplace accidents with multiple potential causes</li>
                 <li>• Analyze equipment failure reports, witness statements, and technical logs</li>
                 <li>• Distinguish between human error, mechanical failure, and procedural violations</li>
@@ -284,8 +284,8 @@ export default function ChainFailSimulationPage() {
               </ul>
             </div>
             
-            <div className={`text-center mb-6 p-4 ${theme === 'dark' ? 'bg-purple-900/20' : 'bg-purple-50'} rounded-lg border border-purple-200`}>
-              <p className={`text-sm ${theme === 'dark' ? 'text-purple-200' : 'text-purple-800'}`}>
+            <div className={`text-center mb-6 p-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-purple-50'} rounded-lg border border-purple-200`}>
+              <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-purple-800'}`}>
                 ⚠️ <strong>Training Focus:</strong> Safety Officers, Compliance Auditors, Factory Managers, and Engineering Trainees
               </p>
             </div>

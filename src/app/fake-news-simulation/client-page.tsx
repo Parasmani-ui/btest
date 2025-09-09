@@ -265,7 +265,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
             >
               📱 Case Overview
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'bg-orange-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
               <div className="prose prose-invert max-w-none">
                 {formatCaseContent(caseData)}
               </div>
@@ -287,7 +287,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                currentView === 'evidence' ? '🔍 Evidence Examination' : 
                '👥 Individual Profiles'}
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'bg-orange-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
               {analysis ? (
                 <div className="prose prose-invert max-w-none">
                   {formatAnalysisContent(analysis)}
@@ -310,7 +310,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
               🎯 Make Final Analysis
             </TextAnimate>
             
-            <div className={`${theme === 'dark' ? 'bg-orange-800' : 'bg-white'} rounded-lg p-6 space-y-8 shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 space-y-8 shadow-lg`}>
               {/* Helper Text */}
               <div className={`${theme === 'dark' ? 'bg-orange-700' : 'bg-blue-50'} p-4 rounded-lg border-l-4 border-orange-500`}>
                 <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -480,7 +480,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
               </div>
 
               {/* Progress Indicator */}
-              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-orange-700' : 'bg-gray-50'}`}>
+              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Analysis Progress</span>
                   <span className="text-sm">{Object.values(decisions).filter(Boolean).length}/4 Complete</span>
@@ -544,7 +544,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                 </div>
               </div>
             )}
-            <div className={`${theme === 'dark' ? 'bg-orange-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
               <div className="prose prose-invert max-w-none">
                 {formatAnalysisContent(analysis)}
               </div>
@@ -567,7 +567,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                   shimmerSize="0.05em"
                   shimmerDuration="2s"
                   borderRadius="0.375rem"
-                  background={theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)'}
+                  background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
                 >
                   Return Home
                 </ShimmerButton>
@@ -643,9 +643,9 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-orange-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       {/* Header */}
-      <div className={`${theme === 'dark' ? 'bg-orange-800' : 'bg-white'} border-b ${theme === 'dark' ? 'border-orange-700' : 'border-gray-200'} p-4`}>
+      <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} p-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <ShimmerButton
@@ -655,7 +655,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
-              background={theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)'}
+              background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
               Exit Simulation
@@ -677,7 +677,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
-              background={theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)'}
+              background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
             >
               {theme === 'dark' ? '☀️' : '🌙'}
             </ShimmerButton>
@@ -699,7 +699,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
 
       <div className="flex h-[calc(100vh-73px)]">
         {/* Sidebar */}
-        <div className={`w-64 ${theme === 'dark' ? 'bg-orange-800' : 'bg-gray-200'} border-r ${theme === 'dark' ? 'border-orange-700' : 'border-gray-200'} overflow-y-auto`}>
+        <div className={`w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} overflow-y-auto`}>
           <div className="p-4">
             <TextAnimate
               className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
@@ -723,8 +723,8 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
                 background={currentView === 'overview' 
-                  ? (theme === 'dark' ? 'rgb(194, 65, 12)' : 'rgb(255, 237, 213)') 
-                  : (theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)')}
+                  ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(255, 237, 213)') 
+                  : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
               >
                 <FileText className="h-4 w-4 mr-2 inline" />
                 Case Overview
@@ -745,8 +745,8 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
                 background={currentView === 'timeline' 
-                  ? (theme === 'dark' ? 'rgb(194, 65, 12)' : 'rgb(255, 237, 213)') 
-                  : (theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)')}
+                  ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(255, 237, 213)') 
+                  : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
               >
                 <Eye className="h-4 w-4 mr-2 inline" />
                 View Timeline
@@ -767,8 +767,8 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
                 background={currentView === 'evidence' 
-                  ? (theme === 'dark' ? 'rgb(194, 65, 12)' : 'rgb(255, 237, 213)') 
-                  : (theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)')}
+                  ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(255, 237, 213)') 
+                  : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
               >
                 <FileText className="h-4 w-4 mr-2 inline" />
                 Examine Evidence
@@ -789,8 +789,8 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
                 background={currentView === 'individuals' 
-                  ? (theme === 'dark' ? 'rgb(194, 65, 12)' : 'rgb(255, 237, 213)') 
-                  : (theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)')}
+                  ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(255, 237, 213)') 
+                  : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
               >
                 <Users className="h-4 w-4 mr-2 inline" />
                 Profile Individuals
@@ -808,8 +808,8 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                 shimmerDuration="2s"
                 borderRadius="0.375rem"
                 background={currentView === 'analysis' 
-                  ? (theme === 'dark' ? 'rgb(194, 65, 12)' : 'rgb(255, 237, 213)') 
-                  : (theme === 'dark' ? 'rgb(234, 88, 12)' : 'rgb(229, 231, 235)')}
+                  ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(255, 237, 213)') 
+                  : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
               >
                 <Target className="h-4 w-4 mr-2 inline" />
                 Make Analysis

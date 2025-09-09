@@ -424,7 +424,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             >
               Investigation Overview
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
               {formatContent(parsedData?.caseOverview || '')}
             </div>
           </div>
@@ -440,7 +440,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             >
               Line Operator Statement
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
               {formatContent(parsedData?.lineOperatorStatement || '')}
             </div>
           </div>
@@ -456,7 +456,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             >
               Supervisor Statement
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
               {formatContent(parsedData?.supervisorStatement || '')}
             </div>
           </div>
@@ -472,7 +472,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             >
               Maintenance Engineer Statement
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
               {formatContent(parsedData?.maintenanceEngineerStatement || '')}
             </div>
           </div>
@@ -488,7 +488,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             >
               Technical Artifact
             </TextAnimate>
-            <div className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
               {formatContent(parsedData?.technicalArtifact || '')}
             </div>
           </div>
@@ -505,11 +505,11 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               Root Cause Assessment
             </TextAnimate>
             
-            <div className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} p-6 rounded-lg shadow-lg space-y-8`}>
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg space-y-8`}>
               {/* Assessment Instructions */}
-              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-purple-900/20' : 'bg-purple-50'} border border-purple-200`}>
+              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-purple-50'} border border-purple-200`}>
                 <h3 className="font-semibold text-lg mb-2 text-purple-400">Assessment Instructions</h3>
-                <p className={`text-sm ${theme === 'dark' ? 'text-purple-200' : 'text-purple-800'}`}>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-purple-800'}`}>
                   Based on your review of all evidence, statements, and technical artifacts, determine the primary root cause of this industrial accident. 
                   Consider the chain of events and identify what could have prevented this incident.
                 </p>
@@ -749,9 +749,9 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-purple-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       {/* Header */}
-      <div className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} border-b ${theme === 'dark' ? 'border-purple-700' : 'border-gray-200'} p-4`}>
+      <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} p-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <ShimmerButton
@@ -761,7 +761,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
-              background={theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)'}
+              background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
               Exit Investigation
@@ -783,7 +783,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
-              background={theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)'}
+              background={theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)'}
             >
               {theme === 'dark' ? '☀️' : '🌙'}
             </ShimmerButton>
@@ -805,7 +805,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
 
       <div className="flex h-[calc(100vh-73px)]">
         {/* Sidebar */}
-        <div className={`w-64 ${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-purple-700' : 'border-gray-200'} p-4`}>
+        <div className={`w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} p-4`}>
           <TextAnimate
             className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
             animation="slideUp"
@@ -820,16 +820,16 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               onClick={() => setCurrentView('overview')}
               className={`w-full p-3 text-left transition ${
                 currentView === 'overview' 
-                  ? `${theme === 'dark' ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800'}` 
-                  : `${theme === 'dark' ? 'text-purple-200 hover:bg-purple-700' : 'text-gray-700 hover:bg-gray-300'}`
+                  ? `${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-purple-100 text-purple-800'}` 
+                  : `${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-300'}`
               }`}
               shimmerColor="rgba(255, 255, 255, 0.3)"
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
               background={currentView === 'overview' 
-                ? (theme === 'dark' ? 'rgb(126, 34, 206)' : 'rgb(243, 232, 255)') 
-                : (theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)')}
+                ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(243, 232, 255)') 
+                : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
             >
               <FileText className="h-4 w-4 mr-2 inline" />
               Case Overview
@@ -839,16 +839,16 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               onClick={() => setCurrentView('operator')}
               className={`w-full p-3 text-left transition ${
                 currentView === 'operator' 
-                  ? `${theme === 'dark' ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800'}` 
-                  : `${theme === 'dark' ? 'text-purple-200 hover:bg-purple-700' : 'text-gray-700 hover:bg-gray-300'}`
+                  ? `${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-purple-100 text-purple-800'}` 
+                  : `${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-300'}`
               }`}
               shimmerColor="rgba(255, 255, 255, 0.3)"
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
               background={currentView === 'operator' 
-                ? (theme === 'dark' ? 'rgb(126, 34, 206)' : 'rgb(243, 232, 255)') 
-                : (theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)')}
+                ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(243, 232, 255)') 
+                : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
             >
               <User className="h-4 w-4 mr-2 inline" />
               Operator Statement
@@ -858,16 +858,16 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               onClick={() => setCurrentView('supervisor')}
               className={`w-full p-3 text-left transition ${
                 currentView === 'supervisor' 
-                  ? `${theme === 'dark' ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800'}` 
-                  : `${theme === 'dark' ? 'text-purple-200 hover:bg-purple-700' : 'text-gray-700 hover:bg-gray-300'}`
+                  ? `${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-purple-100 text-purple-800'}` 
+                  : `${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-300'}`
               }`}
               shimmerColor="rgba(255, 255, 255, 0.3)"
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
               background={currentView === 'supervisor' 
-                ? (theme === 'dark' ? 'rgb(126, 34, 206)' : 'rgb(243, 232, 255)') 
-                : (theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)')}
+                ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(243, 232, 255)') 
+                : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
             >
               <User className="h-4 w-4 mr-2 inline" />
               Supervisor Statement
@@ -877,16 +877,16 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               onClick={() => setCurrentView('maintenance')}
               className={`w-full p-3 text-left transition ${
                 currentView === 'maintenance' 
-                  ? `${theme === 'dark' ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800'}` 
-                  : `${theme === 'dark' ? 'text-purple-200 hover:bg-purple-700' : 'text-gray-700 hover:bg-gray-300'}`
+                  ? `${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-purple-100 text-purple-800'}` 
+                  : `${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-300'}`
               }`}
               shimmerColor="rgba(255, 255, 255, 0.3)"
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
               background={currentView === 'maintenance' 
-                ? (theme === 'dark' ? 'rgb(126, 34, 206)' : 'rgb(243, 232, 255)') 
-                : (theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)')}
+                ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(243, 232, 255)') 
+                : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
             >
               <Wrench className="h-4 w-4 mr-2 inline" />
               Maintenance Report
@@ -896,16 +896,16 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               onClick={() => setCurrentView('artifact')}
               className={`w-full p-3 text-left transition ${
                 currentView === 'artifact' 
-                  ? `${theme === 'dark' ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800'}` 
-                  : `${theme === 'dark' ? 'text-purple-200 hover:bg-purple-700' : 'text-gray-700 hover:bg-gray-300'}`
+                  ? `${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-purple-100 text-purple-800'}` 
+                  : `${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-300'}`
               }`}
               shimmerColor="rgba(255, 255, 255, 0.3)"
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
               background={currentView === 'artifact' 
-                ? (theme === 'dark' ? 'rgb(126, 34, 206)' : 'rgb(243, 232, 255)') 
-                : (theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)')}
+                ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(243, 232, 255)') 
+                : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
             >
               <FileText className="h-4 w-4 mr-2 inline" />
               Technical Artifact
@@ -915,16 +915,16 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
               onClick={() => setCurrentView('analysis')}
               className={`w-full p-3 text-left transition ${
                 currentView === 'analysis' 
-                  ? `${theme === 'dark' ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-800'}` 
-                  : `${theme === 'dark' ? 'text-purple-200 hover:bg-purple-700' : 'text-gray-700 hover:bg-gray-300'}`
+                  ? `${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-purple-100 text-purple-800'}` 
+                  : `${theme === 'dark' ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-300'}`
               }`}
               shimmerColor="rgba(255, 255, 255, 0.3)"
               shimmerSize="0.05em"
               shimmerDuration="2s"
               borderRadius="0.375rem"
               background={currentView === 'analysis' 
-                ? (theme === 'dark' ? 'rgb(126, 34, 206)' : 'rgb(243, 232, 255)') 
-                : (theme === 'dark' ? 'rgb(147, 51, 234)' : 'rgb(229, 231, 235)')}
+                ? (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(243, 232, 255)') 
+                : (theme === 'dark' ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)')}
             >
               <Target className="h-4 w-4 mr-2 inline" />
               Final Assessment

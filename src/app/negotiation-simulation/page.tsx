@@ -165,9 +165,9 @@ export default function NegotiationSimulationPage() {
         gameEnded={gameEnded}
         sessionStartTime={sessionStartTime}
       />
-      <div className={`flex h-screen ${theme === 'dark' ? 'bg-purple-900' : 'bg-gray-100'}`}>
+      <div className={`flex h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
         {/* Sidebar */}
-        <div className={`w-64 ${theme === 'dark' ? 'bg-purple-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-purple-700' : 'border-gray-300'}`}>
+        <div className={`w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} flex flex-col p-4 border-r ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`}>
           {/* Logo */}
           <div className="mb-4 flex justify-center">
             <div className="w-24 h-24 relative">
@@ -184,7 +184,7 @@ export default function NegotiationSimulationPage() {
             onClick={() => window.location.href = '/'}
             className={`group mb-4 w-full py-2 px-4 flex items-center justify-center transition rounded ${
               theme === 'dark' 
-                ? 'text-white bg-purple-700 hover:bg-purple-600' 
+                ? 'text-white bg-gray-700 hover:bg-gray-600' 
                 : 'text-gray-700 bg-gray-300 hover:bg-gray-400'
             }`}
           >
@@ -199,7 +199,7 @@ export default function NegotiationSimulationPage() {
             onClick={toggleTheme}
             className={`mb-4 w-full py-2 px-4 flex items-center justify-center transition rounded ${
               theme === 'dark' 
-                ? 'text-white bg-purple-700 hover:bg-purple-600' 
+                ? 'text-white bg-gray-700 hover:bg-gray-600' 
                 : 'text-gray-700 bg-gray-300 hover:bg-gray-400'
             }`}
           >
@@ -215,7 +215,7 @@ export default function NegotiationSimulationPage() {
               <h1 className={`text-4xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 Negotiation Simulation
               </h1>
-              <p className={`text-lg ${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'}`}>
+              <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 Master the art of negotiation through realistic workplace scenarios
               </p>
             </div>
@@ -232,7 +232,7 @@ export default function NegotiationSimulationPage() {
               <div className="text-center py-12">
                 <div className="inline-flex items-center space-x-3">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-                  <span className={`text-lg ${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'}`}>
+                  <span className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                     Generating negotiation scenario...
                   </span>
                 </div>
@@ -245,7 +245,7 @@ export default function NegotiationSimulationPage() {
                 {SUB_GAMES.map((subGame, index) => (
                   <div
                     key={subGame.id}
-                    className={`${theme === 'dark' ? 'bg-purple-800' : 'bg-white'} rounded-lg shadow-lg overflow-hidden transition-all duration-200 hover:shadow-xl hover:scale-105`}
+                    className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg overflow-hidden transition-all duration-200 hover:shadow-xl hover:scale-105`}
                   >
                     <button
                       onClick={() => generateSimulation(index)}
@@ -253,7 +253,7 @@ export default function NegotiationSimulationPage() {
                       className="w-full p-4 text-left focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-purple-300' : 'text-purple-600'}`}>
+                        <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-purple-600'}`}>
                           {subGame.title}
                         </h3>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -268,7 +268,7 @@ export default function NegotiationSimulationPage() {
                         {subGame.description}
                       </p>
                       <div className="mt-2 flex items-center">
-                        <span className={`text-xs ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>
+                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-purple-600'}`}>
                           Click to start →
                         </span>
                       </div>
@@ -279,7 +279,7 @@ export default function NegotiationSimulationPage() {
             )}
 
             {/* Footer Info */}
-            <div className={`mt-12 text-center ${theme === 'dark' ? 'text-purple-300' : 'text-gray-600'}`}>
+            <div className={`mt-12 text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
               <p className="text-sm">
                 Each simulation takes 5-10 minutes and includes 5 negotiation rounds with performance feedback
               </p>
