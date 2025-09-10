@@ -343,7 +343,8 @@ export default function Home() {
                     </div>
                     <div className="p-4">
                       <h3 className="text-sm font-bold mb-2">
-                        Hospital Management
+                        {/* Hospital Management*/}
+                        Crisis Management
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Lifeline & Leverage</p>
                     </div>
