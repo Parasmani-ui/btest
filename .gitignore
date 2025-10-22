@@ -62,6 +62,10 @@ caseCache.json
 *.cache
 .cache/
 
+# Setup and test scripts (but allow utility scripts)
+scripts/setupAuthUsers.js
+scripts/setupTestData.js
+
 # IDE and Editor files
 .vscode/
 .idea/
@@ -95,14 +99,64 @@ pids
 # Temporary folders
 tmp/
 temp/
-DASHBOARD_IMPLEMENTATION_SUMMARY.md
-TEST_DATA_SETUP.md
-VERCEL_DEPLOYMENT_SETUP.md
 
-setupAuthUsers.js
-setupTestData.js
-
+# Cache and temporary files
 caseCache.json
 
-report
+# Documentation and reports
 report/
+report
+temperory/
+Temperory/
+readme project.md
+
+# Additional sensitive files that should not be in version control
+# Firebase service account files
+parasmanigame-firebase-adminsdk-fbsvc-*.json
+
+# Environment files (already covered but being explicit)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Build and deployment files
+.next/
+out/
+build/
+dist/
+
+# Package manager files (keep package-lock.json for consistency)
+yarn.lock
+pnpm-lock.yaml
+
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Temporary files
+*.tmp
+*.temp
