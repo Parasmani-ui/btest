@@ -9,6 +9,7 @@ import { TextAnimate } from '@/components/magicui/text-animate';
 import ReactMarkdown from 'react-markdown';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 // Define props for the component
 interface HospitalSimulationClientProps {
@@ -302,7 +303,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
           if (!gameEndedRef.current) {
             gameEndedRef.current = true;
             const totalScore = calculateHospitalScore(messages, currentRound);
-            const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+            const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
             
             try {
               await handleGameEnd(caseSolved, totalScore);
@@ -394,52 +395,19 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
     onStartNewCase(); // Call the original function
   };
   
-  // Calculate score for hospital simulation
+  // Calculate 3-parameter score for hospital simulation
   const calculateHospitalScore = (messages: {role: string, content: string}[], currentRound: number): number => {
-    const maxRounds = 10;
-    const completionBonus = (currentRound / maxRounds) * 60; // 60% for completion
-    
-    // Base score for reaching the end
-    let score = completionBonus;
-    
-    // Check final message for performance indicators
     const finalMessage = messages[messages.length - 1];
     if (finalMessage?.content) {
-      const content = finalMessage.content.toLowerCase();
-      
-      // Look for score in the final message
-      const scoreMatch = finalMessage.content.match(/final score[:\s]+(\d+)/i);
-      if (scoreMatch) {
-        return parseInt(scoreMatch[1]);
-      }
-      
-      // Look for positive indicators
-      const positiveIndicators = [
-        'excellent', 'outstanding', 'superior', 'exceptional', 'perfect',
-        'effective', 'successful', 'appropriate', 'well-handled', 'commendable'
-      ];
-      
-      const negativeIndicators = [
-        'poor', 'inadequate', 'failed', 'unsuccessful', 'inappropriate',
-        'missed', 'overlooked', 'delayed', 'ineffective', 'concerning'
-      ];
-      
-      let positiveCount = 0;
-      let negativeCount = 0;
-      
-      positiveIndicators.forEach(indicator => {
-        if (content.includes(indicator)) positiveCount++;
-      });
-      
-      negativeIndicators.forEach(indicator => {
-        if (content.includes(indicator)) negativeCount++;
-      });
-      
-      const qualityScore = Math.max(0, (positiveCount - negativeCount) * 10);
-      score += Math.min(40, qualityScore); // Max 40% for quality
+      // Use the new 3-parameter scoring system
+      const score = calculateSimulationScore('HOSPITAL_CRISIS_SIMULATION', finalMessage.content, null, messages);
+      return score.overall;
     }
     
-    return Math.min(100, Math.max(0, score));
+    // Fallback scoring logic if no content is found
+    const maxRounds = 10;
+    const completionBonus = (currentRound / maxRounds) * 60; // 60% for completion
+    return Math.min(100, Math.max(0, Math.round(completionBonus)));
   };
   
   return (

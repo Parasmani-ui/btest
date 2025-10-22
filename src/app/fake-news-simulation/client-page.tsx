@@ -9,6 +9,7 @@ import { TextAnimate } from '@/components/magicui/text-animate';
 
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 interface FakeNewsDecisions {
   postFactuality: string;
@@ -27,7 +28,7 @@ interface FakeNewsSimulationClientProps {
 
 export default function FakeNewsSimulationClient({ simulationText, onStartNewCase, onGameEnd, onSessionStart, onSessionEnd }: FakeNewsSimulationClientProps) {
   const router = useRouter();
-  const { startSession } = useGameSession();
+  const { startSession, updateSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [caseData, setCaseData] = useState<string>('');
   const [currentView, setCurrentView] = useState<'overview' | 'timeline' | 'evidence' | 'individuals' | 'analysis' | 'final_result'>('overview');
@@ -39,6 +40,8 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
   });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<string>('');
+  const [scoreData, setScoreData] = useState<any>(null);
+  const [formattedScores, setFormattedScores] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [hasSubmittedFinal, setHasSubmittedFinal] = useState(false);
   const [loadedAnalysisType, setLoadedAnalysisType] = useState<string>('');
@@ -93,13 +96,22 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setAnalysis(data.analysis);
+
+        // Store score data if available
+        if (data.score) {
+          setScoreData(data.score);
+        }
+        if (data.formattedScores) {
+          setFormattedScores(data.formattedScores);
+        }
+
         if (analysisType === 'final_judgment') {
           setCurrentView('final_result');
           setHasSubmittedFinal(true);
-          
+
           // Capture elapsed time before ending session
           if (sessionStartTime) {
             const endTime = new Date();
@@ -110,11 +122,33 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
             setFinalElapsedTime(elapsedTimeStr);
             onSessionEnd?.(endTime, elapsedTimeStr); // Notify parent of session end
           }
-          
-          // Calculate score based on analysis and decisions
-          const totalScore = calculateFakeNewsScore(data.analysis, decisions);
-          const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
-          
+
+          // Use the score from API if available, otherwise calculate
+          const totalScore = data.score?.overall || calculateFakeNewsScore(data.analysis, decisions);
+          const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
+
+          // Save analysis data to game session before ending
+          try {
+            await updateSession({
+              analysis: data.analysis,
+              caseTitle: caseData.substring(0, 100) || 'Fake News Investigation',
+              scoreBreakdown: data.score ? {
+                parameter1: data.score.parameter1,
+                parameter1Name: 'Fact Verification',
+                parameter2: data.score.parameter2,
+                parameter2Name: 'Bias Awareness',
+                parameter3: data.score.parameter3,
+                parameter3Name: 'Ethical Judgement',
+                overall: data.score.overall,
+                summary: data.score.summary
+              } : undefined,
+              userDecisions: decisions
+            });
+            console.log('✅ Analysis data saved to game session');
+          } catch (error) {
+            console.error('❌ Error saving analysis data:', error);
+          }
+
           // Update user stats when game ends
           try {
             await handleGameEnd(caseSolved, totalScore);
@@ -122,7 +156,7 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
           } catch (error) {
             console.error('❌ Error updating fake news simulation stats:', error);
           }
-          
+
           onGameEnd();
         }
       } else {
@@ -544,6 +578,34 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
                 </div>
               </div>
             )}
+
+            {/* Display 3-Parameter Scores */}
+            {scoreData && (
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-r from-orange-900/50 to-red-900/50 border-orange-700' : 'bg-gradient-to-r from-orange-50 to-red-50 border-orange-300'} p-6 rounded-lg border-2 shadow-lg mb-6`}>
+                <h3 className="text-xl font-bold mb-4 text-center">
+                  📊 Final Scores
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                    <div className="text-sm font-semibold mb-2 text-orange-400">Fact Verification</div>
+                    <div className="text-3xl font-bold">{scoreData.parameter1 || scoreData.factVerification || 0}/10</div>
+                  </div>
+                  <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                    <div className="text-sm font-semibold mb-2 text-red-400">Bias Awareness</div>
+                    <div className="text-3xl font-bold">{scoreData.parameter2 || scoreData.biasAwareness || 0}/10</div>
+                  </div>
+                  <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                    <div className="text-sm font-semibold mb-2 text-yellow-400">Ethical Judgement</div>
+                    <div className="text-3xl font-bold">{scoreData.parameter3 || scoreData.ethicalJudgement || 0}/10</div>
+                  </div>
+                </div>
+                <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                  <div className="text-sm font-semibold mb-2">Overall Outcome</div>
+                  <div className="text-lg font-semibold text-orange-500">{scoreData.summary || 'Performance evaluated'}</div>
+                </div>
+              </div>
+            )}
+
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 shadow-lg`}>
               <div className="prose prose-invert max-w-none">
                 {formatAnalysisContent(analysis)}
@@ -580,66 +642,14 @@ export default function FakeNewsSimulationClient({ simulationText, onStartNewCas
     }
   };
 
-  // Calculate score for fake-news simulation
+  // Calculate 3-parameter score for fake-news simulation
   const calculateFakeNewsScore = (analysis: string, decisions: FakeNewsDecisions): number => {
-    let score = 0;
-    const maxScore = 100;
-
-    // Base score for having all required decisions
-    if (decisions.postFactuality && decisions.keyAmplifier && decisions.criticalEvidence && decisions.consequenceSeverity) {
-      score += 30; // 30% for completing all fields
-    }
-
-    // Score based on analysis content quality
-    if (analysis) {
-      const positiveIndicators = [
-        'accurate', 'thorough', 'excellent', 'comprehensive', 'correct',
-        'well-identified', 'properly', 'effective', 'insightful', 'detailed'
-      ];
-      
-      const negativeIndicators = [
-        'inaccurate', 'incomplete', 'poor', 'incorrect', 'missed',
-        'failed', 'superficial', 'lacking', 'inadequate', 'insufficient'
-      ];
-      
-      const analysisLower = analysis.toLowerCase();
-      let positiveCount = 0;
-      let negativeCount = 0;
-      
-      positiveIndicators.forEach(indicator => {
-        if (analysisLower.includes(indicator)) {
-          positiveCount++;
-        }
-      });
-      
-      negativeIndicators.forEach(indicator => {
-        if (analysisLower.includes(indicator)) {
-          negativeCount++;
-        }
-      });
-      
-      const indicatorScore = Math.max(0, (positiveCount - negativeCount) * 8);
-      score += Math.min(40, indicatorScore); // Max 40% for analysis quality
-    }
-
-    // Score based on decision quality
-    if (decisions.postFactuality && decisions.postFactuality.length > 15) {
-      score += 7.5; // 7.5% for detailed factuality assessment
-    }
+    // Combine analysis and decisions into a single content string for scoring
+    const content = `${analysis || ''} ${decisions.postFactuality || ''} ${decisions.keyAmplifier || ''} ${decisions.criticalEvidence || ''} ${decisions.consequenceSeverity || ''}`;
     
-    if (decisions.keyAmplifier && decisions.keyAmplifier.length > 15) {
-      score += 7.5; // 7.5% for detailed amplifier identification
-    }
-    
-    if (decisions.criticalEvidence && decisions.criticalEvidence.length > 15) {
-      score += 7.5; // 7.5% for detailed evidence analysis
-    }
-    
-    if (decisions.consequenceSeverity && decisions.consequenceSeverity.length > 15) {
-      score += 7.5; // 7.5% for detailed consequence assessment
-    }
-
-    return Math.min(maxScore, score);
+    // Use the new 3-parameter scoring system for fake-news
+    const score = calculateSimulationScore('FAKE_NEWS_SIMULATION', content, decisions);
+    return score.overall;
   };
 
   return (

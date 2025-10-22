@@ -285,19 +285,9 @@ export function calculateGameScore(scores: any, gameType: string): number {
   }
 }
 
-// Determine if case was solved based on game type
+// Determine if case was solved based on game type - SIMPLE: Any score counts as solved
 export function determineCaseSolved(verdict: any, scores: any, gameType: string): boolean {
-  switch (gameType) {
-    case 'food-safety':
-      return verdict === 'ban_lifted';
-    
-    case 'forensic-audit':
-      return verdict === 'fraud_detected' || (scores && (scores.accuracy + scores.thoroughness) >= 8);
-    
-    case 'hospital':
-      return verdict === 'crisis_resolved' || (scores && (scores.decisionQuality + scores.timeManagement) >= 8);
-    
-    default:
-      return verdict === 'success' || verdict === 'solved';
-  }
+  // SIMPLE: For all game types, any score (0-100) counts as solved
+  // This function is kept for backward compatibility but now uses simple logic
+  return true; // Any attempt counts as solved
 } 

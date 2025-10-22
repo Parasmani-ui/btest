@@ -56,7 +56,7 @@ export default function FinancialNegotiationPage() {
   const handleStartSimulation = (subGameIndex: number) => {
     checkAuthAndProceed(() => {
       startSimulation(subGameIndex);
-    }, 'Financial Negotiation');
+    }, 'Financial Investigation');
   };
 
   const startSimulation = async (subGameIndex: number) => {
@@ -78,10 +78,10 @@ export default function FinancialNegotiationPage() {
         setSelectedSubGame(subGameIndex);
         setSessionStartTime(new Date());
       } else {
-        console.error('Failed to generate financial negotiation simulation');
+        console.error('Failed to generate Financial Investigation simulation');
       }
     } catch (error) {
-      console.error('Error generating financial negotiation simulation:', error);
+      console.error('Error generating Financial Investigation simulation:', error);
     } finally {
       setIsGenerating(false);
     }
@@ -108,7 +108,7 @@ export default function FinancialNegotiationPage() {
 
   // Handle session end  
   const handleSessionEnd = (endTime: Date, elapsedTime: string) => {
-    console.log('Financial negotiation session ended:', { endTime, elapsedTime });
+    console.log('Financial Investigation session ended:', { endTime, elapsedTime });
   };
 
   const getThemeColors = () => {
@@ -148,7 +148,7 @@ export default function FinancialNegotiationPage() {
                 ? 'bg-purple-900 text-purple-200'
                 : 'bg-purple-100 text-purple-800'
             }`}>
-              💰 Financial Negotiation Training
+              💰 Financial Investigation Training
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -177,7 +177,7 @@ export default function FinancialNegotiationPage() {
           <div className="text-center mb-8">
             <div className="mb-4">
               <h1 className={`text-4xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Financial Negotiation Training
+                Financial Investigation Training
               </h1>
             </div>
             <TextAnimate
@@ -281,7 +281,7 @@ export default function FinancialNegotiationPage() {
         isOpen={showSignInPopup}
         onClose={closeSignInPopup}
         onSuccess={onSignInSuccess}
-        gameName="Financial Negotiation"
+        gameName="Financial Investigation"
       />
     </ThemeProvider>
   );

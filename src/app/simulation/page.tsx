@@ -7,6 +7,8 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 
 import { useGameSession } from '@/lib/gameSession';
+import { updateUserStatsOnGameStart } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameAuth } from '@/hooks/useGameAuth';
 import { SignInPopup } from '@/components/auth/SignInPopup';
@@ -17,6 +19,7 @@ export default function SimulationPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const { userData } = useAuth();
   const { startSession } = useGameSession();
   
   // Authentication hook
@@ -37,6 +40,11 @@ export default function SimulationPage() {
     try {
       // Start game session tracking
       await startSession('simulation');
+      
+      // Update user stats when game starts (count games on start, not end)
+      console.log(`📊 Updating user stats for game start: simulation`);
+      await updateUserStatsOnGameStart(userData.uid, 'simulation');
+      console.log(`✅ User stats updated for game start`);
     } catch (sessionError) {
       console.error('Error starting session:', sessionError);
     }

@@ -156,7 +156,7 @@ export default function ForensicAuditSimulationClientPage() {
           }
           
           const totalScore = calculateForensicScore(data.cfoScore, data.outcome);
-          const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+          const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
           
           try {
             await handleGameEnd(caseSolved, totalScore);

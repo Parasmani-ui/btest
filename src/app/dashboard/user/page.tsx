@@ -8,10 +8,10 @@ import { getUserGames } from '@/lib/firestore';
 import { UserStats } from '@/types/user';
 import { useUserDataRefresh } from '@/hooks/useUserDataRefresh';
 import Link from 'next/link';
-import { 
-  UserIcon, 
-  GamepadIcon, 
-  TrophyIcon, 
+import {
+  UserIcon,
+  GamepadIcon,
+  TrophyIcon,
   ClockIcon,
   TrendingUpIcon,
   ActivityIcon,
@@ -20,8 +20,7 @@ import {
   BookOpenIcon,
   AlertTriangleIcon,
   NewspaperIcon,
-  LinkIcon,
-  DownloadIcon
+  LinkIcon
 } from 'lucide-react';
 
 export default function UserDashboardPage() {
@@ -169,29 +168,6 @@ export default function UserDashboardPage() {
     }
   };
 
-  const exportToCSV = () => {
-    if (!userStats) return;
-    
-    const csvData = [
-      ['Game Type', 'Sessions', 'Playtime (minutes)', 'Average Score'],
-      ...Object.entries(userStats.gameTypeBreakdown).map(([type, data]) => [
-        getGameTypeName(type),
-        data.sessions.toString(),
-        data.playtime.toString(),
-        data.averageScore.toFixed(2)
-      ])
-    ];
-    
-    const csvContent = csvData.map(row => row.join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${userData?.displayName}_game_stats.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
   if (loading) {
     return (
       <ProtectedRoute>
@@ -257,13 +233,6 @@ export default function UserDashboardPage() {
                 >
                   <TrendingUpIcon className={`w-5 h-5 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
                   {isRefreshing ? 'Refreshing...' : 'Refresh'}
-                </button>
-                <button
-                  onClick={exportToCSV}
-                  className="inline-flex items-center px-4 py-2 bg-blue-800 bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
-                >
-                  <DownloadIcon className="w-5 h-5 mr-2" />
-                  Export CSV
                 </button>
                 <Link
                   href="/"
@@ -336,8 +305,8 @@ export default function UserDashboardPage() {
                 <h2 className="text-lg font-semibold text-white">Recent Sessions</h2>
               </div>
               <div className="p-6">
-                <div className="space-y-4">
-                  {userStats?.recentSessions.slice(0, 5).map((session) => (
+                <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                  {userStats?.recentSessions.map((session) => (
                     <div key={session.id} className="flex items-start space-x-3">
                       <div className={`w-2 h-2 rounded-full mt-2 ${session.caseSolved ? 'bg-green-500' : 'bg-gray-500'}`}></div>
                       <div className="flex-1 min-w-0">

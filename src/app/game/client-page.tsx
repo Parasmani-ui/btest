@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,6 +13,9 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { TextAnimate } from "@/components/magicui/text-animate";
 
 import { useGameSession } from '@/lib/gameSession';
+import { updateUserStatsOnGameStart } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 import GameHeader from '@/components/ui/GameHeader';
 
 interface GameState {
@@ -46,7 +49,8 @@ export default function GameContent() {
   const router = useRouter();
   const mode = 'quick';
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const { startSession, endSession, addEvidence, addAction, incrementHints, getCurrentSession } = useGameSession();
+  const { userData } = useAuth();
+  const { startSession, endSession, updateSession, addEvidence, addAction, incrementHints, getCurrentSession } = useGameSession();
   const [gameState, setGameState] = useState<GameState>({
     started: false,
     mode: null,
@@ -72,6 +76,7 @@ export default function GameContent() {
   const [showGuide, setShowGuide] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [sessionInfo, setSessionInfo] = useState(getCurrentSession());
+  const hasStartedRef = useRef(false); // Prevent duplicate game starts
 
   // Update session info periodically
   useEffect(() => {
@@ -84,7 +89,15 @@ export default function GameContent() {
 
   // start new game
   const startGame = useCallback(async () => {
+    // Prevent duplicate calls
+    if (hasStartedRef.current) {
+      console.log('⚠️ Game already started, skipping duplicate call');
+      return;
+    }
+
+    hasStartedRef.current = true;
     setLoading(true);
+
     try {
       const response = await fetch('/api/start-game', {
         method: 'POST',
@@ -97,10 +110,17 @@ export default function GameContent() {
       }
 
       const data = await response.json();
-      
+
       // Start game session tracking AFTER AI response is received
       await startSession('quick');
-      
+
+      // Update user stats when game starts (count games on start, not end)
+      if (userData?.uid) {
+        console.log(`📊 Updating user stats for game start: quick`);
+        await updateUserStatsOnGameStart(userData.uid, 'quick');
+        console.log(`✅ User stats updated for game start`);
+      }
+
       setGameState(prevState => ({
         ...prevState,
         started: true,
@@ -120,15 +140,18 @@ export default function GameContent() {
     } catch (error) {
       console.error('Error starting game:', error);
       alert('Something went wrong. Please try again.');
+      hasStartedRef.current = false; // Reset on error
     } finally {
       setLoading(false);
     }
-  }, [startSession]);
+  }, [startSession, userData]);
 
   // Start game when component is mounted
   useEffect(() => {
-    startGame();
-  }, []);
+    if (!hasStartedRef.current) {
+      startGame();
+    }
+  }, [startGame]);
 
   // Cleanup session on component unmount or page leave
   useEffect(() => {
@@ -295,25 +318,51 @@ export default function GameContent() {
       console.log('Arrest API response:', data); // Debug logging
       
       if (data.success) {
-        // Calculate score based on correctness and efficiency
+        // Calculate 3-parameter score for detective simulation
         const isCorrect = data.correctSuspectIdentified;
-        const baseScore = isCorrect ? 100 : 0;
-        const evidenceBonus = gameState.analyzedEvidence.length * 5; // 5 points per evidence analyzed
-        const interrogationBonus = gameState.interrogatedSuspects.length * 3; // 3 points per suspect interrogated
-        const hintsUsed = gameState.currentHint + 1;
-        const hintPenalty = hintsUsed * 2; // 2 points penalty per hint used
+        const gameContent = `${gameState.caseDetails} Evidence: ${gameState.analyzedEvidence.join(', ')} Suspects: ${gameState.interrogatedSuspects.join(', ')} Result: ${data.reasoning}`;
         
-        const finalScore = Math.max(0, baseScore + evidenceBonus + interrogationBonus - hintPenalty);
+        const score = calculateSimulationScore('DETECTIVE_SIMULATION', gameContent, {
+          correct: isCorrect,
+          evidenceAnalyzed: gameState.analyzedEvidence.length,
+          suspectsInterrogated: gameState.interrogatedSuspects.length,
+          hintsUsed: gameState.currentHint + 1
+        });
+        
+        const finalScore = score.overall;
         
         // Capture elapsed time before ending session
         const finalElapsedMinutes = sessionInfo.timeSpent;
         const minutes = Math.floor(finalElapsedMinutes);
         const seconds = Math.floor((finalElapsedMinutes % 1) * 60);
         const finalElapsedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
+
+        // Save analysis data to game session before ending
+        try {
+          await updateSession({
+            analysis: data.reasoning || data.explanation,
+            caseTitle: gameState.caseDetails.substring(0, 100) || 'Quick Investigation',
+            scoreBreakdown: data.scores ? {
+              parameter1: data.scores.criticalThinking || data.scores.parameter1,
+              parameter1Name: 'Critical Thinking',
+              parameter2: data.scores.evidenceAnalysis || data.scores.parameter2,
+              parameter2Name: 'Evidence Analysis',
+              parameter3: data.scores.intuition || data.scores.parameter3,
+              parameter3Name: 'Intuition',
+              overall: data.scores.overall,
+              summary: data.scores.summary
+            } : undefined,
+            correctAnswer: data.correctSuspect,
+            userAnswer: suspect
+          });
+          console.log('✅ Analysis data saved to game session');
+        } catch (error) {
+          console.error('❌ Error saving analysis data:', error);
+        }
+
         // End the game session
         await endSession(isCorrect, finalScore);
-        
+
         setGameState(prev => ({
           ...prev,
           gameOver: true,

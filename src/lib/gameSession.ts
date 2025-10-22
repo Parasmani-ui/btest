@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { createGameSession, updateGameSession, updateUserStatsAfterGame } from '@/lib/firestore';
+import { createGameSession, updateGameSession, updateUserStatsAfterGame, updateUserStatsOnGameStart } from '@/lib/firestore';
 import { GameSession } from '@/types/user';
 
 // Game session manager class
@@ -10,6 +10,7 @@ export class GameSessionManager {
   private gameType: string | null = null;
   private userId: string | null = null;
   private organizationId: string | null | undefined = null;
+  private isCreatingSession: boolean = false; // Lock to prevent duplicate creation
 
   private constructor() {}
 
@@ -27,8 +28,28 @@ export class GameSessionManager {
     organizationId?: string | null
   ): Promise<string> {
     try {
+      // Prevent duplicate session creation
+      if (this.isCreatingSession) {
+        console.log(`⏳ Session creation already in progress, skipping duplicate call`);
+        // Wait for the current session creation to complete
+        while (this.isCreatingSession) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        if (this.currentSession) {
+          console.log(`✅ Returning existing session: ${this.currentSession}`);
+          return this.currentSession;
+        }
+      }
+
+      // If session already exists for this game type, return it
+      if (this.currentSession && this.gameType === gameType && this.userId === userId) {
+        console.log(`✅ Session already exists: ${this.currentSession}`);
+        return this.currentSession;
+      }
+
+      this.isCreatingSession = true;
       console.log(`🎮 Starting new game session: ${gameType} for user ${userId}`);
-      
+
       // End any existing session first
       if (this.currentSession) {
         console.log(`⚠️  Ending existing session: ${this.currentSession}`);
@@ -57,6 +78,7 @@ export class GameSessionManager {
 
       this.currentSession = await createGameSession(sessionData);
       console.log(`✅ Game session started successfully: ${this.currentSession} for ${gameType}`);
+
       return this.currentSession;
     } catch (error) {
       console.error('❌ Error starting game session:', error);
@@ -67,6 +89,8 @@ export class GameSessionManager {
       this.userId = null;
       this.organizationId = null;
       throw error;
+    } finally {
+      this.isCreatingSession = false;
     }
   }
 
@@ -76,6 +100,12 @@ export class GameSessionManager {
     actions?: string[];
     hints?: number;
     score?: number;
+    analysis?: string;
+    caseTitle?: string;
+    scoreBreakdown?: any;
+    userDecisions?: any;
+    correctAnswer?: string;
+    userAnswer?: string;
   }): Promise<void> {
     if (!this.currentSession) {
       console.warn('No active session to update');
@@ -250,6 +280,12 @@ export function useGameSession() {
     actions?: string[];
     hints?: number;
     score?: number;
+    analysis?: string;
+    caseTitle?: string;
+    scoreBreakdown?: any;
+    userDecisions?: any;
+    correctAnswer?: string;
+    userAnswer?: string;
   }) => {
     await sessionManager.updateSession(updates);
   };

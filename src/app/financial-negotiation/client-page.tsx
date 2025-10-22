@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 import { useAuth } from '@/contexts/AuthContext';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 // Define props for the component
 interface FinancialNegotiationClientProps {
@@ -117,9 +118,9 @@ const FinancialNegotiationClient: React.FC<FinancialNegotiationClientProps> = ({
         setSessionStarted(true);
         setCurrentElapsedTime('0m 0s'); // Initialize timer
         onSessionStart?.(startTime); // Notify parent of session start
-        console.log('✅ Financial negotiation simulation session started when scenario loaded');
+        console.log('✅ Financial Investigation simulation session started when scenario loaded');
       }).catch(error => {
-        console.error('❌ Error starting financial negotiation session:', error);
+        console.error('❌ Error starting Financial Investigation session:', error);
       });
     }
   }, [simulationText, sessionStarted]);
@@ -359,13 +360,13 @@ const FinancialNegotiationClient: React.FC<FinancialNegotiationClientProps> = ({
           // End game session when simulation completes
           const finalMessagesForScoring = [...newMessages, aiMessage];
           const totalScore = calculateFinancialScore(finalMessagesForScoring, currentTurn);
-          const caseSolved = totalScore >= 70;
+          const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
           
           try {
             await handleGameEnd(caseSolved, totalScore);
-            console.log('✅ Financial negotiation simulation stats updated successfully');
+            console.log('✅ Financial Investigation simulation stats updated successfully');
           } catch (error) {
-            console.error('❌ Error updating financial negotiation simulation stats:', error);
+            console.error('❌ Error updating Financial Investigation simulation stats:', error);
           }
         } else {
           // Increment turn for next round
@@ -377,11 +378,11 @@ const FinancialNegotiationClient: React.FC<FinancialNegotiationClientProps> = ({
           setHintUsed(false);
         }
       } else {
-        console.error('Failed to get response from financial negotiation simulation API');
+        console.error('Failed to get response from Financial Investigation simulation API');
         setMessages(prev => [...prev, {role: 'assistant', content: 'Sorry, there was an error processing your request.'}]);
       }
     } catch (error) {
-      console.error('Error in financial negotiation simulation:', error);
+      console.error('Error in Financial Investigation simulation:', error);
       setMessages(prev => [...prev, {role: 'assistant', content: 'Sorry, an unexpected error occurred.'}]);
     } finally {
       setIsThinking(false);
@@ -483,12 +484,12 @@ const FinancialNegotiationClient: React.FC<FinancialNegotiationClientProps> = ({
         sessionInitialized.current = true;
         onSessionStart?.(startTime);
         
-        console.log('✅ New financial negotiation case started');
+        console.log('✅ New Financial Investigation case started');
       } else {
-        console.error('Failed to generate new financial negotiation case');
+        console.error('Failed to generate new Financial Investigation case');
       }
     } catch (error) {
-      console.error('Error generating new financial negotiation case:', error);
+      console.error('Error generating new Financial Investigation case:', error);
     } finally {
       setIsGeneratingNewCase(false);
     }
@@ -584,37 +585,19 @@ const FinancialNegotiationClient: React.FC<FinancialNegotiationClientProps> = ({
     }
   };
 
-  // Calculate score for financial investigation simulation
+  // Calculate 3-parameter score for financial forensic simulation
   const calculateFinancialScore = (messages: {role: string, content: string}[], currentTurn: number): number => {
     const finalMessage = messages[messages.length - 1];
     if (finalMessage?.content) {
-      const scoreMatch = finalMessage.content.match(/Final Score[:\s]+(\d+)/i);
-      if (scoreMatch) {
-        return parseInt(scoreMatch[1]);
-      }
+      // Use the new 3-parameter scoring system
+      const score = calculateSimulationScore('FINANCIAL_FORENSIC_SIMULATION', finalMessage.content, null, messages);
+      return score.overall;
     }
     
-    // Fallback scoring logic if no explicit score is found
+    // Fallback scoring logic if no content is found
     const maxTurns = 5;
     const completionBonus = (currentTurn / maxTurns) * 60; // Up to 60% for completion
-    let score = completionBonus;
-    
-    if (finalMessage?.content) {
-        const content = finalMessage.content.toLowerCase();
-        const positiveIndicators = ['thorough', 'detailed investigation', 'professional', 'accurate', 'compliant', 'well-documented'];
-        const negativeIndicators = ['insufficient', 'incomplete', 'rushed', 'unprofessional', 'missed'];
-        
-        let positiveCount = 0;
-        let negativeCount = 0;
-        
-        positiveIndicators.forEach(indicator => { if (content.includes(indicator)) positiveCount++; });
-        negativeIndicators.forEach(indicator => { if (content.includes(indicator)) negativeCount++; });
-        
-        const qualityScore = Math.max(0, (positiveCount - negativeCount) * 8);
-        score += Math.min(40, qualityScore); // Max 40% for quality
-    }
-    
-    return Math.min(100, Math.max(0, Math.round(score)));
+    return Math.min(100, Math.max(0, Math.round(completionBonus)));
   };
 
   const getThemeColors = () => {

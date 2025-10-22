@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
 import { useAuth } from '@/contexts/AuthContext';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 // Define props for the component
 interface NegotiationSimulationClientProps {
@@ -360,7 +361,7 @@ const NegotiationSimulationClient: React.FC<NegotiationSimulationClientProps> = 
           // End game session when simulation completes
           const finalMessagesForScoring = [...newMessages, aiMessage];
           const totalScore = calculateNegotiationScore(finalMessagesForScoring, currentTurn);
-          const caseSolved = totalScore >= 70;
+          const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
           
           try {
             await handleGameEnd(caseSolved, totalScore);
@@ -551,37 +552,19 @@ const NegotiationSimulationClient: React.FC<NegotiationSimulationClientProps> = 
     onStartNewCase();
   };
 
-  // Calculate score for negotiation simulation
+  // Calculate 3-parameter score for negotiation simulation
   const calculateNegotiationScore = (messages: {role: string, content: string}[], currentTurn: number): number => {
     const finalMessage = messages[messages.length - 1];
     if (finalMessage?.content) {
-      const scoreMatch = finalMessage.content.match(/Final Score[:\s]+(\d+)/i);
-      if (scoreMatch) {
-        return parseInt(scoreMatch[1]);
-      }
+      // Use the new 3-parameter scoring system
+      const score = calculateSimulationScore('NEGOTIATION_SIMULATION', finalMessage.content, null, messages);
+      return score.overall;
     }
     
-    // Fallback scoring logic if no explicit score is found
+    // Fallback scoring logic if no content is found
     const maxTurns = 5;
     const completionBonus = (currentTurn / maxTurns) * 60; // Up to 60% for completion
-    let score = completionBonus;
-    
-    if (finalMessage?.content) {
-        const content = finalMessage.content.toLowerCase();
-        const positiveIndicators = ['win-win', 'mutual benefit', 'agreement', 'successful', 'effective', 'solution', 'beneficial'];
-        const negativeIndicators = ['failed', 'deadlock', 'breakdown', 'unsuccessful', 'rejected'];
-        
-        let positiveCount = 0;
-        let negativeCount = 0;
-        
-        positiveIndicators.forEach(indicator => { if (content.includes(indicator)) positiveCount++; });
-        negativeIndicators.forEach(indicator => { if (content.includes(indicator)) negativeCount++; });
-        
-        const qualityScore = Math.max(0, (positiveCount - negativeCount) * 8);
-        score += Math.min(40, qualityScore); // Max 40% for quality
-    }
-    
-    return Math.min(100, Math.max(0, Math.round(score)));
+    return Math.min(100, Math.max(0, Math.round(completionBonus)));
   };
 
   const getThemeColors = () => {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { HOSPITAL_CRISIS_SIMULATION_PROMPT } from '@/utils/prompts';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 export const maxDuration = 60;
 
@@ -47,7 +48,15 @@ export async function POST(request: NextRequest) {
     // Create the user message based on input
     let userMessage = "";
     if (isRound10Complete) {
-      userMessage = "exit and provide a performance evaluation";
+      userMessage = `exit and provide a comprehensive performance evaluation that includes:
+
+**Final Scores:**
+Leadership: [score]/10
+Resource Management: [score]/10
+Decision Clarity: [score]/10
+Overall Outcome: [summary outcome]
+
+Provide detailed feedback on the user's performance across all 10 rounds.`;
     } else {
       userMessage = userInput;
     }
@@ -83,17 +92,51 @@ export async function POST(request: NextRequest) {
       });
 
       const responseText = completion.choices[0]?.message?.content;
-      
+
       if (!responseText) {
         console.log('No response text in API response');
-        return NextResponse.json({ 
-          error: 'Failed to generate response' 
+        return NextResponse.json({
+          error: 'Failed to generate response'
         }, { status: 500 });
       }
-      
+
+      // If it's round 10 (final round), calculate the 3-parameter scores
+      let scoreData = null;
+      let formattedScores = null;
+      if (isRound10Complete) {
+        // Calculate scores using centralized scoring system
+        const calculatedScores = calculateSimulationScore(
+          'HOSPITAL_CRISIS_SIMULATION',
+          responseText,
+          {
+            messages: messages.length,
+            roundsCompleted: currentRound
+          },
+          messages
+        );
+
+        // Format the scores for display
+        formattedScores = formatFinalScores(calculatedScores, 'HOSPITAL_CRISIS_SIMULATION');
+
+        scoreData = {
+          parameter1: calculatedScores.parameter1,
+          parameter2: calculatedScores.parameter2,
+          parameter3: calculatedScores.parameter3,
+          overall: calculatedScores.overall,
+          summary: calculatedScores.summary,
+          // Legacy compatibility
+          leadership: calculatedScores.parameter1,
+          resourceManagement: calculatedScores.parameter2,
+          decisionClarity: calculatedScores.parameter3
+        };
+      }
+
       // Return the response in the format the client expects
-      return NextResponse.json({ 
-        response: responseText 
+      return NextResponse.json({
+        response: responseText,
+        isComplete: isRound10Complete,
+        score: scoreData,
+        formattedScores: formattedScores
       });
     } catch (apiError) {
       console.error('API Error:', apiError);

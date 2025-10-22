@@ -63,8 +63,10 @@ caseCache.json
 .cache/
 
 # Setup and test scripts (but allow utility scripts)
-scripts/setupAuthUsers.js
-scripts/setupTestData.js
+
+
+scripfiles
+scripfiles/
 
 # IDE and Editor files
 .vscode/

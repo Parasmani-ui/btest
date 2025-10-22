@@ -121,7 +121,7 @@ export async function getUserGames(uid: string): Promise<UserStats> {
       gamesPlayed,
       casesCompleted,
       averageScore,
-      recentSessions: sessions.slice(0, 10), // Last 10 sessions
+      recentSessions: sessions, // All sessions (removed 10 limit)
       gameTypeBreakdown
     };
 
@@ -397,7 +397,7 @@ export async function updateGameSession(sessionId: string, updates: Partial<Game
       }
       return acc;
     }, {} as any);
-    
+
     await updateDoc(doc(db, 'gameSessions', sessionId), cleanedUpdates);
   } catch (error) {
     console.error('Error updating game session:', error);
@@ -405,22 +405,59 @@ export async function updateGameSession(sessionId: string, updates: Partial<Game
   }
 }
 
-// Update user stats after a game session ends - IMPROVED VERSION WITH TRANSACTION
-export async function updateUserStatsAfterGame(
+// Get user's game session history (last N sessions)
+export async function getUserGameHistory(userId: string, maxResults: number = 10): Promise<GameSession[]> {
+  try {
+    const sessionsRef = collection(db, 'gameSessions');
+
+    // Simplified query - doesn't require composite index
+    // We filter for completed sessions in code instead of query
+    const q = query(
+      sessionsRef,
+      where('userId', '==', userId),
+      orderBy('startedAt', 'desc'),
+      limit(maxResults * 2) // Fetch more to account for filtering
+    );
+
+    const querySnapshot = await getDocs(q);
+    const sessions: GameSession[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      // Filter out incomplete sessions (those without endedAt)
+      if (data.endedAt) {
+        sessions.push({
+          id: doc.id,
+          ...data
+        } as GameSession);
+      }
+    });
+
+    // Sort by endedAt in descending order and limit results
+    return sessions
+      .sort((a, b) => {
+        const dateA = new Date(a.endedAt || 0).getTime();
+        const dateB = new Date(b.endedAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, maxResults);
+  } catch (error) {
+    console.error('Error fetching user game history:', error);
+    throw error;
+  }
+}
+
+// Update user stats when a game session starts - SIMPLE: COUNT GAMES ON START
+export async function updateUserStatsOnGameStart(
   userId: string, 
-  gameType: string, 
-  caseSolved: boolean, 
-  score: number, 
-  duration: number
+  gameType: string
 ): Promise<void> {
   try {
-    console.log(`🎯 Updating user stats for ${userId}: game=${gameType}, solved=${caseSolved}, score=${score}, duration=${duration}m`);
+    console.log(`🎮 Game started: ${userId}, game=${gameType}`);
     
     const userDocRef = doc(db, 'users', userId);
     
-    // Use runTransaction to prevent race conditions
     await runTransaction(db, async (transaction) => {
-      // Read current user data within transaction
       const userDoc = await transaction.get(userDocRef);
       
       if (!userDoc.exists()) {
@@ -429,61 +466,100 @@ export async function updateUserStatsAfterGame(
       
       const userData = userDoc.data() as UserData;
       
-      // Calculate new values
-      const currentGamesPlayed = (userData.gamesPlayed || 0) + 1;
-      const currentCasesCompleted = (userData.casesCompleted || 0) + (caseSolved ? 1 : 0);
-      const currentTotalPlaytime = (userData.totalPlaytime || 0) + duration;
+      // SIMPLE: Just increment games played
+      const newGamesPlayed = (userData.gamesPlayed || 0) + 1;
       
-      // Calculate new overall average score
-      const currentAverageScore = userData.averageScore || 0;
-      const previousGamesPlayed = userData.gamesPlayed || 0;
-      const totalPreviousScore = currentAverageScore * previousGamesPlayed;
-      const newAverageScore = previousGamesPlayed > 0 
-        ? (totalPreviousScore + score) / currentGamesPlayed
-        : score;
-
-      // Get current game type performance
+      // Update game type played count
       const gameTypePerformance = userData.gameTypePerformance || {};
-      const currentGameTypeStats = gameTypePerformance[gameType] || {
-        played: 0,
-        solved: 0,
-        averageScore: 0
-      };
-
-      // Calculate new game type stats
+      const currentGameTypeStats = gameTypePerformance[gameType] || { played: 0, solved: 0, averageScore: 0 };
       const newGameTypePlayed = currentGameTypeStats.played + 1;
-      const newGameTypeSolved = currentGameTypeStats.solved + (caseSolved ? 1 : 0);
-      const previousGameTypeTotal = currentGameTypeStats.averageScore * currentGameTypeStats.played;
-      const newGameTypeAverageScore = currentGameTypeStats.played > 0
-        ? (previousGameTypeTotal + score) / newGameTypePlayed
-        : score;
 
-      // Prepare the update data
-      const updateData = {
-        gamesPlayed: currentGamesPlayed,
-        casesCompleted: currentCasesCompleted,
-        totalPlaytime: currentTotalPlaytime,
-        averageScore: newAverageScore,
+      transaction.update(userDocRef, {
+        gamesPlayed: newGamesPlayed,
         gameTypePerformance: {
           ...gameTypePerformance,
           [gameType]: {
             played: newGameTypePlayed,
+            solved: currentGameTypeStats.solved,
+            averageScore: currentGameTypeStats.averageScore
+          }
+        },
+        lastUpdated: new Date().toISOString()
+      });
+      
+      console.log(`✅ Games played: ${newGamesPlayed}, ${gameType} played: ${newGameTypePlayed}`);
+    });
+    
+  } catch (error) {
+    console.error('❌ Error updating game start stats:', error);
+    throw error;
+  }
+}
+
+// Update user stats after a game session ends - SIMPLE: COUNT CASES SOLVED ON ANY SCORE
+export async function updateUserStatsAfterGame(
+  userId: string, 
+  gameType: string, 
+  caseSolved: boolean, 
+  score: number, 
+  duration: number
+): Promise<void> {
+  try {
+    console.log(`🎯 Game ended: ${userId}, game=${gameType}, score=${score}`);
+    
+    const userDocRef = doc(db, 'users', userId);
+    
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userDocRef);
+      
+      if (!userDoc.exists()) {
+        throw new Error('User document does not exist');
+      }
+      
+      const userData = userDoc.data() as UserData;
+      
+      // SIMPLE: Count as solved if ANY score (0-100)
+      const isSolved = score >= 0;
+      const newCasesCompleted = (userData.casesCompleted || 0) + (isSolved ? 1 : 0);
+      const newTotalPlaytime = (userData.totalPlaytime || 0) + duration;
+      
+      // Calculate new average score
+      const currentGamesPlayed = userData.gamesPlayed || 0;
+      const currentAverageScore = userData.averageScore || 0;
+      const totalPreviousScore = currentAverageScore * (currentGamesPlayed - 1);
+      const newAverageScore = currentGamesPlayed > 1 
+        ? (totalPreviousScore + score) / currentGamesPlayed
+        : score;
+
+      // Update game type stats
+      const gameTypePerformance = userData.gameTypePerformance || {};
+      const currentGameTypeStats = gameTypePerformance[gameType] || { played: 0, solved: 0, averageScore: 0 };
+      const newGameTypeSolved = currentGameTypeStats.solved + (isSolved ? 1 : 0);
+      const gameTypeTotalScore = currentGameTypeStats.averageScore * currentGameTypeStats.played;
+      const newGameTypeAverageScore = currentGameTypeStats.played > 0
+        ? (gameTypeTotalScore + score) / currentGameTypeStats.played
+        : score;
+
+      transaction.update(userDocRef, {
+        casesCompleted: newCasesCompleted,
+        totalPlaytime: newTotalPlaytime,
+        averageScore: newAverageScore,
+        gameTypePerformance: {
+          ...gameTypePerformance,
+          [gameType]: {
+            played: currentGameTypeStats.played, // Keep existing played count
             solved: newGameTypeSolved,
             averageScore: newGameTypeAverageScore
           }
         },
         lastUpdated: new Date().toISOString()
-      } as Partial<UserData>;
-
-      // Perform the atomic update
-      transaction.update(userDocRef, updateData);
+      });
       
-      console.log(`✅ Transaction prepared for ${userId}: games=${currentGamesPlayed}, cases=${currentCasesCompleted}, avgScore=${newAverageScore.toFixed(1)}`);
+      console.log(`✅ Cases solved: ${newCasesCompleted}, playtime: ${newTotalPlaytime}m, avg: ${newAverageScore.toFixed(1)}`);
     });
     
-    console.log(`🎉 User stats updated successfully for ${userId}`);
   } catch (error) {
-    console.error('❌ Error updating user stats:', error);
+    console.error('❌ Error updating game end stats:', error);
     throw error;
   }
 } 

@@ -11,6 +11,7 @@ import { TextAnimate } from '@/components/magicui/text-animate';
 import { useRouter } from 'next/navigation';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession } from '@/lib/gameSession';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 interface SimulationClientProps {
   simulationText: string;
@@ -188,8 +189,8 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
         }
         
         // End game session when simulation completes
-        const totalScore = calculateSimulationScore(data.analysis, conclusionState);
-        const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
+        const totalScore = calculatePOSHScore(data.analysis, conclusionState);
+        const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
         
         try {
           await handleGameEnd(caseSolved, totalScore);
@@ -514,24 +515,14 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
     );
   }
   
-  // Calculate score for complex simulation
-  const calculateSimulationScore = (analysis: string, conclusions: ConclusionState): number => {
-    let score = 50; // Base score
+  // Calculate 3-parameter score for POSH simulation
+  const calculatePOSHScore = (analysis: string, conclusions: ConclusionState): number => {
+    // Combine analysis and conclusions into a single content string for scoring
+    const content = `${analysis || ''} ${conclusions.text || ''} ${conclusions.responsibleParty || ''} ${conclusions.misconductType || ''} ${conclusions.primaryMotivation || ''}`;
     
-    // Score based on correct selections
-    if (conclusions.responsibleParty) score += 15;
-    if (conclusions.misconductType) score += 15;
-    if (conclusions.primaryMotivation) score += 15;
-    if (conclusions.text && conclusions.text.length > 50) score += 5;
-    
-    // Check analysis for quality indicators
-    if (analysis) {
-      const analysisLower = analysis.toLowerCase();
-      if (analysisLower.includes('correct') || analysisLower.includes('accurate')) score += 10;
-      if (analysisLower.includes('excellent') || analysisLower.includes('thorough')) score += 5;
-    }
-    
-    return Math.min(100, score);
+    // Use the new 3-parameter scoring system for POSH
+    const score = calculateSimulationScore('POSH_SIMULATION', content, conclusions);
+    return score.overall;
   };
   
   return (

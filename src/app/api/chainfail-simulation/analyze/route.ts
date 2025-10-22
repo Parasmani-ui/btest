@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 export const maxDuration = 60;
 
@@ -46,18 +47,20 @@ export async function POST(request: NextRequest) {
         - Preventive Action Recommendation: ${userDecisions.preventiveAction}
         - Responsible Party Assessment: ${userDecisions.responsibleParty}
 
-        Please provide a comprehensive analysis that:
-        1. Evaluates the accuracy of the root cause identification
+        Please provide a comprehensive analysis that MUST include:
 
-        2. Explains the correct primary cause with supporting evidence
+        **Final Scores:**
+        Technical Analysis: [score]/10
+        Safety Awareness: [score]/10
+        Preventive Planning: [score]/10
+        Overall Outcome: [summary outcome]
 
-        3. Assesses the appropriateness of the preventive action recommendation
-
-        4. Highlights key learning points about industrial safety investigation
-
-        5. Provides a score out of 10 based on investigation accuracy
-        
-        6. Offers constructive feedback for improvement in accident analysis
+        Then provide:
+        1. Evaluation of the accuracy of the root cause identification
+        2. Explanation of the correct primary cause with supporting evidence
+        3. Assessment of the appropriateness of the preventive action recommendation
+        4. Key learning points about industrial safety investigation
+        5. Constructive feedback for improvement in accident analysis
 
         Use simple, clear language without any special formatting symbols. Write in a professional but accessible tone that helps the user learn proper accident investigation techniques. NO extra line breaks or spacing between paragraphs.
       `;
@@ -97,9 +100,40 @@ export async function POST(request: NextRequest) {
     // Clean the analysis content before sending to client
     const cleanedResponse = cleanAnalysisContent(response);
 
+    // Calculate 3-parameter scores for final judgment
+    let scoreData = null;
+    let formattedScores = null;
+    if (analysisType === 'final_judgment') {
+      // Calculate scores using centralized scoring system
+      const calculatedScores = calculateSimulationScore(
+        'CHAINFAIL_SIMULATION',
+        cleanedResponse,
+        {
+          userDecisions
+        }
+      );
+
+      // Format the scores for display
+      formattedScores = formatFinalScores(calculatedScores, 'CHAINFAIL_SIMULATION');
+
+      scoreData = {
+        parameter1: calculatedScores.parameter1,
+        parameter2: calculatedScores.parameter2,
+        parameter3: calculatedScores.parameter3,
+        overall: calculatedScores.overall,
+        summary: calculatedScores.summary,
+        // Legacy compatibility
+        technicalAnalysis: calculatedScores.parameter1,
+        safetyAwareness: calculatedScores.parameter2,
+        preventivePlanning: calculatedScores.parameter3
+      };
+    }
+
     return NextResponse.json({
       success: true,
       analysis: cleanedResponse,
+      score: scoreData,
+      formattedScores: formattedScores
     });
 
   } catch (error) {

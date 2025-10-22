@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ResponsibleParty, MisconductType, PrimaryMotivation, SimulationData } from '@/types/simulation';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 export const maxDuration = 60; // Set maxDuration to 60 seconds (if using Edge runtime)
 
@@ -231,14 +232,49 @@ function generateAnalysis(
     accuracyColor = 'text-red-500';
   }
   
-  // Build the analysis HTML
+  // Calculate 3-parameter scores using centralized scoring system
+  const performanceContent = `
+POSH Investigation Report:
+- Responsible Party Assessment: ${responsibleCorrect ? 'Correct' : 'Incorrect'}
+- Misconduct Type Assessment: ${misconductCorrect ? 'Correct' : 'Incorrect'}
+- Motivation Assessment: ${motivationCorrect ? 'Correct' : 'Incorrect'}
+- Overall Accuracy: ${scorePercentage}%
+
+User demonstrated ${responsibleCorrect ? 'strong awareness' : 'limited awareness'} of organizational dynamics.
+User showed ${misconductCorrect ? 'good decision integrity' : 'needs improvement in decision integrity'} in identifying misconduct.
+User exhibited ${motivationCorrect ? 'high sensitivity' : 'needs better sensitivity'} to underlying motivations.
+  `.trim();
+
+  const calculatedScores = calculateSimulationScore(
+    'POSH_SIMULATION',
+    performanceContent,
+    {
+      responsibleCorrect,
+      misconductCorrect,
+      motivationCorrect,
+      totalCorrect,
+      scorePercentage
+    }
+  );
+
+  // Build the analysis HTML with 3-parameter scoring
   let analysisHtml = `
     <div class="space-y-4">
+      <div class="mb-6">
+        <h4 class="text-lg font-bold mb-2">Final Scores</h4>
+        <div class="bg-gray-100 p-4 rounded-lg">
+          <p><strong>Awareness:</strong> ${calculatedScores.parameter1}/10</p>
+          <p><strong>Decision Integrity:</strong> ${calculatedScores.parameter2}/10</p>
+          <p><strong>Sensitivity:</strong> ${calculatedScores.parameter3}/10</p>
+          <p><strong>Overall Outcome:</strong> ${calculatedScores.summary}</p>
+        </div>
+      </div>
+
       <div class="mb-6">
         <h4 class="text-lg font-bold mb-2">Analysis Summary</h4>
         <p>Your conclusion accuracy is: <span class="${accuracyColor} font-bold">${accuracyLevel} (${scorePercentage}%)</span></p>
       </div>
-      
+
       <div class="mb-4">
         <h4 class="text-lg font-bold mb-2">Your Selections</h4>
         <ul class="list-disc pl-5 space-y-1">

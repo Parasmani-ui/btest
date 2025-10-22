@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { NEGOTIATION_SIMULATION_PROMPTS } from '@/utils/prompts';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 export const maxDuration = 60;
 
@@ -70,13 +71,18 @@ Current turn: ${currentTurn}/5
 
 ${isFinalTurn ? `
 This is the final turn. Provide a comprehensive performance evaluation that includes:
-1. Assessment of the user's negotiation approach
-2. Scores for each dimension in the scoring matrix (out of 10)
-3. Overall outcome classification
-4. Specific feedback on what they did well and areas for improvement
-5. Final recommendation or negotiation result
 
-Format the evaluation clearly with sections and scores.
+**Final Scores:**  
+Assertiveness: [score]/10  
+Data-Driven Arguments: [score]/10  
+Empathy/Relationship Maintenance: [score]/10  
+Overall Outcome: [summary outcome]
+
+1. Assessment of the user's negotiation approach
+2. Specific feedback on what they did well and areas for improvement
+3. Final recommendation or negotiation result
+
+Format the evaluation clearly with the scoring section first, followed by detailed feedback.
 ` : `
 Continue the negotiation scenario. Respond as the other party in the negotiation, then present the next situation with 4 new dialogue options (A, B, C, D) for turn ${currentTurn + 1}.
 
@@ -123,17 +129,41 @@ ${messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
         throw new Error('No response generated from OpenAI');
       }
 
-      // If it's the final turn, try to extract scoring information
+      // If it's the final turn, calculate the 3-parameter scores
       let scoreData = null;
+      let formattedScores = null;
       if (isFinalTurn) {
-        scoreData = extractScoreFromResponse(response, selectedScenario.SCORING_MATRIX);
+        // Calculate scores using centralized scoring system
+        const calculatedScores = calculateSimulationScore(
+          'NEGOTIATION_SIMULATION',
+          response,
+          {
+            messages: messages.length,
+            turnsCompleted: currentTurn
+          },
+          messages
+        );
+
+        // Format the scores for display
+        formattedScores = formatFinalScores(calculatedScores, 'NEGOTIATION_SIMULATION');
+
+        scoreData = {
+          parameter1: calculatedScores.parameter1,
+          parameter2: calculatedScores.parameter2,
+          parameter3: calculatedScores.parameter3,
+          overall: calculatedScores.overall,
+          summary: calculatedScores.summary,
+          // Legacy compatibility
+          ...extractScoreFromResponse(response, selectedScenario.SCORING_MATRIX)
+        };
       }
 
       console.log(`Successfully processed negotiation turn ${currentTurn}`);
-      return NextResponse.json({ 
+      return NextResponse.json({
         response: response,
         isComplete: isFinalTurn,
-        score: scoreData
+        score: scoreData,
+        formattedScores: formattedScores
       });
 
     } catch (openaiError: any) {

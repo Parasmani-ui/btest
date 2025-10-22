@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { FINANCIAL_NAGOTIATION_SIMULATION_PROMPTS } from '@/utils/prompts';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
-  console.log('Processing financial negotiation simulation interaction');
+  console.log('Processing Financial Investigation simulation interaction');
   
   try {
     // Parse request body
@@ -69,13 +70,18 @@ Current turn: ${currentTurn}/5
 
 ${isFinalTurn ? `
 This is the final turn. Provide a comprehensive performance evaluation that includes:
-1. Assessment of the user's investigation approach and professionalism
-2. Scores for key performance areas (out of 10): Documentation Check, Professional Tone, Evidence Gathering
-3. Overall investigation outcome classification
-4. Specific feedback on what they did well and areas for improvement
-5. Final recommendation on the case findings
 
-Format the evaluation clearly with sections and scores.
+**Final Scores:**  
+Data Accuracy: [score]/10  
+Compliance Awareness: [score]/10  
+Risk Assessment: [score]/10  
+Overall Outcome: [summary outcome]
+
+1. Assessment of the user's investigation approach and professionalism
+2. Specific feedback on what they did well and areas for improvement
+3. Final recommendation on the case findings
+
+Format the evaluation clearly with the scoring section first, followed by detailed feedback.
 ` : `
 Continue the financial investigation scenario. Respond as the relevant party (manager, colleague, system, etc.) in the investigation, then present the next situation with 4 new dialogue options (A, B, C, D) for turn ${currentTurn + 1}.
 
@@ -120,17 +126,43 @@ ${messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
         throw new Error('No response generated from OpenAI');
       }
 
-      // If it's the final turn, try to extract scoring information
+      // If it's the final turn, calculate the 3-parameter scores
       let scoreData = null;
+      let formattedScores = null;
       if (isFinalTurn) {
-        scoreData = extractScoreFromResponse(response);
+        // Calculate scores using centralized scoring system
+        const calculatedScores = calculateSimulationScore(
+          'FINANCIAL_FORENSIC_SIMULATION',
+          response,
+          {
+            messages: messages.length,
+            turnsCompleted: currentTurn
+          },
+          messages
+        );
+
+        // Format the scores for display
+        formattedScores = formatFinalScores(calculatedScores, 'FINANCIAL_FORENSIC_SIMULATION');
+
+        scoreData = {
+          parameter1: calculatedScores.parameter1,
+          parameter2: calculatedScores.parameter2,
+          parameter3: calculatedScores.parameter3,
+          overall: calculatedScores.overall,
+          summary: calculatedScores.summary,
+          // Legacy compatibility
+          dataAccuracy: calculatedScores.parameter1,
+          complianceAwareness: calculatedScores.parameter2,
+          riskAssessment: calculatedScores.parameter3
+        };
       }
 
       console.log(`Successfully processed financial investigation turn ${currentTurn}`);
-      return NextResponse.json({ 
+      return NextResponse.json({
         response: response,
         isComplete: isFinalTurn,
-        score: scoreData
+        score: scoreData,
+        formattedScores: formattedScores
       });
 
     } catch (openaiError: any) {
@@ -154,7 +186,7 @@ ${messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
     }
 
   } catch (error: any) {
-    console.error('Error processing financial negotiation interaction:', error);
+    console.error('Error processing Financial Investigation interaction:', error);
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 });

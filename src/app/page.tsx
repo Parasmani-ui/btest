@@ -99,7 +99,7 @@ export default function Home() {
   const startFinancialNegotiationSimulation = () => {
     checkAuthAndProceed(() => {
       router.push(`/financial-negotiation`);
-    }, 'Financial Negotiation');
+    }, 'Financial Investigation');
   };
 
   // Don't render until client-side
@@ -231,7 +231,7 @@ export default function Home() {
                     background="rgb(34, 197, 94)"
                   >
                     <div className="text-center">
-                      Financial Negotiation
+                      Financial Investigation
                     </div>
                   </ShimmerButton>
                 </div>
@@ -265,7 +265,7 @@ export default function Home() {
                   </h1>
                   <h2 className="text-xl font-semibold mb-4">Skills Assessment Agency</h2>
                   <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-4xl mx-auto`}>
-                    "Parasmani Skills" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
+                    "AIMA Bizlab" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
                   </p>
                 </div>
               </div>
@@ -480,7 +480,7 @@ export default function Home() {
                     )}
                   </div>
                   
-                  {/* Financial Negotiation card - Enhanced with hover */}
+                  {/* Financial Investigation card - Enhanced with hover */}
                   <div 
                     className={`relative rounded-lg border border-[rgb(21,128,61)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden`} 
                     onClick={startFinancialNegotiationSimulation}
@@ -489,8 +489,8 @@ export default function Home() {
                   >
                     <div className="relative h-40 w-full">
                       <Image 
-                        src="/09_financial negotiation.png" 
-                        alt="Financial Negotiation" 
+                        src="/09_Financial Investigation.png" 
+                        alt="Financial Investigation" 
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
@@ -498,7 +498,7 @@ export default function Home() {
                     </div>
                     <div className="p-4">
                       <h3 className="text-sm font-bold mb-2">
-                        Financial Negotiation
+                        Financial Investigation
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>3 modes</p>
                     </div>
@@ -599,7 +599,7 @@ export default function Home() {
               {/* Footer */}
               <div className="text-center pt-8 border-t border-gray-300">
                 <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  © 2016 Parasmani Skills. | Empowering minds through innovative assessment solutions.
+                  © AIMA Bizlab | Empowering minds through innovative assessment solutions.
                 </p>
               </div>
             </div>

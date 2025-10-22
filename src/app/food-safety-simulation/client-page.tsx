@@ -6,6 +6,8 @@ import GameHeader from '@/components/ui/GameHeader';
 
 import { handleGameEnd } from '@/lib/gameSession';
 import { useGameSession } from '@/lib/gameSession';
+import { updateUserStatsOnGameStart } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 
 
 
@@ -44,6 +46,7 @@ export default function FoodSafetySimulationClientPage() {
     gameEnded: false,
   });
   const [userInput, setUserInput] = useState('');
+  const { userData } = useAuth();
   const { startSession } = useGameSession();
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
@@ -71,6 +74,12 @@ export default function FoodSafetySimulationClientPage() {
         // Start game session tracking after AI response is received
         const startTime = new Date();
         await startSession('food-safety');
+        
+        // Update user stats when game starts (count games on start, not end)
+        console.log(`📊 Updating user stats for game start: food-safety`);
+        await updateUserStatsOnGameStart(userData.uid, 'food-safety');
+        console.log(`✅ User stats updated for game start`);
+        
         setSessionStartTime(startTime);
         console.log('✅ Food safety simulation session started after AI response');
         

@@ -5,7 +5,7 @@ import { FINANCIAL_NAGOTIATION_SIMULATION_PROMPTS } from '@/utils/prompts';
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
-  console.log('Generating financial negotiation simulation');
+  console.log('Generating Financial Investigation simulation');
   
   try {
     // Parse request body
@@ -85,7 +85,7 @@ Start the scenario with context setting and your role, then present the initial 
         throw new Error('No simulation text generated from OpenAI');
       }
 
-      console.log('Successfully generated financial negotiation simulation');
+      console.log('Successfully generated Financial Investigation simulation');
       return NextResponse.json({ simulation: simulationText });
 
     } catch (openaiError: any) {
@@ -109,7 +109,7 @@ Start the scenario with context setting and your role, then present the initial 
     }
 
   } catch (error: any) {
-    console.error('Error generating financial negotiation simulation:', error);
+    console.error('Error generating Financial Investigation simulation:', error);
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 });

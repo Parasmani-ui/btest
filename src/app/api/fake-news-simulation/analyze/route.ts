@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 export const maxDuration = 60;
 
@@ -46,12 +47,19 @@ export async function POST(request: NextRequest) {
         - Most Critical Evidence: ${userDecisions.criticalEvidence}
         - Consequence Severity: ${userDecisions.consequenceSeverity}
 
-        Please provide a comprehensive analysis that:
-        1. Evaluates the accuracy of each decision
-        2. Explains the correct answers with evidence
-        3. Highlights key learning points about misinformation detection
-        4. Provides a score out of 10
-        5. Offers constructive feedback for improvement
+        Please provide a comprehensive analysis that MUST include:
+
+        **Final Scores:**
+        Fact Verification: [score]/10
+        Bias Awareness: [score]/10
+        Ethical Judgement: [score]/10
+        Overall Outcome: [summary outcome]
+
+        Then provide:
+        1. Evaluation of the accuracy of each decision
+        2. Explanation of the correct answers with evidence
+        3. Key learning points about misinformation detection
+        4. Constructive feedback for improvement
 
         Use simple, clear language without any special formatting symbols. Write in a professional but accessible tone that helps the user learn from their decisions. NO extra line breaks or spacing between paragraphs.
       `;
@@ -91,9 +99,40 @@ export async function POST(request: NextRequest) {
     // Clean the analysis content before sending to client
     const cleanedResponse = cleanAnalysisContent(response);
 
+    // Calculate 3-parameter scores for final judgment
+    let scoreData = null;
+    let formattedScores = null;
+    if (analysisType === 'final_judgment') {
+      // Calculate scores using centralized scoring system
+      const calculatedScores = calculateSimulationScore(
+        'FAKE_NEWS_SIMULATION',
+        cleanedResponse,
+        {
+          userDecisions
+        }
+      );
+
+      // Format the scores for display
+      formattedScores = formatFinalScores(calculatedScores, 'FAKE_NEWS_SIMULATION');
+
+      scoreData = {
+        parameter1: calculatedScores.parameter1,
+        parameter2: calculatedScores.parameter2,
+        parameter3: calculatedScores.parameter3,
+        overall: calculatedScores.overall,
+        summary: calculatedScores.summary,
+        // Legacy compatibility
+        factVerification: calculatedScores.parameter1,
+        biasAwareness: calculatedScores.parameter2,
+        ethicalJudgement: calculatedScores.parameter3
+      };
+    }
+
     return NextResponse.json({
       success: true,
       analysis: cleanedResponse,
+      score: scoreData,
+      formattedScores: formattedScores
     });
 
   } catch (error) {

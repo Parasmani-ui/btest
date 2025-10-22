@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Parasmani - AI-powered Games</title>
+        <title>AIMA Bizlab - AI-powered Games</title>
         <meta name="description" content="Solve mysteries using your detective skills in this interactive investigation game" />
       </head>
       <body className={inter.className} suppressHydrationWarning>

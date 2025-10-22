@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import NegotiationSimulationClient from './client-page';
 import { useGameSession } from '@/lib/gameSession';
+import { updateUserStatsOnGameStart } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 import GameHeader from '@/components/ui/GameHeader';
 
 interface SubGame {
@@ -55,6 +57,7 @@ export default function NegotiationSimulationPage() {
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [sessionActive, setSessionActive] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
+  const { userData } = useAuth();
   const { startSession } = useGameSession();
 
   const toggleTheme = () => {
@@ -69,6 +72,11 @@ export default function NegotiationSimulationPage() {
     try {
       // Start game session tracking
       await startSession('negotiation');
+      
+      // Update user stats when game starts (count games on start, not end)
+      console.log(`📊 Updating user stats for game start: negotiation`);
+      await updateUserStatsOnGameStart(userData.uid, 'negotiation');
+      console.log(`✅ User stats updated for game start`);
     } catch (sessionError) {
       console.error('Error starting session:', sessionError);
     }

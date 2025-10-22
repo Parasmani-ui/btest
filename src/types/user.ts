@@ -49,6 +49,23 @@ export interface GameSession {
   actions: string[]; // Actions taken during the game (interrogations, searches, etc.)
   hints: number; // Number of hints used
   timeSpent: number; // Real-time spent in minutes (updates during game)
+
+  // Analysis and scoring data
+  analysis?: string; // Final analysis/conclusion text from the simulation
+  caseTitle?: string; // Title/name of the case
+  scoreBreakdown?: {
+    parameter1?: number;
+    parameter1Name?: string;
+    parameter2?: number;
+    parameter2Name?: string;
+    parameter3?: number;
+    parameter3Name?: string;
+    overall?: number;
+    summary?: string;
+  };
+  userDecisions?: any; // User's decisions/answers during the game
+  correctAnswer?: string; // The correct answer/suspect for detective games
+  userAnswer?: string; // The user's answer/suspect
 }
 
 export interface DashboardStats {

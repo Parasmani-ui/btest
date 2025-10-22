@@ -8,6 +8,7 @@ import { TextAnimate } from '@/components/magicui/text-animate';
 
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameSession, handleGameEnd } from '@/lib/gameSession';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 import { useRef } from 'react';
 
 interface ChainFailDecisions {
@@ -35,7 +36,7 @@ interface ParsedCaseData {
 
 export default function ChainFailSimulationClient({ simulationText, onStartNewCase, onGameEnd, onSessionStart, onSessionEnd }: ChainFailSimulationClientProps) {
   const router = useRouter();
-  const { startSession } = useGameSession();
+  const { startSession, updateSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [caseData, setCaseData] = useState<string>('');
   const [parsedData, setParsedData] = useState<ParsedCaseData | null>(null);
@@ -47,6 +48,8 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
   });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<string>('');
+  const [scoreData, setScoreData] = useState<any>(null);
+  const [formattedScores, setFormattedScores] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [hasSubmittedFinal, setHasSubmittedFinal] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
@@ -54,60 +57,14 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
   const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
   const sessionInitialized = useRef(false);
 
-  // Calculate score for chainfail simulation
+  // Calculate 3-parameter score for chainfail simulation
   const calculateChainFailScore = (analysis: string, decisions: ChainFailDecisions): number => {
-    let score = 0;
-    const maxScore = 100;
-
-    // Base score for having all required decisions
-    if (decisions.rootCause && decisions.preventiveAction) {
-      score += 30; // 30% for completing the analysis
-    }
-
-    // Score based on analysis content quality
-    if (analysis) {
-      // Check for positive indicators in the analysis
-      const positiveIndicators = [
-        'comprehensive', 'thorough', 'excellent', 'good', 'appropriate', 
-        'correct', 'accurate', 'well-identified', 'properly', 'effective'
-      ];
-      
-      const negativeIndicators = [
-        'insufficient', 'inadequate', 'poor', 'incorrect', 'missed', 
-        'failed', 'incomplete', 'lacking', 'not enough', 'superficial'
-      ];
-      
-      const analysisLower = analysis.toLowerCase();
-      let positiveCount = 0;
-      let negativeCount = 0;
-      
-      positiveIndicators.forEach(indicator => {
-        if (analysisLower.includes(indicator)) {
-          positiveCount++;
-        }
-      });
-      
-      negativeIndicators.forEach(indicator => {
-        if (analysisLower.includes(indicator)) {
-          negativeCount++;
-        }
-      });
-      
-      // Score based on positive vs negative indicators
-      const indicatorScore = Math.max(0, (positiveCount - negativeCount) * 10);
-      score += Math.min(40, indicatorScore); // Max 40% for analysis quality
-    }
-
-    // Score based on decision quality
-    if (decisions.rootCause && decisions.rootCause.length > 20) {
-      score += 15; // 15% for detailed root cause
-    }
+    // Combine analysis and decisions into a single content string for scoring
+    const content = `${analysis || ''} ${decisions.rootCause || ''} ${decisions.secondaryFactor || ''} ${decisions.preventiveAction || ''}`;
     
-    if (decisions.preventiveAction && decisions.preventiveAction.length > 20) {
-      score += 15; // 15% for detailed preventive action
-    }
-
-    return Math.min(maxScore, score);
+    // Use the new 3-parameter scoring system for chainfail
+    const score = calculateSimulationScore('CHAINFAIL_SIMULATION', content, decisions);
+    return score.overall;
   };
 
   // Parse JSON data if it exists
@@ -249,13 +206,22 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setAnalysis(data.analysis);
+
+        // Store score data if available
+        if (data.score) {
+          setScoreData(data.score);
+        }
+        if (data.formattedScores) {
+          setFormattedScores(data.formattedScores);
+        }
+
         if (analysisType === 'final_analysis') {
           setCurrentView('final_result');
           setHasSubmittedFinal(true);
-          
+
           // Capture elapsed time before ending session
           if (sessionStartTime) {
             const endTime = new Date();
@@ -266,11 +232,33 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
             setFinalElapsedTime(elapsedTimeStr);
             onSessionEnd?.(endTime, elapsedTimeStr); // Notify parent of session end
           }
-          
-          // Calculate score based on analysis and decisions
-          const totalScore = calculateChainFailScore(data.analysis, decisions);
-          const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
-          
+
+          // Use the score from API if available, otherwise calculate
+          const totalScore = data.score?.overall || calculateChainFailScore(data.analysis, decisions);
+          const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
+
+          // Save analysis data to game session before ending
+          try {
+            await updateSession({
+              analysis: data.analysis,
+              caseTitle: parsedData?.caseOverview?.substring(0, 100) || 'ChainFail Investigation',
+              scoreBreakdown: data.score ? {
+                parameter1: data.score.parameter1,
+                parameter1Name: 'Technical Analysis',
+                parameter2: data.score.parameter2,
+                parameter2Name: 'Safety Awareness',
+                parameter3: data.score.parameter3,
+                parameter3Name: 'Preventive Planning',
+                overall: data.score.overall,
+                summary: data.score.summary
+              } : undefined,
+              userDecisions: decisions
+            });
+            console.log('✅ Analysis data saved to game session');
+          } catch (error) {
+            console.error('❌ Error saving analysis data:', error);
+          }
+
           // Update user stats when game ends
           try {
             await handleGameEnd(caseSolved, totalScore);
@@ -278,7 +266,7 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
           } catch (error) {
             console.error('❌ Error updating chainfail simulation stats:', error);
           }
-          
+
           onGameEnd();
         }
       } else {
@@ -738,6 +726,34 @@ export default function ChainFailSimulationClient({ simulationText, onStartNewCa
                 </div>
               </div>
             )}
+
+            {/* Display 3-Parameter Scores */}
+            {scoreData && (
+              <div className={`${theme === 'dark' ? 'bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-700' : 'bg-gradient-to-r from-purple-50 to-blue-50 border-purple-300'} p-6 rounded-lg border-2 shadow-lg mb-6`}>
+                <h3 className="text-xl font-bold mb-4 text-center">
+                  📊 Final Scores
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                    <div className="text-sm font-semibold mb-2 text-purple-400">Technical Analysis</div>
+                    <div className="text-3xl font-bold">{scoreData.parameter1 || scoreData.technicalAnalysis || 0}/10</div>
+                  </div>
+                  <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                    <div className="text-sm font-semibold mb-2 text-blue-400">Safety Awareness</div>
+                    <div className="text-3xl font-bold">{scoreData.parameter2 || scoreData.safetyAwareness || 0}/10</div>
+                  </div>
+                  <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                    <div className="text-sm font-semibold mb-2 text-green-400">Preventive Planning</div>
+                    <div className="text-3xl font-bold">{scoreData.parameter3 || scoreData.preventivePlanning || 0}/10</div>
+                  </div>
+                </div>
+                <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg text-center`}>
+                  <div className="text-sm font-semibold mb-2">Overall Outcome</div>
+                  <div className="text-lg font-semibold text-purple-500">{scoreData.summary || 'Performance evaluated'}</div>
+                </div>
+              </div>
+            )}
+
             <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-lg`}>
               {formatAnalysisContent(analysis)}
             </div>
