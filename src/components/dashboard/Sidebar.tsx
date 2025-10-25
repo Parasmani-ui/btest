@@ -27,7 +27,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
     { name: 'Profile', href: '/dashboard/profile', icon: UserIcon },
     { name: 'Game History', href: '/dashboard/history', icon: GamepadIcon },
-    { name: 'Settings', href: '/dashboard/settings', icon: CogIcon },
   ];
 
   const adminNavigation = [

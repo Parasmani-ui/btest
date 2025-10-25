@@ -259,7 +259,7 @@ export default function Home() {
               <div className="text-center mb-12">
                 <Image src="/img.png" alt="Parasmani Skills Logo" width={200} height={200} className="mx-auto mb-6" priority/>
                 
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <h1 className="text-2xl sm:text-3xl font-bold mb-2">
                     Your Trusted Company
                   </h1>
@@ -267,7 +267,7 @@ export default function Home() {
                   <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-4xl mx-auto`}>
                     "AIMA Bizlab" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
                   </p>
-                </div>
+                </div> */}
               </div>
 
               {/* Game Modes Section */}
@@ -489,7 +489,7 @@ export default function Home() {
                   >
                     <div className="relative h-40 w-full">
                       <Image 
-                        src="/09_Financial Investigation.png" 
+                        src="/09_Financial investigation.png" 
                         alt="Financial Investigation" 
                         fill
                         className="object-cover"
@@ -541,7 +541,7 @@ export default function Home() {
                     by="word"
                     duration={0.3}
                   >
-                    Experience our comprehensive skills assessment program 
+                    Experience our comprehensive skills training program 
                   </TextAnimate>
                 </div>  
                 <p className={`text-lg mt-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-3xl mx-auto`}>
@@ -549,7 +549,7 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Partners section */}
+              {/* Partners section
               <div className="mb-16">
                 <h3 className="text-xl font-bold text-center mb-8">Our Esteemed Partners</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 items-center justify-center">
@@ -569,16 +569,16 @@ export default function Home() {
                     <Image src="/pssc.png" alt="PSSC" width={80} height={80} className="object-contain" />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* About section */}
               <div className={`p-8 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} mb-16`}>
-                <h3 className="text-2xl font-bold mb-6 text-center">Why Choose Parasmani ?</h3>
+                <h3 className="text-2xl font-bold mb-6 text-center">Why Choose Us ?</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="text-center">
-                    <h4 className="text-lg font-semibold mb-3">🎯 Targeted Assessment</h4>
+                    <h4 className="text-lg font-semibold mb-3">🎯 Deatailed Report</h4>
                     <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                      Our assessments are designed to evaluate specific cognitive skills essential for modern problem-solving scenarios.
+                    Monitor student performance and track progress effectively. This helps in providing timely feedback and enhancing the overall learning experience.
                     </p>
                   </div>
                   <div className="text-center">
@@ -599,7 +599,7 @@ export default function Home() {
               {/* Footer */}
               <div className="text-center pt-8 border-t border-gray-300">
                 <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  © AIMA Bizlab | Empowering minds through innovative assessment solutions.
+                  © AIMA Bizlab | All India Management Association (AIMA).
                 </p>
               </div>
             </div>

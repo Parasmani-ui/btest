@@ -142,35 +142,8 @@ export default function GameHeader({
             )}
           </div>
 
-          {/* Center - Elapsed Time (show when timing has started or game has ended) */}
-          {(startTiming || gameEnded) && sessionStartTime && (
-            <div className={`hidden md:flex items-center space-x-2 px-4 py-2 rounded-lg ${
-              gameEnded 
-                ? 'bg-blue-900 bg-opacity-50' 
-                : 'bg-green-900 bg-opacity-50'
-            }`}>
-              <PlayIcon className={`w-4 h-4 ${
-                gameEnded ? 'text-blue-400' : 'text-green-400'
-              }`} />
-              <div className={`text-sm ${
-                gameEnded ? 'text-blue-300' : 'text-green-300'
-              }`}>
-                <span className="font-medium">
-                  {gameEnded ? 'Final Time:' : 'Elapsed:'}
-                </span> {elapsedTime}
-              </div>
-            </div>
-          )}
-
-          {/* Show "Waiting to start..." when timing hasn't started yet */}
-          {!startTiming && !gameEnded && (
-            <div className="hidden md:flex items-center space-x-2 bg-yellow-900 bg-opacity-50 px-4 py-2 rounded-lg">
-              <ClockIcon className="w-4 h-4 text-yellow-400" />
-              <div className="text-sm text-yellow-300">
-                <span className="font-medium">Waiting to start...</span>
-              </div>
-            </div>
-          )}
+          {/* Timer hidden from users */}
+          <div className="hidden md:block"></div>
 
           {/* Right side - User info and actions */}
           <div className="flex items-center space-x-4">
@@ -218,27 +191,7 @@ export default function GameHeader({
           </div>
         </div>
 
-        {/* Mobile elapsed time (show when timing has started or game has ended) */}
-        {(startTiming || gameEnded) && sessionStartTime && (
-          <div className="md:hidden pb-3 flex items-center justify-center space-x-2 text-sm text-gray-400">
-            <PlayIcon className={`w-4 h-4 ${
-              gameEnded ? 'text-blue-400' : 'text-green-400'
-            }`} />
-            <span className={`${
-              gameEnded ? 'text-blue-400' : 'text-green-400'
-            }`}>
-              {gameEnded ? 'Final Time:' : 'Elapsed:'} {elapsedTime}
-            </span>
-          </div>
-        )}
-
-        {/* Mobile waiting message */}
-        {!startTiming && !gameEnded && (
-          <div className="md:hidden pb-3 flex items-center justify-center space-x-2 text-sm text-gray-400">
-            <ClockIcon className="w-4 h-4 text-yellow-400" />
-            <span className="text-yellow-400">Waiting to start...</span>
-          </div>
-        )}
+        {/* Timer hidden from mobile users */}
       </div>
     </header>
   );

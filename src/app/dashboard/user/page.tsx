@@ -20,7 +20,8 @@ import {
   BookOpenIcon,
   AlertTriangleIcon,
   NewspaperIcon,
-  LinkIcon
+  LinkIcon,
+  Building2Icon
 } from 'lucide-react';
 
 export default function UserDashboardPage() {
@@ -223,6 +224,14 @@ export default function UserDashboardPage() {
                   <p className="text-blue-100 mt-1">
                     Track your progress and continue your learning journey.
                   </p>
+                  {userData?.organizationName && (
+                    <div className="flex items-center gap-2 mt-2 text-blue-200">
+                      <Building2Icon className="w-4 h-4" />
+                      <span className="text-sm">
+                        Organization: <span className="font-semibold">{userData.organizationName}</span>
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex space-x-2">

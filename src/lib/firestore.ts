@@ -70,7 +70,14 @@ export async function getUserGames(uid: string): Promise<UserStats> {
 
     // Use user document stats if available (preferred), otherwise calculate from sessions (fallback)
     const gamesPlayed = userData?.gamesPlayed ?? sessions.length;
-    const casesCompleted = userData?.casesCompleted ?? sessions.filter(session => session.caseSolved).length;
+    let casesCompleted = userData?.casesCompleted ?? sessions.filter(session => session.caseSolved).length;
+
+    // Ensure casesCompleted never exceeds gamesPlayed
+    if (casesCompleted > gamesPlayed) {
+      console.warn(`⚠️  Cases completed (${casesCompleted}) exceeds games played (${gamesPlayed}). Fixing...`);
+      casesCompleted = gamesPlayed;
+    }
+
     const totalPlaytime = userData?.totalPlaytime ?? sessions.reduce((sum, session) => sum + session.duration, 0);
     const averageScore = userData?.averageScore ?? (sessions.reduce((sum, session) => sum + (session.score || 0), 0) / sessions.length || 0);
 
@@ -520,11 +527,17 @@ export async function updateUserStatsAfterGame(
       
       // SIMPLE: Count as solved if ANY score (0-100)
       const isSolved = score >= 0;
-      const newCasesCompleted = (userData.casesCompleted || 0) + (isSolved ? 1 : 0);
+      let newCasesCompleted = (userData.casesCompleted || 0) + (isSolved ? 1 : 0);
       const newTotalPlaytime = (userData.totalPlaytime || 0) + duration;
-      
+
       // Calculate new average score
       const currentGamesPlayed = userData.gamesPlayed || 0;
+
+      // Ensure casesCompleted never exceeds gamesPlayed
+      if (newCasesCompleted > currentGamesPlayed) {
+        console.warn(`⚠️  Cases completed (${newCasesCompleted}) would exceed games played (${currentGamesPlayed}). Capping at ${currentGamesPlayed}`);
+        newCasesCompleted = currentGamesPlayed;
+      }
       const currentAverageScore = userData.averageScore || 0;
       const totalPreviousScore = currentAverageScore * (currentGamesPlayed - 1);
       const newAverageScore = currentGamesPlayed > 1 

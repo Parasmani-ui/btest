@@ -111,6 +111,9 @@ report
 temperory/
 Temperory/
 readme project.md
+.claude/
+.claude/settings.local.json
+
 
 # Additional sensitive files that should not be in version control
 # Firebase service account files

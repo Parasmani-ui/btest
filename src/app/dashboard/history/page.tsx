@@ -146,7 +146,7 @@ export default function GameHistoryPage() {
                 <GamepadIcon className="w-8 h-8 text-blue-600" />
                 <div>
                   <h1 className="text-2xl font-bold text-sky-200">Game History</h1>
-                  <p className="text-white">Track your detective journey and achievements</p>
+                  <p className="text-white">Track your training journey and achievements</p>
                 </div>
               </div>
 
