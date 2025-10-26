@@ -12,6 +12,7 @@ import {
   ShieldCheckIcon,
   GamepadIcon,
   ChartBarIcon,
+  BuildingIcon,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -32,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const adminNavigation = [
     { name: 'Admin Panel', href: '/admin', icon: ShieldCheckIcon },
     { name: 'User Management', href: '/admin/users', icon: UserIcon },
+    { name: 'Organizations', href: '/admin/organizations', icon: BuildingIcon },
     { name: 'Game Analytics', href: '/admin/analytics', icon: ChartBarIcon },
     { name: 'Content Management', href: '/admin/content', icon: CogIcon },
   ];

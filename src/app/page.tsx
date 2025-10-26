@@ -257,7 +257,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto">
               {/* Header Section */}
               <div className="text-center mb-12">
-                <Image src="/img.png" alt="Parasmani Skills Logo" width={200} height={200} className="mx-auto mb-6" priority/>
+                <Image src="/img.png" alt="AIMA Bizlab Logo" width={200} height={200} className="mx-auto mb-6" priority/>
                 
                 {/* <div className="mb-6">
                   <h1 className="text-2xl sm:text-3xl font-bold mb-2">
@@ -489,7 +489,7 @@ export default function Home() {
                   >
                     <div className="relative h-40 w-full">
                       <Image 
-                        src="/09_Financial investigation.png" 
+                        src="/09_financial investigation.png" 
                         alt="Financial Investigation" 
                         fill
                         className="object-cover"
@@ -541,11 +541,11 @@ export default function Home() {
                     by="word"
                     duration={0.3}
                   >
-                    Experience our comprehensive skills training program 
+                    Experience our comprehensive training program 
                   </TextAnimate>
                 </div>  
                 <p className={`text-lg mt-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-3xl mx-auto`}>
-                  Develop critical thinking, problem-solving, and investigative skills through immersive scenarios designed to challenge and enhance your cognitive abilities.
+                  Develop critical thinking, problem-solving, investigative and other skills through immersive scenarios designed to challenge and enhance your cognitive abilities.
                 </p>
               </div>
 
@@ -599,7 +599,7 @@ export default function Home() {
               {/* Footer */}
               <div className="text-center pt-8 border-t border-gray-300">
                 <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  © AIMA Bizlab | All India Management Association (AIMA).
+                 AIMA Bizlab | All India Management Association (AIMA).
                 </p>
               </div>
             </div>

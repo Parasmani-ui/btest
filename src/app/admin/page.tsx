@@ -2,48 +2,98 @@
 
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { 
-  UsersIcon, 
-  GamepadIcon, 
-  ChartBarIcon, 
+import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
+import { auth } from '@/lib/firebase';
+import {
+  UsersIcon,
+  GamepadIcon,
+  ChartBarIcon,
   CogIcon,
   AlertTriangleIcon,
-  TrendingUpIcon 
+  TrendingUpIcon,
+  BuildingIcon
 } from 'lucide-react';
 
 export default function AdminPage() {
+  const { userData } = useAuth();
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeGames: 0,
+    totalGames: 0,
+    organizationName: '',
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAdminStats();
+  }, [userData]);
+
+  const loadAdminStats = async () => {
+    try {
+      if (!userData) return;
+
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const token = await user.getIdToken();
+      const response = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const users = data.users || [];
+
+        // Calculate stats
+        const totalGames = users.reduce((sum: number, u: any) => sum + (u.gamesPlayed || 0), 0);
+        const activeUsers = users.filter((u: any) => {
+          const lastLogin = u.lastLoginAt ? new Date(u.lastLoginAt) : null;
+          if (!lastLogin) return false;
+          const daysSinceLogin = (Date.now() - lastLogin.getTime()) / (1000 * 60 * 60 * 24);
+          return daysSinceLogin <= 7; // Active if logged in within last 7 days
+        }).length;
+
+        setStats({
+          totalUsers: users.length,
+          activeGames: activeUsers,
+          totalGames,
+          organizationName: userData.organizationName || '',
+        });
+      }
+    } catch (error) {
+      console.error('Error loading admin stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const adminStats = [
     {
-      name: 'Total Users',
-      value: '1,247',
+      name: userData?.role === 'group_admin' ? 'Organization Users' : 'Total Users',
+      value: loading ? '...' : stats.totalUsers.toString(),
       icon: UsersIcon,
       color: 'bg-blue-500',
-      change: '+12.5%',
-      changeType: 'increase',
     },
     {
-      name: 'Active Games',
-      value: '89',
-      icon: GamepadIcon,
-      color: 'bg-green-500',
-      change: '+5.2%',
-      changeType: 'increase',
-    },
-    {
-      name: 'System Load',
-      value: '67%',
+      name: 'Active Users (7 days)',
+      value: loading ? '...' : stats.activeGames.toString(),
       icon: TrendingUpIcon,
-      color: 'bg-yellow-500',
-      change: '-2.1%',
-      changeType: 'decrease',
+      color: 'bg-green-500',
     },
     {
-      name: 'Issues',
-      value: '3',
-      icon: AlertTriangleIcon,
-      color: 'bg-red-500',
-      change: '+1',
-      changeType: 'increase',
+      name: 'Total Games Played',
+      value: loading ? '...' : stats.totalGames.toString(),
+      icon: GamepadIcon,
+      color: 'bg-purple-500',
+    },
+    {
+      name: userData?.role === 'group_admin' ? 'Organization' : 'System Status',
+      value: userData?.role === 'group_admin' ? (stats.organizationName || 'N/A') : 'Operational',
+      icon: userData?.role === 'group_admin' ? BuildingIcon : AlertTriangleIcon,
+      color: userData?.role === 'group_admin' ? 'bg-yellow-500' : 'bg-green-500',
     },
   ];
 

@@ -78,10 +78,14 @@ export async function getUserGames(uid: string): Promise<UserStats> {
       casesCompleted = gamesPlayed;
     }
 
-    const totalPlaytime = userData?.totalPlaytime ?? sessions.reduce((sum, session) => sum + session.duration, 0);
+    // Calculate total playtime: elapsedTime is in seconds, duration is in MINUTES (convert to seconds)
+    const totalPlaytime = userData?.totalPlaytime ?? sessions.reduce((sum, session) => {
+      const timeInSeconds = (session as any).elapsedTime || (session.duration ? session.duration * 60 : 0);
+      return sum + timeInSeconds;
+    }, 0);
     const averageScore = userData?.averageScore ?? (sessions.reduce((sum, session) => sum + (session.score || 0), 0) / sessions.length || 0);
 
-    console.log(`📊 Final stats - Games: ${gamesPlayed}, Cases: ${casesCompleted}, Playtime: ${totalPlaytime}m, Avg Score: ${averageScore.toFixed(1)}`);
+    console.log(`📊 Final stats - Games: ${gamesPlayed}, Cases: ${casesCompleted}, Playtime: ${totalPlaytime}s (${Math.floor(totalPlaytime/60)}m), Avg Score: ${averageScore.toFixed(1)}`);
 
     // Game type breakdown - prefer user document data, fallback to session calculation
     let gameTypeBreakdown: { [key: string]: { sessions: number; playtime: number; averageScore: number } } = {};
@@ -98,10 +102,11 @@ export async function getUserGames(uid: string): Promise<UserStats> {
         return acc;
       }, {} as { [key: string]: { sessions: number; playtime: number; averageScore: number } });
 
-      // Add playtime from sessions for each game type
+      // Add playtime from sessions for each game type (duration is in MINUTES, convert to seconds)
       sessions.forEach(session => {
         if (gameTypeBreakdown[session.gameType]) {
-          gameTypeBreakdown[session.gameType].playtime += session.duration;
+          const timeInSeconds = (session as any).elapsedTime || (session.duration ? session.duration * 60 : 0);
+          gameTypeBreakdown[session.gameType].playtime += timeInSeconds;
         }
       });
     } else {
@@ -116,7 +121,8 @@ export async function getUserGames(uid: string): Promise<UserStats> {
           };
         }
         gameTypeBreakdown[session.gameType].sessions++;
-        gameTypeBreakdown[session.gameType].playtime += session.duration;
+        const timeInSeconds = (session as any).elapsedTime || (session.duration ? session.duration * 60 : 0);
+        gameTypeBreakdown[session.gameType].playtime += timeInSeconds;
         gameTypeBreakdown[session.gameType].averageScore = 
           (gameTypeBreakdown[session.gameType].averageScore * (gameTypeBreakdown[session.gameType].sessions - 1) + 
            (session.score || 0)) / gameTypeBreakdown[session.gameType].sessions;

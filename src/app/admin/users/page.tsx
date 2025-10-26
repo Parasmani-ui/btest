@@ -5,84 +5,217 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useState, useEffect } from 'react';
 import { UserData, Organization } from '@/types/user';
-import { 
-  collection, 
-  getDocs, 
-  doc, 
-  updateDoc, 
-  query, 
-  orderBy 
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { 
-  UsersIcon, 
-  EditIcon, 
-  TrashIcon, 
+import { auth } from '@/lib/firebase';
+import {
+  UsersIcon,
+  EditIcon,
+  TrashIcon,
   SearchIcon,
   FilterIcon,
   DownloadIcon,
   PlusIcon,
   BuildingIcon,
   ShieldIcon,
-  UserIcon
+  UserIcon,
+  EyeIcon,
+  AlertTriangleIcon,
+  XIcon
 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function AdminUsersPage() {
   const { userData } = useAuth();
+  const router = useRouter();
   const [users, setUsers] = useState<UserData[]>([]);
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [orgFilter, setOrgFilter] = useState<string>('all');
+
+  // Modals
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
+  const [deletingUser, setDeletingUser] = useState<UserData | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Create user form
+  const [newUser, setNewUser] = useState({
+    email: '',
+    password: '',
+    displayName: '',
+    role: 'user',
+    organizationId: '',
+    organizationName: ''
+  });
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadUsers();
+  }, [roleFilter, orgFilter]);
 
-  const loadData = async () => {
+  const getAuthToken = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('Not authenticated');
+    }
+    return await user.getIdToken();
+  };
+
+  const loadUsers = async () => {
     try {
-      // Load users
-      const usersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
-      const usersSnapshot = await getDocs(usersQuery);
-      const usersData = usersSnapshot.docs.map(doc => ({
-        uid: doc.id,
-        ...doc.data()
-      })) as UserData[];
-      setUsers(usersData);
+      setLoading(true);
+      const token = await getAuthToken();
 
-      // Load organizations
-      const orgsSnapshot = await getDocs(collection(db, 'organizations'));
-      const orgsData = orgsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Organization[];
-      setOrganizations(orgsData);
-    } catch (error) {
-      console.error('Error loading data:', error);
+      // Build query params
+      const params = new URLSearchParams();
+      if (roleFilter && roleFilter !== 'all') {
+        params.append('role', roleFilter);
+      }
+      if (orgFilter && orgFilter !== 'all') {
+        params.append('organizationId', orgFilter);
+      }
+
+      const response = await fetch(`/api/admin/users?${params.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load users');
+      }
+
+      const data = await response.json();
+      setUsers(data.users || []);
+    } catch (error: any) {
+      console.error('Error loading users:', error);
+      toast.error(error.message || 'Failed to load users');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateUser = async (userId: string, updates: Partial<UserData>) => {
+  const handleCreateUser = async () => {
     try {
-      await updateDoc(doc(db, 'users', userId), updates);
-      setUsers(prev => prev.map(user => 
-        user.uid === userId ? { ...user, ...updates } : user
-      ));
-      setEditingUser(null);
-    } catch (error) {
-      console.error('Error updating user:', error);
+      if (!newUser.email || !newUser.password || !newUser.displayName) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
+      if (newUser.password.length < 6) {
+        toast.error('Password must be at least 6 characters');
+        return;
+      }
+
+      const token = await getAuthToken();
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newUser)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create user');
+      }
+
+      toast.success('User created successfully');
+      setShowCreateModal(false);
+      setNewUser({
+        email: '',
+        password: '',
+        displayName: '',
+        role: 'user',
+        organizationId: '',
+        organizationName: ''
+      });
+      loadUsers();
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      toast.error(error.message || 'Failed to create user');
     }
   };
 
+  const handleUpdateUser = async () => {
+    if (!editingUser) return;
+
+    try {
+      const token = await getAuthToken();
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uid: editingUser.uid,
+          email: editingUser.email,
+          displayName: editingUser.displayName,
+          role: editingUser.role,
+          organizationId: editingUser.organizationId,
+          organizationName: editingUser.organizationName,
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update user');
+      }
+
+      toast.success('User updated successfully');
+      setEditingUser(null);
+      loadUsers();
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      toast.error(error.message || 'Failed to update user');
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deletingUser) return;
+
+    try {
+      const token = await getAuthToken();
+      const response = await fetch(`/api/admin/users?uid=${deletingUser.uid}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete user');
+      }
+
+      toast.success(`User deleted successfully (${data.deletedSessions} sessions removed)`);
+      setDeletingUser(null);
+      loadUsers();
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast.error(error.message || 'Failed to delete user');
+    }
+  };
+
+  const handleViewUser = (userId: string) => {
+    router.push(`/admin/users/${userId}`);
+  };
+
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    return matchesSearch && matchesRole;
+    const matchesSearch = user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
+
+  // Get unique organizations from users
+  const uniqueOrganizations = Array.from(
+    new Set(users.map(u => u.organizationName).filter(Boolean))
+  );
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -106,30 +239,6 @@ export default function AdminUsersPage() {
     }
   };
 
-  const exportToCSV = () => {
-    const csvData = [
-      ['Name', 'Email', 'Role', 'Organization', 'Created At', 'Last Login', 'Total Playtime', 'Games Played'],
-      ...filteredUsers.map(user => [
-        user.displayName,
-        user.email,
-        user.role,
-        user.organizationName || 'N/A',
-        new Date(user.createdAt).toLocaleDateString(),
-        new Date(user.lastLoginAt).toLocaleDateString(),
-        (user.totalPlaytime || 0).toString(),
-        (user.gamesPlayed || 0).toString()
-      ])
-    ];
-    
-    const csvContent = csvData.map(row => row.join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
 
   if (loading) {
     return (
@@ -152,11 +261,11 @@ export default function AdminUsersPage() {
               <p className="text-gray-400">Manage users, roles, and organizations</p>
             </div>
             <button
-              onClick={exportToCSV}
+              onClick={() => setShowCreateModal(true)}
               className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-white"
             >
-              <DownloadIcon className="w-5 h-5 mr-2" />
-              Export CSV
+              <PlusIcon className="w-5 h-5 mr-2" />
+              Create User
             </button>
           </div>
 
@@ -284,13 +393,31 @@ export default function AdminUsersPage() {
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <button
-                          onClick={() => setEditingUser(user)}
-                          className="inline-flex items-center px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-                        >
-                          <EditIcon className="w-4 h-4 mr-1" />
-                          Edit
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleViewUser(user.uid)}
+                            className="inline-flex items-center px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+                            title="View Details"
+                          >
+                            <EyeIcon className="w-4 h-4 mr-1" />
+                            View
+                          </button>
+                          <button
+                            onClick={() => setEditingUser(user)}
+                            className="inline-flex items-center px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                            title="Edit User"
+                          >
+                            <EditIcon className="w-4 h-4 mr-1" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => setDeletingUser(user)}
+                            className="inline-flex items-center px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                            title="Delete User"
+                          >
+                            <TrashIcon className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -299,12 +426,120 @@ export default function AdminUsersPage() {
             </div>
           </div>
 
+          {/* Create User Modal */}
+          {showCreateModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-white">Create New User</h3>
+                  <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-white">
+                    <XIcon className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Email * <span className="text-red-500">Required</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="user@example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Password * <span className="text-red-500">(min 6 characters)</span>
+                    </label>
+                    <input
+                      type="password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="••••••"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Display Name * <span className="text-red-500">Required</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newUser.displayName}
+                      onChange={(e) => setNewUser({...newUser, displayName: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Role
+                    </label>
+                    <select
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="user">User</option>
+                      <option value="group_admin">Group Admin</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Organization Name (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={newUser.organizationName}
+                      onChange={(e) => setNewUser({...newUser, organizationName: e.target.value, organizationId: e.target.value.toLowerCase().replace(/\s+/g, '-')})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Tech Corp"
+                    />
+                  </div>
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      onClick={handleCreateUser}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Create User
+                    </button>
+                    <button
+                      onClick={() => setShowCreateModal(false)}
+                      className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Edit User Modal */}
           {editingUser && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
-                <h3 className="text-lg font-semibold text-white mb-4">Edit User</h3>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-white">Edit User</h3>
+                  <button onClick={() => setEditingUser(null)} className="text-gray-400 hover:text-white">
+                    <XIcon className="w-5 h-5" />
+                  </button>
+                </div>
                 <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={editingUser.email}
+                      onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Display Name
@@ -330,12 +565,20 @@ export default function AdminUsersPage() {
                       <option value="admin">Admin</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Organization Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editingUser.organizationName || ''}
+                      onChange={(e) => setEditingUser({...editingUser, organizationName: e.target.value, organizationId: e.target.value.toLowerCase().replace(/\s+/g, '-')})}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                   <div className="flex space-x-3 pt-4">
                     <button
-                      onClick={() => handleUpdateUser(editingUser.uid, {
-                        displayName: editingUser.displayName,
-                        role: editingUser.role
-                      })}
+                      onClick={handleUpdateUser}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       Save Changes
@@ -347,6 +590,38 @@ export default function AdminUsersPage() {
                       Cancel
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Delete User Confirmation Modal */}
+          {deletingUser && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+                <div className="flex items-center mb-4">
+                  <AlertTriangleIcon className="w-6 h-6 text-red-500 mr-3" />
+                  <h3 className="text-lg font-semibold text-white">Confirm Delete User</h3>
+                </div>
+                <p className="text-gray-300 mb-4">
+                  Are you sure you want to delete <strong>{deletingUser.displayName}</strong> ({deletingUser.email})?
+                </p>
+                <p className="text-red-400 text-sm mb-4">
+                  This action will permanently delete the user and all their game sessions. This cannot be undone.
+                </p>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleDeleteUser}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Delete User
+                  </button>
+                  <button
+                    onClick={() => setDeletingUser(null)}
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             </div>

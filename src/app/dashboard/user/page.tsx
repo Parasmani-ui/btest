@@ -126,13 +126,17 @@ export default function UserDashboardPage() {
     await handleRefreshData();
   };
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
     if (hours > 0) {
-      return `${hours}h ${mins}m`;
+      return `${hours}h ${minutes}m`;
+    } else if (minutes > 0) {
+      return `${minutes}m`;
     }
-    return `${mins}m`;
+    return `${secs}s`;
   };
 
   const getGameTypeIcon = (gameType: string) => {
