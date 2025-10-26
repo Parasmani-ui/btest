@@ -79,10 +79,17 @@ export async function getUserGames(uid: string): Promise<UserStats> {
     }
 
     // Calculate total playtime: elapsedTime is in seconds, duration is in MINUTES (convert to seconds)
-    const totalPlaytime = userData?.totalPlaytime ?? sessions.reduce((sum, session) => {
-      const timeInSeconds = (session as any).elapsedTime || (session.duration ? session.duration * 60 : 0);
-      return sum + timeInSeconds;
-    }, 0);
+    // const totalPlaytime = userData?.totalPlaytime ?? sessions.reduce((sum, session) => {
+    //   const timeInSeconds = (session as any).elapsedTime || (session.duration ? session.duration * 60 : 0);
+    //   return sum + timeInSeconds;
+    // }, 0);
+    // Calculate total playtime: userData stores in MINUTES, convert to seconds
+    const totalPlaytime = userData?.totalPlaytime 
+    ? userData.totalPlaytime * 60  // Convert minutes to seconds
+    : sessions.reduce((sum, session) => {
+        const timeInSeconds = (session as any).elapsedTime || (session.duration ? session.duration * 60 : 0);
+        return sum + timeInSeconds;
+      }, 0);
     const averageScore = userData?.averageScore ?? (sessions.reduce((sum, session) => sum + (session.score || 0), 0) / sessions.length || 0);
 
     console.log(`📊 Final stats - Games: ${gamesPlayed}, Cases: ${casesCompleted}, Playtime: ${totalPlaytime}s (${Math.floor(totalPlaytime/60)}m), Avg Score: ${averageScore.toFixed(1)}`);

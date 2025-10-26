@@ -327,7 +327,7 @@ export default function UserDashboardPage() {
                           {getGameTypeName(session.gameType)}
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
-                          {formatDuration(session.duration)} • {new Date(session.startedAt).toLocaleDateString()}
+                          {formatDuration((session as any).elapsedTime || session.duration * 60)} • {new Date(session.startedAt).toLocaleDateString()}
                         </p>
                       </div>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
