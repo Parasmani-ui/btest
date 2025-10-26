@@ -66,6 +66,24 @@ export const SIMULATION_PARAMETERS: Record<string, SimulationParameters> = {
     parameter3: 'Empathy/Relationship Maintenance',
     metaCompetencies: ['Collaboration', 'Agility', 'Strategic Outlook']
   },
+  'FORENSIC_AUDIT_SIMULATION': {
+    parameter1: 'Data Accuracy',
+    parameter2: 'Compliance Awareness',
+    parameter3: 'Risk Assessment',
+    metaCompetencies: ['Strategic Outlook', 'Resource Allocation', 'Organizational Understanding']
+  },
+  'FOOD_SAFETY_SIMULATION': {
+    parameter1: 'Risk Analysis',
+    parameter2: 'Regulatory Knowledge',
+    parameter3: 'Crisis Response',
+    metaCompetencies: ['Strategic Outlook', 'Decisiveness', 'Organizational Understanding']
+  },
+  'FINANCIAL_NEGOTIATION_SIMULATION': {
+    parameter1: 'Financial Analysis',
+    parameter2: 'Investigative Reasoning',
+    parameter3: 'Evidence Synthesis',
+    metaCompetencies: ['Strategic Outlook', 'Growth Mindset', 'Decisiveness']
+  },
   'POSH_ACADEMY_SIMULATION': {
     parameter1: 'Communication Clarity',
     parameter2: 'Policy Knowledge',
@@ -332,6 +350,30 @@ function analyzeContentQuality(content: string, parameterName: string): number {
     'case handling': {
       positive: ['professional', 'systematic', 'thorough', 'competent', 'effective'],
       negative: ['unprofessional', 'chaotic', 'incomplete', 'incompetent', 'ineffective']
+    },
+    'risk analysis': {
+      positive: ['thorough', 'comprehensive', 'systematic', 'detailed', 'proactive'],
+      negative: ['superficial', 'incomplete', 'reactive', 'careless', 'negligent']
+    },
+    'regulatory knowledge': {
+      positive: ['knowledgeable', 'compliant', 'informed', 'expert', 'competent'],
+      negative: ['ignorant', 'non-compliant', 'uninformed', 'inexperienced', 'incompetent']
+    },
+    'crisis response': {
+      positive: ['effective', 'decisive', 'swift', 'organized', 'professional'],
+      negative: ['ineffective', 'hesitant', 'slow', 'chaotic', 'unprofessional']
+    },
+    'financial analysis': {
+      positive: ['thorough', 'accurate', 'detailed', 'analytical', 'systematic'],
+      negative: ['superficial', 'inaccurate', 'incomplete', 'careless', 'hasty']
+    },
+    'investigative reasoning': {
+      positive: ['logical', 'systematic', 'thorough', 'analytical', 'methodical'],
+      negative: ['illogical', 'hasty', 'superficial', 'careless', 'unsystematic']
+    },
+    'evidence synthesis': {
+      positive: ['comprehensive', 'coherent', 'logical', 'systematic', 'thorough'],
+      negative: ['incomplete', 'incoherent', 'illogical', 'fragmented', 'superficial']
     }
   };
 

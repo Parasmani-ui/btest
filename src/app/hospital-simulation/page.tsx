@@ -7,9 +7,11 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 
 import { useGameSession } from '@/lib/gameSession';
+import { updateUserStatsOnGameStart } from '@/lib/firestore';
 import GameHeader from '@/components/ui/GameHeader';
 import { useGameAuth } from '@/hooks/useGameAuth';
 import { SignInPopup } from '@/components/auth/SignInPopup';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function HospitalSimulationPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +23,8 @@ export default function HospitalSimulationPage() {
   const [sessionActive, setSessionActive] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
   const { startSession } = useGameSession();
-  
+  const { userData } = useAuth();
+
   // Authentication hook
   const { checkAuthAndProceed, showSignInPopup, closeSignInPopup, onSignInSuccess } = useGameAuth();
 
@@ -36,10 +39,17 @@ export default function HospitalSimulationPage() {
   const generateSimulation = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Start game session tracking
       await startSession('hospital');
+
+      // Update user stats when game starts (count games on start, not end)
+      if (userData?.uid) {
+        console.log(`📊 Updating user stats for game start: hospital`);
+        await updateUserStatsOnGameStart(userData.uid, 'hospital');
+        console.log(`✅ User stats updated for game start`);
+      }
     } catch (sessionError) {
       console.error('Error starting session:', sessionError);
     }

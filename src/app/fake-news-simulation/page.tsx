@@ -7,6 +7,8 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { TextAnimate } from '@/components/magicui/text-animate';
 
 import { useGameSession } from '@/lib/gameSession';
+import { updateUserStatsOnGameStart } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 import GameHeader from '@/components/ui/GameHeader';
 
 export default function FakeNewsSimulationPage() {
@@ -20,6 +22,7 @@ export default function FakeNewsSimulationPage() {
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [sessionActive, setSessionActive] = useState(false);
   const { startSession } = useGameSession();
+  const { userData } = useAuth();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -45,11 +48,18 @@ export default function FakeNewsSimulationPage() {
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         setSimulationText(data.simulationText);
         setHasStarted(true);
         await startSession('fake-news');
+
+        // Update user stats when game starts (count games on start, not end)
+        if (userData?.uid) {
+          console.log(`📊 Updating user stats for game start: fake-news`);
+          await updateUserStatsOnGameStart(userData.uid, 'fake-news');
+          console.log(`✅ User stats updated for game start`);
+        }
       } else {
         throw new Error(data.error || 'Failed to generate simulation');
       }

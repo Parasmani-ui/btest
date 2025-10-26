@@ -585,12 +585,12 @@ const FinancialNegotiationClient: React.FC<FinancialNegotiationClientProps> = ({
     }
   };
 
-  // Calculate 3-parameter score for financial forensic simulation
+  // Calculate 3-parameter score for financial negotiation simulation
   const calculateFinancialScore = (messages: {role: string, content: string}[], currentTurn: number): number => {
     const finalMessage = messages[messages.length - 1];
     if (finalMessage?.content) {
       // Use the new 3-parameter scoring system
-      const score = calculateSimulationScore('FINANCIAL_FORENSIC_SIMULATION', finalMessage.content, null, messages);
+      const score = calculateSimulationScore('FINANCIAL_NEGOTIATION_SIMULATION', finalMessage.content, null, messages);
       return score.overall;
     }
     

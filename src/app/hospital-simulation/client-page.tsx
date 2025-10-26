@@ -31,7 +31,7 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
   onSessionEnd
 }) => {
   const router = useRouter();
-  const { startSession } = useGameSession();
+  const { startSession, updateSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [userInput, setUserInput] = useState<string>('');
   const [isThinking, setIsThinking] = useState<boolean>(false);
@@ -115,26 +115,47 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
     if (content.includes('FINAL PERFORMANCE EVALUATION') || content.includes('Final Score:')) {
       setIsCompleted(true);
       setScenarioText(content);
-      
+
       // End game session when simulation completes (only if not already ended)
       if (!gameEndedRef.current) {
         gameEndedRef.current = true;
         const totalScore = calculateHospitalScore(messages, currentRound);
-        const caseSolved = totalScore >= 70; // Consider case solved if score >= 70%
-        
-        try {
-          handleGameEnd(caseSolved, totalScore).then(() => {
+        const caseSolved = totalScore >= 0; // Any score counts as completed
+
+        // Save analysis data and end game in async IIFE
+        (async () => {
+          // Save analysis data to game session before ending
+          try {
+            const scoreCalc = calculateSimulationScore('HOSPITAL_CRISIS_SIMULATION', content, null, messages);
+            await updateSession({
+              analysis: content,
+              caseTitle: `Hospital Crisis Simulation`,
+              scoreBreakdown: {
+                parameter1: scoreCalc.parameter1,
+                parameter1Name: 'Leadership',
+                parameter2: scoreCalc.parameter2,
+                parameter2Name: 'Resource Management',
+                parameter3: scoreCalc.parameter3,
+                parameter3Name: 'Decision Clarity',
+                overall: totalScore
+              }
+            });
+            console.log('✅ Analysis data saved to game session (parseScenarioAndOptions path)');
+          } catch (error) {
+            console.error('❌ Error saving analysis data:', error);
+          }
+
+          try {
+            await handleGameEnd(caseSolved, totalScore);
             console.log('✅ Hospital simulation stats updated successfully');
-          }).catch(error => {
-            console.error('❌ Error updating hospital simulation stats:', error);
-          });
-        } catch (error) {
-          console.error('❌ Error in handleGameEnd:', error);
-        }
+          } catch (error) {
+            console.error('❌ Error in handleGameEnd:', error);
+          }
+        })();
       } else {
         console.log('🔄 Game already ended, skipping duplicate handleGameEnd call');
       }
-      
+
       return;
     }
     
@@ -304,7 +325,29 @@ const HospitalSimulationClient: React.FC<HospitalSimulationClientProps> = ({
             gameEndedRef.current = true;
             const totalScore = calculateHospitalScore(messages, currentRound);
             const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
-            
+
+            // Save analysis data to game session before ending
+            try {
+              const aiMessageContent = messages[messages.length - 1]?.content || data.response;
+              const scoreCalc = calculateSimulationScore('HOSPITAL_CRISIS_SIMULATION', aiMessageContent, null, messages);
+              await updateSession({
+                analysis: data.response,
+                caseTitle: `Hospital Crisis Simulation`,
+                scoreBreakdown: {
+                  parameter1: scoreCalc.parameter1,
+                  parameter1Name: 'Leadership',
+                  parameter2: scoreCalc.parameter2,
+                  parameter2Name: 'Resource Management',
+                  parameter3: scoreCalc.parameter3,
+                  parameter3Name: 'Decision Clarity',
+                  overall: totalScore
+                }
+              });
+              console.log('✅ Analysis data saved to game session');
+            } catch (error) {
+              console.error('❌ Error saving analysis data:', error);
+            }
+
             try {
               await handleGameEnd(caseSolved, totalScore);
               console.log('✅ Hospital simulation stats updated successfully');

@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import GameHeader from '@/components/ui/GameHeader';
 
-import { handleGameEnd } from '@/lib/gameSession';
-import { useGameSession } from '@/lib/gameSession';
+import { handleGameEnd, useGameSession } from '@/lib/gameSession';
 import { updateUserStatsOnGameStart } from '@/lib/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -47,7 +46,7 @@ export default function FoodSafetySimulationClientPage() {
   });
   const [userInput, setUserInput] = useState('');
   const { userData } = useAuth();
-  const { startSession } = useGameSession();
+  const { startSession, updateSession } = useGameSession();
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [finalElapsedTime, setFinalElapsedTime] = useState<string>('');
 
@@ -164,10 +163,31 @@ export default function FoodSafetySimulationClientPage() {
           }
           
           try {
-            const totalScore = data.scores ? 
+            const totalScore = data.scores ?
               ((data.scores.insightfulness + data.scores.evidenceEvaluation) / 10) * 100 : 50;
-            const caseSolved = data.finalVerdict === 'ban_lifted';
-            
+            // Consider game completed (not necessarily "solved") if they finished all rounds
+            const caseSolved = totalScore >= 0; // Any score means they completed the game
+
+            // Save analysis data to game session before ending
+            try {
+              await updateSession({
+                analysis: data.finalStatement || '',
+                caseTitle: gameState.caseTitle || 'Food Safety Crisis',
+                scoreBreakdown: data.scores ? {
+                  parameter1: data.scores.insightfulness,
+                  parameter1Name: 'Insightful Questions',
+                  parameter2: data.scores.evidenceEvaluation,
+                  parameter2Name: 'Evidence Evaluation',
+                  parameter3: 0,
+                  parameter3Name: 'Not Applicable',
+                  overall: totalScore
+                } : undefined
+              });
+              console.log('✅ Analysis data saved to game session');
+            } catch (error) {
+              console.error('❌ Error saving analysis data:', error);
+            }
+
             await handleGameEnd(caseSolved, totalScore);
             console.log('✅ Food safety simulation stats updated successfully');
           } catch (error) {

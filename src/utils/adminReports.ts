@@ -419,6 +419,21 @@ export function generateOrganizationReportExcel(
         param2: 'Compliance Awareness',
         param3: 'Risk Assessment',
       },
+      'FORENSIC_AUDIT_SIMULATION': {
+        param1: 'Data Accuracy',
+        param2: 'Compliance Awareness',
+        param3: 'Risk Assessment',
+      },
+      'FOOD_SAFETY_SIMULATION': {
+        param1: 'Risk Analysis',
+        param2: 'Regulatory Knowledge',
+        param3: 'Crisis Response',
+      },
+      'FINANCIAL_NEGOTIATION_SIMULATION': {
+        param1: 'Financial Analysis',
+        param2: 'Investigative Reasoning',
+        param3: 'Evidence Synthesis',
+      },
       'HOSPITAL_CRISIS_SIMULATION': {
         param1: 'Leadership',
         param2: 'Resource Management',
@@ -454,17 +469,20 @@ export function generateOrganizationReportExcel(
     // Map database gameType values to expected simulation names
     const gameTypeMapping: { [key: string]: string } = {
       // Lowercase database values to uppercase simulation names
-      'chainfail': 'CHAINFAIL_SIMULATION',
-      'fake-news': 'FAKE_NEWS_SIMULATION',
-      'negotiation': 'NEGOTIATION_SIMULATION',
-      'forensic-audit': 'FINANCIAL_FORENSIC_SIMULATION',
-      'detective': 'DETECTIVE_SIMULATION',
+      'quick': 'DETECTIVE_SIMULATION',
+      'simulation': 'POSH_SIMULATION', // Generic simulation maps to POSH
       'hospital': 'HOSPITAL_CRISIS_SIMULATION',
+      'fake-news': 'FAKE_NEWS_SIMULATION',
+      'chainfail': 'CHAINFAIL_SIMULATION',
+      'forensic-audit': 'FORENSIC_AUDIT_SIMULATION',
+      'food-safety': 'FOOD_SAFETY_SIMULATION',
+      'negotiation': 'NEGOTIATION_SIMULATION',
+      'financial-negotiation': 'FINANCIAL_NEGOTIATION_SIMULATION',
+      // Legacy mappings for backward compatibility
+      'detective': 'DETECTIVE_SIMULATION',
+      'posh': 'POSH_SIMULATION',
       'suicide-awareness': 'SUICIDE_AWARENESS_SIMULATION',
       'posh-academy': 'POSH_ACADEMY_SIMULATION',
-      'simulation': 'POSH_SIMULATION', // Generic simulation maps to POSH
-      'posh': 'POSH_SIMULATION',
-      // Note: 'quick' type doesn't map to any standard simulation (might be a test/demo game)
     };
 
     // First pass: collect all unique game types from all users' sessions

@@ -36,7 +36,7 @@ const NegotiationSimulationClient: React.FC<NegotiationSimulationClientProps> = 
   onSessionEnd
 }) => {
   const router = useRouter();
-  const { startSession } = useGameSession();
+  const { startSession, updateSession } = useGameSession();
   const { userData } = useAuth();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [userInput, setUserInput] = useState<string>('');
@@ -362,7 +362,28 @@ const NegotiationSimulationClient: React.FC<NegotiationSimulationClientProps> = 
           const finalMessagesForScoring = [...newMessages, aiMessage];
           const totalScore = calculateNegotiationScore(finalMessagesForScoring, currentTurn);
           const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
-          
+
+          // Save analysis data to game session before ending
+          try {
+            const scoreCalc = calculateSimulationScore('NEGOTIATION_SIMULATION', aiMessage.content, null, finalMessagesForScoring);
+            await updateSession({
+              analysis: data.response || aiMessage.content,
+              caseTitle: `Negotiation Simulation`,
+              scoreBreakdown: {
+                parameter1: scoreCalc.parameter1,
+                parameter1Name: 'Assertiveness',
+                parameter2: scoreCalc.parameter2,
+                parameter2Name: 'Data-Driven Arguments',
+                parameter3: scoreCalc.parameter3,
+                parameter3Name: 'Empathy/Relationship Maintenance',
+                overall: totalScore
+              }
+            });
+            console.log('✅ Analysis data saved to game session');
+          } catch (error) {
+            console.error('❌ Error saving analysis data:', error);
+          }
+
           try {
             await handleGameEnd(caseSolved, totalScore);
             console.log('✅ Negotiation simulation stats updated successfully');

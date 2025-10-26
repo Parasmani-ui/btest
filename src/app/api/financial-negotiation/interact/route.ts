@@ -132,7 +132,7 @@ ${messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
       if (isFinalTurn) {
         // Calculate scores using centralized scoring system
         const calculatedScores = calculateSimulationScore(
-          'FINANCIAL_FORENSIC_SIMULATION',
+          'FINANCIAL_NEGOTIATION_SIMULATION',
           response,
           {
             messages: messages.length,
@@ -142,7 +142,7 @@ ${messages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
         );
 
         // Format the scores for display
-        formattedScores = formatFinalScores(calculatedScores, 'FINANCIAL_FORENSIC_SIMULATION');
+        formattedScores = formatFinalScores(calculatedScores, 'FINANCIAL_NEGOTIATION_SIMULATION');
 
         scoreData = {
           parameter1: calculatedScores.parameter1,
