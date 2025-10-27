@@ -102,6 +102,22 @@ export default function Home() {
     }, 'Financial Investigation');
   };
 
+  const startScenarioPlanning = () => {
+    checkAuthAndProceed(() => {
+      router.push(`/scenario-planning`);
+    }, 'Scenario Planning');
+  };
+
+  // Sub-games data for Scenario Planning
+  const scenarioPlanningSubGames = [
+    "Political Navigator",
+    "Social Navigator",
+    "Technology Navigator",
+    "Economic Navigator",
+    "Focal Issue Transformer",
+    "Force Classifier"
+  ];
+
   // Don't render until client-side
   if (!mounted) {
     return null;
@@ -232,6 +248,20 @@ export default function Home() {
                   >
                     <div className="text-center">
                       Financial Investigation
+                    </div>
+                  </ShimmerButton>
+
+                  <ShimmerButton
+                    onClick={startScenarioPlanning}
+                    className="w-full p-4 text-white text-sm font-medium"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(99, 102, 241)"
+                  >
+                    <div className="text-center">
+                      Scenario Planning
                     </div>
                   </ShimmerButton>
                 </div>
@@ -519,14 +549,43 @@ export default function Home() {
                     )}
                   </div>
                   
-                  <div className={`rounded-lg border border-gray-300 ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-100'} opacity-50 overflow-hidden`}>
-                    <div className="h-40 w-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">Coming Soon</span>
+                  {/* Scenario Planning / Strategic Foresight card - Enhanced with hover */}
+                  <div 
+                    className={`relative rounded-lg border border-[rgb(99,102,241)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden`} 
+                    onClick={startScenarioPlanning}
+                    onMouseEnter={() => setHoveredCard('scenario')}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/10_scenario_planning.png" 
+                        alt="Scenario Planning" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
                     </div>
                     <div className="p-4">
-                      <div className="text-lg font-bold mb-2 text-gray-500">Coming Soon</div>
-                      <p className="text-sm text-gray-400">New Game Mode</p>
+                      <h3 className="text-sm font-bold mb-2">
+                        Scenario Planning
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>6 navigators</p>
                     </div>
+                    
+                    {/* Hover overlay */}
+                    {hoveredCard === 'scenario' && (
+                      <div className={`absolute inset-0 rounded-lg p-4 ${theme === 'dark' ? 'bg-gray-900/95' : 'bg-white/95'} border border-indigo-400 z-10 backdrop-blur-sm`}>
+                        <div className="text-sm font-semibold mb-2 text-indigo-600">6 Navigator Modes:</div>
+                        <ul className={`text-xs space-y-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {scenarioPlanningSubGames.map((game, index) => (
+                            <li key={index} className="flex items-center">
+                              <span className="text-indigo-500 mr-2">•</span>
+                              {game}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
