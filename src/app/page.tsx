@@ -78,6 +78,12 @@ export default function Home() {
     }, 'Chain Analysis');
   };
 
+  const startPowerCrisisSimulation = () => {
+    checkAuthAndProceed(() => {
+      router.push(`/power-crisis-simulation`);
+    }, 'Power Crisis');
+  };
+
   const startForensicAuditSimulation = () => {
     checkAuthAndProceed(() => {
       router.push(`/forensic-audit-simulation`);
@@ -188,6 +194,19 @@ export default function Home() {
                   </ShimmerButton>
 
                   <ShimmerButton
+                    onClick={startPowerCrisisSimulation}
+                    className="w-full p-4 text-white text-sm font-medium"
+                    shimmerColor="rgba(255, 255, 255, 0.8)"
+                    shimmerSize="0.1em"
+                    shimmerDuration="2s"
+                    borderRadius="0.5rem"
+                    background="rgb(168, 85, 247)"
+                  >
+                    Power Crisis
+                  </ShimmerButton>
+
+                  {/* HIDDEN: ChainFail Simulation - Can be restored later */}
+                  {/* <ShimmerButton
                     onClick={startChainFailSimulation}
                     className="w-full p-4 text-white text-sm font-medium"
                     shimmerColor="rgba(255, 255, 255, 0.8)"
@@ -197,7 +216,7 @@ export default function Home() {
                     background="rgb(168, 85, 247)"
                   >
                     ChainFail 
-                  </ShimmerButton>
+                  </ShimmerButton> */}
 
                   <ShimmerButton
                     onClick={startForensicAuditSimulation}
@@ -351,8 +370,8 @@ export default function Home() {
                     </div>
                     <div className="p-4">
                       <h3 className="text-sm font-bold mb-2">
-                        POSH Investigation
-                        {/* Organizational Misinformation */}
+                        {/* POSH Investigation */}
+                        Organizational Misinformation
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Culture Compass</p>
                     </div>
@@ -403,8 +422,30 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  {/* Chain Analysis card */}
+                  {/* Power Crisis card */}
                   <div 
+                    className={`rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
+                    onClick={startPowerCrisisSimulation}
+                  >
+                    <div className="relative h-40 w-full">
+                      <Image 
+                        src="/05_power_crisis.png" 
+                        alt="Power Crisis" 
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-bold mb-2">
+                        Power Crisis
+                      </h3>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Critical Crisis Management</p>
+                    </div>
+                  </div>
+
+                  {/* HIDDEN: Chain Analysis card - Can be restored later */}
+                  {/* <div 
                     className={`rounded-lg border border-[rgb(168,85,247)] ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} cursor-pointer hover:shadow-lg transition overflow-hidden`} 
                     onClick={startChainFailSimulation}
                   >
@@ -423,7 +464,7 @@ export default function Home() {
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Critical ChainFail</p>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Second Row */}

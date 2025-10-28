@@ -36,7 +36,7 @@ export interface Organization {
 export interface GameSession {
   id: string;
   userId: string;
-  gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation';
+  gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation' | 'powercrisis';
   startedAt: string;
   endedAt?: string;
   completedAt?: string;

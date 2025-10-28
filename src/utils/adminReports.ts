@@ -459,6 +459,11 @@ export function generateOrganizationReportExcel(
         param2: 'Data-Driven Arguments',
         param3: 'Empathy/Relationship Maintenance',
       },
+      'POWERPLANT_CRISIS_SIMULATION': {
+        param1: 'Leadership',
+        param2: 'Resource Management',
+        param3: 'Decision Clarity',
+      },
       'POSH_ACADEMY_SIMULATION': {
         param1: 'Communication Clarity',
         param2: 'Policy Knowledge',
@@ -478,6 +483,7 @@ export function generateOrganizationReportExcel(
       'food-safety': 'FOOD_SAFETY_SIMULATION',
       'negotiation': 'NEGOTIATION_SIMULATION',
       'financial-negotiation': 'FINANCIAL_NEGOTIATION_SIMULATION',
+      'powercrisis': 'POWERPLANT_CRISIS_SIMULATION',
       // Legacy mappings for backward compatibility
       'detective': 'DETECTIVE_SIMULATION',
       'posh': 'POSH_SIMULATION',

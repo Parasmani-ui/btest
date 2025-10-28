@@ -23,7 +23,7 @@ export class GameSessionManager {
 
   // Start a new game session
   async startSession(
-    gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation',
+    gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation' | 'powercrisis',
     userId: string,
     organizationId?: string | null
   ): Promise<string> {
@@ -264,7 +264,7 @@ export function useGameSession() {
   const { userData, refreshUserData } = useAuth();
   const sessionManager = GameSessionManager.getInstance();
 
-  const startSession = async (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation') => {
+  const startSession = async (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation' | 'powercrisis') => {
     if (!userData?.uid) {
       throw new Error('User not authenticated');
     }

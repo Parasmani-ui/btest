@@ -84,6 +84,12 @@ export const SIMULATION_PARAMETERS: Record<string, SimulationParameters> = {
     parameter3: 'Evidence Synthesis',
     metaCompetencies: ['Strategic Outlook', 'Growth Mindset', 'Decisiveness']
   },
+  'POWERPLANT_CRISIS_SIMULATION': {
+    parameter1: 'Leadership',
+    parameter2: 'Resource Management',
+    parameter3: 'Decision Clarity',
+    metaCompetencies: ['Leadership', 'Resource Allocation', 'Agility']
+  },
   'POSH_ACADEMY_SIMULATION': {
     parameter1: 'Communication Clarity',
     parameter2: 'Policy Knowledge',

@@ -220,7 +220,8 @@ Provide a concise, actionable hint that helps the user improve their negotiation
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      // model: "gpt-4o-mini",
+      model: "gpt-4.1",
       messages: [
         {
           role: 'system',

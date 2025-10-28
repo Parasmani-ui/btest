@@ -62,7 +62,8 @@ Start the scenario with context setting and your role, then present the initial 
     try {
       // Make the API call
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        // model: "gpt-4o-mini",
+        model: "gpt-4.1",
         messages: [
           {
             role: 'system',

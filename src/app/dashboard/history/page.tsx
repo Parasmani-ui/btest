@@ -63,7 +63,8 @@ export default function GameHistoryPage() {
       'forensic-audit': 'Forensic Audit',
       'food-safety': 'Food Safety',
       'negotiation': 'Negotiation',
-      'financial-negotiation': 'Financial Forensics'
+      'financial-negotiation': 'Financial Forensics',
+      'powercrisis': 'Power Crisis Simulation'
     };
     return labels[gameType] || gameType;
   };
