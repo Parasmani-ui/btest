@@ -57,7 +57,7 @@ Generate your response now. Remember: ${isExiting ? 'Provide a structured summar
 
     // Call OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4.1",
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages.map((msg: any) => ({
@@ -65,8 +65,8 @@ Generate your response now. Remember: ${isExiting ? 'Provide a structured summar
           content: msg.content
         }))
       ],
-      temperature: 0.7,
-      max_tokens: 1000,
+      temperature: 0.5,
+      max_tokens: 5000,
     });
 
     const response = completion.choices[0]?.message?.content || 'I apologize, but I encountered an issue. Please try again.';

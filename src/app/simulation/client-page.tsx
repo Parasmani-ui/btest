@@ -27,7 +27,7 @@ interface ConclusionState {
 
 export default function SimulationClient({ simulationText, onStartNewCase }: SimulationClientProps) {
   const router = useRouter();
-  const { startSession, handleGameEnd } = useGameSession();
+  const { startSession, updateSession, handleGameEnd } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeTab, setActiveTab] = useState<string>('case');
   const [showConclusionForm, setShowConclusionForm] = useState<boolean>(false);
@@ -191,7 +191,34 @@ export default function SimulationClient({ simulationText, onStartNewCase }: Sim
         // End game session when simulation completes
         const totalScore = calculatePOSHScore(data.analysis, conclusionState);
         const caseSolved = totalScore >= 0; // SIMPLE: Any score (0-100) counts as solved
-        
+
+        // Save analysis data to game session before ending
+        try {
+          const scoreCalc = calculateSimulationScore('POSH_SIMULATION', data.analysis, conclusionState);
+          await updateSession({
+            analysis: data.analysis,
+            caseTitle: parsedData.simulationData?.caseTitle || parsedData.markdownData?.caseTitle || 'POSH Investigation',
+            scoreBreakdown: {
+              parameter1: scoreCalc.parameter1,
+              parameter1Name: 'Awareness',
+              parameter2: scoreCalc.parameter2,
+              parameter2Name: 'Decision Integrity',
+              parameter3: scoreCalc.parameter3,
+              parameter3Name: 'Sensitivity',
+              overall: totalScore
+            },
+            userDecisions: {
+              responsibleParty: conclusionState.responsibleParty,
+              misconductType: conclusionState.misconductType,
+              primaryMotivation: conclusionState.primaryMotivation,
+              conclusion: conclusionState.text
+            }
+          });
+          console.log('✅ Analysis data saved to game session');
+        } catch (error) {
+          console.error('❌ Error saving analysis data:', error);
+        }
+
         try {
           await handleGameEnd(caseSolved, totalScore);
           console.log('✅ Complex simulation stats updated successfully');

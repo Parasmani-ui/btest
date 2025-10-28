@@ -352,6 +352,7 @@ export default function Home() {
                     <div className="p-4">
                       <h3 className="text-sm font-bold mb-2">
                         POSH Investigation
+                        {/* Organizational Misinformation */}
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Culture Compass</p>
                     </div>
@@ -567,7 +568,8 @@ export default function Home() {
                     </div>
                     <div className="p-4">
                       <h3 className="text-sm font-bold mb-2">
-                        Scenario Planning
+                        {/* Scenario Planning */}
+                        organizational crisis management
                       </h3>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>6 navigators</p>
                     </div>

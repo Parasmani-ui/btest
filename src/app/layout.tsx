@@ -4,11 +4,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ["latin"] });
-
-// Metadata can't be exported from a Client Component
-// This is now moved to separate metadata object in the metadata.ts file
 
 export default function RootLayout({
   children,
@@ -48,6 +46,7 @@ export default function RootLayout({
               },
             }}
           />
+          <SpeedInsights />
         </AuthProvider>
       </body>
     </html>

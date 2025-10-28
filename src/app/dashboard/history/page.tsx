@@ -68,6 +68,40 @@ export default function GameHistoryPage() {
     return labels[gameType] || gameType;
   };
 
+  // Helper function to strip HTML tags and format analysis text
+  const formatAnalysisText = (htmlText: string): string => {
+    if (!htmlText) return '';
+
+    // Remove HTML tags and decode entities
+    let text = htmlText
+      .replace(/<div[^>]*>/gi, '\n')
+      .replace(/<\/div>/gi, '\n')
+      .replace(/<p[^>]*>/gi, '\n')
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<h4[^>]*>/gi, '\n\n')
+      .replace(/<\/h4>/gi, ':\n')
+      .replace(/<ul[^>]*>/gi, '\n')
+      .replace(/<\/ul>/gi, '\n')
+      .replace(/<li[^>]*>/gi, '  • ')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<strong>/gi, '')
+      .replace(/<\/strong>/gi, '')
+      .replace(/<span[^>]*>/gi, '')
+      .replace(/<\/span>/gi, '')
+      .replace(/<[^>]+>/g, '') // Remove any remaining tags
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\n\s*\n\s*\n/g, '\n\n') // Replace multiple newlines with double newline
+      .trim();
+
+    return text;
+  };
+
   const calculateAverageScore = () => {
     if (gameHistory.length === 0) return 0;
     const totalScore = gameHistory.reduce((sum, game) => sum + (game.score || 0), 0);
@@ -372,7 +406,7 @@ export default function GameHistoryPage() {
                   <div className="bg-gray-700 p-6 rounded-lg">
                     <h3 className="text-xl font-bold text-sky-200 mb-4">Analysis & Conclusion</h3>
                     <div className="text-gray-300 whitespace-pre-wrap">
-                      {selectedGame.analysis}
+                      {formatAnalysisText(selectedGame.analysis)}
                     </div>
                   </div>
                 )}

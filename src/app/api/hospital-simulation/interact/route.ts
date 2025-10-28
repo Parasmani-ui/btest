@@ -64,7 +64,7 @@ Provide detailed feedback on the user's performance across all 10 rounds.`;
     // Make the API call
     try {
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4.1",
         messages: [
           {
             role: 'system',

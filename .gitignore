@@ -104,6 +104,7 @@ temp/
 
 # Cache and temporary files
 caseCache.json
+caseCache.json/
 
 # Documentation and reports
 report/
@@ -113,6 +114,8 @@ Temperory/
 readme project.md
 .claude/
 .claude/settings.local.json
+node_modules_old_20251028_125815
+tailwindcss-oxide.win32-x64-msvc.node
 
 
 # Additional sensitive files that should not be in version control

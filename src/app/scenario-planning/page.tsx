@@ -89,12 +89,13 @@ export default function ScenarioPlanningPage() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
-      <GameHeader gameTitle="Scenario Planning Workshop" />
+      <GameHeader gameTitle="Organizational Crisis Management" />
       
       <main className={`container mx-auto px-4 py-8 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Scenario Planning Workshop</h1>
+          {/* <h1 className="text-4xl font-bold mb-4">Scenario Planning Workshop</h1> */}
+          <h2 className="text-2xl font-bold mb-4">Organizational Crisis Management Workshop</h2>
           <p className={`text-lg max-w-3xl mx-auto ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
             Explore strategic foresight through our comprehensive navigators. Each tool helps you identify driving forces and build robust scenarios for your strategic decisions.
           </p>
