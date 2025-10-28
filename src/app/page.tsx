@@ -287,7 +287,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto">
               {/* Header Section */}
               <div className="text-center mb-12">
-                <Image src="/img.png" alt="AIMA Bizlab Logo" width={200} height={200} className="mx-auto mb-6" priority/>
+                <Image src="/img.png" alt="AIMA Logo" width={200} height={200} className="mx-auto mb-6" priority/>
                 
                 {/* <div className="mb-6">
                   <h1 className="text-2xl sm:text-3xl font-bold mb-2">
@@ -295,7 +295,7 @@ export default function Home() {
                   </h1>
                   <h2 className="text-xl font-semibold mb-4">Skills Assessment Agency</h2>
                   <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-4xl mx-auto`}>
-                    "AIMA Bizlab" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
+                    "AIMA" is started with the objective to be a key player as an assessing agency and incorporated the socio-economic background of the trainee in the assessment procedure so as to make the whole process more objective.
                   </p>
                 </div> */}
               </div>
@@ -658,7 +658,7 @@ export default function Home() {
               {/* Footer */}
               <div className="text-center pt-8 border-t border-gray-300">
                 <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                 AIMA Bizlab | All India Management Association (AIMA).
+                 AIMA | All India Management Association (AIMA).
                 </p>
               </div>
             </div>
