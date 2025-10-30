@@ -95,6 +95,12 @@ export const SIMULATION_PARAMETERS: Record<string, SimulationParameters> = {
     parameter2: 'Policy Knowledge',
     parameter3: 'Case Handling',
     metaCompetencies: ['Leadership', 'Organizational Understanding', 'Growth Mindset']
+  },
+  'SCENARIO_PLANNING_SIMULATION': {
+    parameter1: 'Strategic Thinking',
+    parameter2: 'Force Identification',
+    parameter3: 'Future Scenario Development',
+    metaCompetencies: ['Strategic Outlook', 'Adaptability', 'Growth Mindset']
   }
 };
 
@@ -380,6 +386,18 @@ function analyzeContentQuality(content: string, parameterName: string): number {
     'evidence synthesis': {
       positive: ['comprehensive', 'coherent', 'logical', 'systematic', 'thorough'],
       negative: ['incomplete', 'incoherent', 'illogical', 'fragmented', 'superficial']
+    },
+    'strategic thinking': {
+      positive: ['strategic', 'long-term', 'forward-thinking', 'visionary', 'comprehensive'],
+      negative: ['short-sighted', 'tactical', 'reactive', 'narrow', 'limited']
+    },
+    'force identification': {
+      positive: ['identified', 'recognized', 'analyzed', 'discovered', 'explored'],
+      negative: ['missed', 'overlooked', 'ignored', 'incomplete', 'superficial']
+    },
+    'future scenario development': {
+      positive: ['detailed', 'comprehensive', 'plausible', 'creative', 'well-developed'],
+      negative: ['vague', 'incomplete', 'unrealistic', 'simplistic', 'underdeveloped']
     }
   };
 

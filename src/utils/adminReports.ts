@@ -469,6 +469,11 @@ export function generateOrganizationReportExcel(
         param2: 'Policy Knowledge',
         param3: 'Case Handling',
       },
+      'SCENARIO_PLANNING_SIMULATION': {
+        param1: 'Strategic Thinking',
+        param2: 'Force Identification',
+        param3: 'Future Scenario Development',
+      },
     };
 
     // Map database gameType values to expected simulation names
@@ -484,6 +489,7 @@ export function generateOrganizationReportExcel(
       'negotiation': 'NEGOTIATION_SIMULATION',
       'financial-negotiation': 'FINANCIAL_NEGOTIATION_SIMULATION',
       'powercrisis': 'POWERPLANT_CRISIS_SIMULATION',
+      'scenario-planning': 'SCENARIO_PLANNING_SIMULATION',
       // Legacy mappings for backward compatibility
       'detective': 'DETECTIVE_SIMULATION',
       'posh': 'POSH_SIMULATION',

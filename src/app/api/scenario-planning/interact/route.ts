@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { SCENARIO_PLANNING_SIMULATIONS } from '@/utils/prompts';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -69,7 +70,7 @@ Generate your response now. Remember: ${isExiting ? 'Provide a structured summar
       max_tokens: 5000,
     });
 
-    const response = completion.choices[0]?.message?.content || 'I apologize, but I encountered an issue. Please try again.';
+    let response = completion.choices[0]?.message?.content || 'I apologize, but I encountered an issue. Please try again.';
 
     // Check if conversation should end
     // ONLY end if:
@@ -77,7 +78,7 @@ Generate your response now. Remember: ${isExiting ? 'Provide a structured summar
     // 2. We're in the exit flow (isExiting flag is set)
     const userMessageLower = userMessage?.toLowerCase().trim() || '';
     const explicitExitKeywords = ['exit', 'quit', 'end'];
-    const isExplicitExit = isExiting || explicitExitKeywords.some(keyword => 
+    const isExplicitExit = isExiting || explicitExitKeywords.some(keyword =>
       userMessageLower === keyword || userMessageLower.startsWith(keyword + ' ') || userMessageLower.endsWith(' ' + keyword)
     );
 
@@ -89,7 +90,7 @@ Generate your response now. Remember: ${isExiting ? 'Provide a structured summar
     // - User explicitly requested exit, OR
     // - We have enough messages AND user's message suggests they're done (contains "done", "finished", "complete", "ready to summarize")
     const shouldComplete = isExplicitExit || (
-      messageCount >= minMessagesBeforeExit && 
+      messageCount >= minMessagesBeforeExit &&
       (
         userMessageLower.includes('done with this') ||
         userMessageLower.includes('ready to') ||
@@ -99,8 +100,21 @@ Generate your response now. Remember: ${isExiting ? 'Provide a structured summar
       )
     );
 
+    // If exiting, append scoring information to the summary
+    if (isExiting && shouldComplete) {
+      const allContent = [...messages, { role: 'assistant', content: response }]
+        .map((m: any) => m.content)
+        .join('\n\n');
+
+      const scoreCalc = calculateSimulationScore('SCENARIO_PLANNING_SIMULATION', allContent, null, messages);
+      const formattedScores = formatFinalScores(scoreCalc, 'SCENARIO_PLANNING_SIMULATION');
+
+      response = `${response}\n\n---\n\n## Performance Evaluation\n\n${formattedScores}`;
+    }
+
     return NextResponse.json({
       response,
+      summary: isExiting ? response : undefined,
       isComplete: shouldComplete,
     });
 

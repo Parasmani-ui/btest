@@ -4,6 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import GameHeader from '@/components/ui/GameHeader';
 import { SCENARIO_PLANNING_SIMULATIONS } from '@/utils/prompts';
+import { useGameSession, handleGameEnd } from '@/lib/gameSession';
+import { calculateSimulationScore, formatFinalScores } from '@/utils/scoring';
+import { updateUserStatsOnGameStart } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ScenarioPlanningClientProps {
   navigatorId: number;
@@ -12,12 +16,14 @@ interface ScenarioPlanningClientProps {
   onSessionEnd?: (endTime: Date, elapsedTime: string) => void;
 }
 
-export default function ScenarioPlanningClient({ 
-  navigatorId, 
+export default function ScenarioPlanningClient({
+  navigatorId,
   onBackToSelection,
   onSessionStart,
   onSessionEnd
 }: ScenarioPlanningClientProps) {
+  const { userData } = useAuth();
+  const { startSession, updateSession } = useGameSession();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [userInput, setUserInput] = useState<string>('');
   const [isThinking, setIsThinking] = useState<boolean>(false);
@@ -27,6 +33,7 @@ export default function ScenarioPlanningClient({
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const sessionInitialized = useRef<boolean>(false);
   const [isEnding, setIsEnding] = useState<boolean>(false);
+  const gameEndedRef = useRef<boolean>(false);
 
   const navigator = SCENARIO_PLANNING_SIMULATIONS[navigatorId];
   const navigatorIcons = ['🏛️', '👥', '🔬', '💰', '🎯', '🔮'];
@@ -37,13 +44,32 @@ export default function ScenarioPlanningClient({
       sessionInitialized.current = true;
       const startTime = new Date();
       setSessionStartTime(startTime);
+
+      // Start game session and update user stats
+      const initializeSession = async () => {
+        try {
+          await startSession('scenario-planning');
+          console.log('✅ Scenario planning session started');
+
+          // Update user stats to increment games played counter
+          if (userData?.uid) {
+            console.log(`📊 Updating user stats for game start: scenario-planning`);
+            await updateUserStatsOnGameStart(userData.uid, 'scenario-planning');
+            console.log(`✅ User stats updated for game start`);
+          }
+        } catch (error) {
+          console.error('❌ Error starting scenario planning session:', error);
+        }
+      };
+
+      initializeSession();
       onSessionStart?.(startTime);
-      
+
       // Start the conversation with first question
-      const firstQuestion = (navigator.QUESTION_SEQUENCE && navigator.QUESTION_SEQUENCE.length > 0) 
-        ? navigator.QUESTION_SEQUENCE[0] 
+      const firstQuestion = (navigator.QUESTION_SEQUENCE && navigator.QUESTION_SEQUENCE.length > 0)
+        ? navigator.QUESTION_SEQUENCE[0]
         : "What is the key strategic issue, question, or decision we are trying to address through this scenario planning exercise?";
-      
+
       setMessages([{
         role: 'assistant',
         content: `Welcome! I'm your ${navigator.name} consultant. ${navigator.TASK}\n\n${firstQuestion}`
@@ -94,9 +120,42 @@ export default function ScenarioPlanningClient({
       }
 
       const data = await response.json();
-      
+
       if (data.isComplete) {
         setIsCompleted(true);
+
+        // Calculate scores and end game session (only if not already ended)
+        if (!gameEndedRef.current) {
+          gameEndedRef.current = true;
+
+          const allContent = [...newMessages, { role: 'assistant', content: data.response }]
+            .map(m => m.content)
+            .join('\n\n');
+
+          const scoreCalc = calculateSimulationScore('SCENARIO_PLANNING_SIMULATION', allContent, null, newMessages);
+          const totalScore = scoreCalc.overall;
+
+          // Save analysis and scores to game session
+          await updateSession({
+            analysis: data.response,
+            caseTitle: `${navigator.name} Session`,
+            scoreBreakdown: {
+              parameter1: scoreCalc.parameter1,
+              parameter1Name: 'Strategic Thinking',
+              parameter2: scoreCalc.parameter2,
+              parameter2Name: 'Force Identification',
+              parameter3: scoreCalc.parameter3,
+              parameter3Name: 'Future Scenario Development',
+              overall: totalScore,
+              summary: scoreCalc.summary
+            }
+          });
+
+          // End the game session
+          await handleGameEnd(true, totalScore);
+          console.log('✅ Scenario planning session completed naturally with score:', totalScore);
+        }
+
         if (sessionStartTime && onSessionEnd) {
           const endTime = new Date();
           const elapsed = Math.floor((endTime.getTime() - sessionStartTime.getTime()) / 1000);
@@ -119,9 +178,10 @@ export default function ScenarioPlanningClient({
   };
 
   const handleExit = async () => {
-    if (isEnding) return;
+    if (isEnding || gameEndedRef.current) return;
     setIsEnding(true);
     setIsCompleted(true);
+    gameEndedRef.current = true;
 
     try {
       const response = await fetch('/api/scenario-planning/interact', {
@@ -137,12 +197,42 @@ export default function ScenarioPlanningClient({
         }),
       });
 
+      let summaryContent = '';
       if (response.ok) {
         const data = await response.json();
         if (data.summary) {
+          summaryContent = data.summary;
           setMessages(prev => [...prev, { role: 'assistant', content: data.summary }]);
         }
       }
+
+      // Calculate scores and end game session
+      const allContent = [...messages, { role: 'assistant', content: summaryContent }]
+        .map(m => m.content)
+        .join('\n\n');
+
+      const scoreCalc = calculateSimulationScore('SCENARIO_PLANNING_SIMULATION', allContent, null, messages);
+      const totalScore = scoreCalc.overall;
+
+      // Save analysis and scores to game session
+      await updateSession({
+        analysis: summaryContent,
+        caseTitle: `${navigator.name} Session`,
+        scoreBreakdown: {
+          parameter1: scoreCalc.parameter1,
+          parameter1Name: 'Strategic Thinking',
+          parameter2: scoreCalc.parameter2,
+          parameter2Name: 'Force Identification',
+          parameter3: scoreCalc.parameter3,
+          parameter3Name: 'Future Scenario Development',
+          overall: totalScore,
+          summary: scoreCalc.summary
+        }
+      });
+
+      // End the game session
+      await handleGameEnd(true, totalScore);
+      console.log('✅ Scenario planning session ended with score:', totalScore);
 
       if (sessionStartTime && onSessionEnd) {
         const endTime = new Date();

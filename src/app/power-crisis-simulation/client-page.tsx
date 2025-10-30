@@ -391,7 +391,7 @@ const PowerCrisisSimulationClient: React.FC<PowerCrisisSimulationClientProps> = 
                   onClick={() => handleOptionClick(option.label)}
                   className={`p-4 text-left rounded-md transition hover:opacity-90 shadow-sm border-l-4 ${
                     theme === 'dark' 
-                      ? 'bg-purple-900 text-white hover:bg-purple-800 border-purple-600' 
+                      ? 'bg-purple-600 text-white hover:bg-purple-800 border-purple-600' 
                       : 'bg-purple-50 text-purple-900 hover:bg-purple-100 border-purple-500'
                   }`}
                 >

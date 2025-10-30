@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { createGameSession, updateGameSession, updateUserStatsAfterGame, updateUserStatsOnGameStart } from '@/lib/firestore';
+import { createGameSession, updateGameSession, updateUserStatsAfterGame } from '@/lib/firestore';
 import { GameSession } from '@/types/user';
 
 // Game session manager class
@@ -23,7 +23,7 @@ export class GameSessionManager {
 
   // Start a new game session
   async startSession(
-    gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation' | 'powercrisis',
+    gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation' | 'powercrisis' | 'scenario-planning',
     userId: string,
     organizationId?: string | null
   ): Promise<string> {
@@ -264,7 +264,7 @@ export function useGameSession() {
   const { userData, refreshUserData } = useAuth();
   const sessionManager = GameSessionManager.getInstance();
 
-  const startSession = async (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation' | 'powercrisis') => {
+  const startSession = async (gameType: 'quick' | 'simulation' | 'hospital' | 'fake-news' | 'chainfail' | 'forensic-audit' | 'food-safety' | 'negotiation' | 'financial-negotiation' | 'powercrisis' | 'scenario-planning') => {
     if (!userData?.uid) {
       throw new Error('User not authenticated');
     }

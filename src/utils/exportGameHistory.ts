@@ -15,7 +15,8 @@ const getGameTypeLabel = (gameType: string): string => {
     'food-safety': 'Food Safety',
     'negotiation': 'Negotiation',
     'financial-negotiation': 'Financial Forensics',
-    'powercrisis': 'Power Crisis Simulation'
+    'powercrisis': 'Power Crisis Simulation',
+    'scenario-planning': 'Scenario Planning'
   };
   return labels[gameType] || gameType;
 };
